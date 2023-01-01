@@ -4,7 +4,7 @@
 ------------------------------------------------
 
 describe: 
-    xtb_xtcs curd
+    csb_enum_key curd
     
 base_info:
     __author__ = PyGo
@@ -13,7 +13,7 @@ base_info:
     __mail__ = gaoming971366@163.com
     __blog__ = www.pygo2.top
     __project__ = fastslot-api-salary
-    __file_name__ = xtb_xtcs.py
+    __file_name__ = csb_enum_key.py
 
 usage:
     
@@ -37,7 +37,7 @@ from sqlalchemy.orm.attributes import InstrumentedAttribute
 from sqlalchemy import func
 
 from deploy.curd.base_curd import BaseCurd
-from deploy.schema.dao.xtb_xtcs import XtbXtcsModel
+from deploy.schema.dao.csb_enum_key import CsbEnumKeyModel
 from deploy.utils.exception import SQLDBHandleException
 
 
@@ -45,59 +45,41 @@ class XtbXtcsCurd(BaseCurd):
 
     @staticmethod
     async def new_model():
-        return XtbXtcsModel()
+        return CsbEnumKeyModel()
 
     async def _get_model_by_field(
         self,
         db: AsyncSession,
         field: str | InstrumentedAttribute,
-        value: Any,
-        filter_lock: bool = False
-    ) -> Optional[XtbXtcsModel]:
+        value: Any
+    ) -> Optional[CsbEnumKeyModel]:
         try:
             if isinstance(field, str):
-                if not hasattr(XtbXtcsModel, field):
+                if not hasattr(CsbEnumKeyModel, field):
                     return None
-                _field = getattr(XtbXtcsModel, field)
+                _field = getattr(CsbEnumKeyModel, field)
             else:
                 _field = field
 
-            stmt = select(XtbXtcsModel).where(
-                _field == value,
-                XtbXtcsModel.status != 1)
-            if filter_lock:
-                stmt = stmt.where(XtbXtcsModel.lock != True)
-            result = await db.execute(stmt)
+            result = await db.execute(select(CsbEnumKeyModel).where( _field == value))
             return result.scalar_one_or_none()
         except Exception as e:
             raise SQLDBHandleException(f"[{self.__class__.__name__}*查询One]{e}")
 
-    async def get_by_id(
-            self, db: AsyncSession,
-            _id: int,
-            filter_lock: bool = False
-    ) -> Optional[XtbXtcsModel]:
-        return await self._get_model_by_field(db, XtbXtcsModel.id, _id, filter_lock)
+    async def get_by_id(self, db: AsyncSession, _id: int):
+        return await self._get_model_by_field(db, CsbEnumKeyModel.id, _id)
 
-    async def get_by_key(
-            self, db: AsyncSession,
-            key: str,
-            filter_lock: bool = False
-    ) -> Optional[XtbXtcsModel]:
-        return await self._get_model_by_field(db, XtbXtcsModel.key, key, filter_lock)
+    async def get_by_key(self, db: AsyncSession, key: str):
+        return await self._get_model_by_field(db, CsbEnumKeyModel.key, key)
 
-    async def get_by_md5(
-            self, db: AsyncSession,
-            md5: str,
-            filter_lock: bool = False
-    ) -> Optional[XtbXtcsModel]:
-        return await self._get_model_by_field(db, XtbXtcsModel.md5, md5, filter_lock)
+    async def get_by_md5(self, db: AsyncSession, md5: str):
+        return await self._get_model_by_field(db, CsbEnumKeyModel.md5, md5)
 
     @classmethod
     async def get_count(cls, db: AsyncSession) -> int:
         try:
             result = await db.execute(
-                select(func.count(XtbXtcsModel.id)).where(XtbXtcsModel.status != 1)
+                select(func.count(CsbEnumKeyModel.id)).where(CsbEnumKeyModel.status != 1)
             )
             return result.scalar()
         except Exception as e:
@@ -108,9 +90,9 @@ class XtbXtcsCurd(BaseCurd):
         cls, db: AsyncSession, offset: int = 0, limit: int = 15
     ) -> Optional[List]:
         try:
-            stmt = (select(XtbXtcsModel)
-                    .where(XtbXtcsModel.status != 1)
-                    .order_by(asc(XtbXtcsModel.order_id), desc(XtbXtcsModel.id))
+            stmt = (select(CsbEnumKeyModel)
+                    .where(CsbEnumKeyModel.status != 1)
+                    .order_by(asc(CsbEnumKeyModel.order_id), desc(CsbEnumKeyModel.id))
                     .offset(offset)
                     .limit(limit))
             result = await db.execute(stmt)
@@ -120,7 +102,7 @@ class XtbXtcsCurd(BaseCurd):
 
     @classmethod
     async def add(
-            cls, db: AsyncSession, model: XtbXtcsModel
+            cls, db: AsyncSession, model: CsbEnumKeyModel
     ) -> None:
         try:
             db.add(model)
@@ -129,7 +111,7 @@ class XtbXtcsCurd(BaseCurd):
 
     @classmethod
     async def update(
-            cls, db: AsyncSession, model: XtbXtcsModel
+            cls, db: AsyncSession, model: CsbEnumKeyModel
     ) -> None:
         try:
             await db.merge(model)
@@ -138,7 +120,7 @@ class XtbXtcsCurd(BaseCurd):
 
     @classmethod
     async def delete(
-            cls, db: AsyncSession, model: XtbXtcsModel
+            cls, db: AsyncSession, model: CsbEnumKeyModel
     ) -> None:
         try:
             await db.delete(model)
@@ -150,7 +132,7 @@ class XtbXtcsCurd(BaseCurd):
             cls, db: AsyncSession, md5_list: List[str]
     ) -> None:
         try:
-            stmt = delete(XtbXtcsModel).where(XtbXtcsModel.md5.in_(md5_list))
+            stmt = delete(CsbEnumKeyModel).where(CsbEnumKeyModel.md5.in_(md5_list))
             await db.execute(stmt)
         except Exception as e:
             raise SQLDBHandleException(f"[{cls.__name__}*批量删除]{e}")
@@ -160,7 +142,7 @@ class XtbXtcsCurd(BaseCurd):
             cls, db: AsyncSession, md5_list: List[str], rtx_id: str
     ) -> None:
         try:
-            stmt = update(XtbXtcsModel).where(XtbXtcsModel.md5.in_(md5_list)).values(
+            stmt = update(CsbEnumKeyModel).where(CsbEnumKeyModel.md5.in_(md5_list)).values(
                 status = True,
                 delete_rtx = rtx_id,
                 delete_time = func.now(),

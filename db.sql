@@ -294,7 +294,7 @@ CREATE TABLE `csb_enum_key`  (
 
     PRIMARY KEY (`id`),
     UNIQUE INDEX `index_id`(`id`) USING HASH COMMENT 'id索引'
-) COMMENT='参数表-ENUM枚举Key表';
+) COMMENT='参数表-枚举Key表';
 
 delete from csb_enum_key;
 
@@ -330,7 +330,7 @@ CREATE TABLE `csb_enum_value`  (
 
     PRIMARY KEY (`id`),
     UNIQUE INDEX `index_id`(`id`) USING HASH COMMENT 'id索引'
-) COMMENT='参数表-ENUM枚举Value表';
+) COMMENT='参数表-枚举Value表';
 
 delete from csb_enum_value;
 

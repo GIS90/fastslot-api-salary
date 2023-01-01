@@ -36,6 +36,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from deploy.curd.xtb_user import XtbUserCurd
 from deploy.curd.xtb_xtcs import XtbXtcsCurd
 from deploy.schema.dao.xtb_user import XtbUserModel
+from deploy.schema.dao.xtb_xtcs import XtbXtcsModel
 from deploy.utils.status import Status, SuccessStatus, FailureStatus
 from deploy.utils.status_value import (StatusCode as status_code,
                                        StatusMsg as status_msg)
@@ -154,9 +155,13 @@ class SystemMainUserService:
 
     async def __generator_default_password(self, password: str="abcd1234") -> str:
         """生成用户密码"""
-        default_password: str = await self.xtb_xtcs_curd.get_by_key(db=self.db, key=XtbXtcsKEY.USER_DEFAULT_PASSWORD.value)
+        default_password: XtbXtcsModel = await self.xtb_xtcs_curd.get_by_key(
+            db=self.db,
+            key=XtbXtcsKEY.USER_DEFAULT_PASSWORD.value,
+            filter_lock=True
+        )
         __value: str = password if not default_password else getattr(default_password, "value")
-        return __value
+        return __value if __value else password
 
     async def default_pwd(self, rtx_id: str) -> Status:
         return SuccessStatus(data={"password": await self.__generator_default_password()})
@@ -173,7 +178,11 @@ class SystemMainUserService:
 
     async def __default_avatar(self, avatar: str="http://2lstore.pygo.space/avatars/default.png") -> str:
         """用户默认头像"""
-        default_avatar: str = await self.xtb_xtcs_curd.get_by_key(db=self.db, key=XtbXtcsKEY.USER_DEFAULT_AVATAR.value)
+        default_avatar: XtbXtcsModel = await self.xtb_xtcs_curd.get_by_key(
+            db=self.db,
+            key=XtbXtcsKEY.USER_DEFAULT_AVATAR.value,
+            filter_lock=True
+        )
         __value: str = avatar if not default_avatar else getattr(default_avatar, "value")
         return __value
 

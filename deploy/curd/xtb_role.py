@@ -61,7 +61,11 @@ class XtbRoleCurd(BaseCurd):
             else:
                 _field = field
 
-            result = await db.execute(select(XtbRoleModel).where(_field == value))
+            result = await db.execute(select(XtbRoleModel).where(
+                _field == value,
+                XtbRoleModel.status != 1
+                )
+            )
             return result.scalar_one_or_none()
         except Exception as e:
             raise SQLDBHandleException(f"[{self.__class__.__name__}*查询One]{e}")

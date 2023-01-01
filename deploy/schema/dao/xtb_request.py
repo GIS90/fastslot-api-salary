@@ -63,7 +63,7 @@ class XtbRequestModel(baseModel, IDField, RtxIdField, Md5Field, StatusField):
     host_url: Mapped[str] = mapped_column(name="host_url", type_=String(100), comment="请求HOST")
     url: Mapped[str] = mapped_column(name="url", type_=String(255), comment="请求全路径")
     cost: Mapped[float] = mapped_column(name="cost", type_=DECIMAL(10, 4), comment="运行时间")
-    create_time: Mapped[datetime] = mapped_column(name="create_time", type_=DateTime(), nullable=False, comment="创建时间")
+    create_time: Mapped[datetime] = mapped_column(name="create_time", type_=DateTime(), comment="创建时间")
     create_date = mapped_column(name="create_date", type_=Date(), comment="创建日期")
     delete_rtx: Mapped[Optional[str]] = mapped_column(name="delete_rtx", type_=String(35), comment="删除用户RTX-ID")
     delete_time: Mapped[Optional[datetime]] = mapped_column(name="delete_time", type_=DateTime(), comment="删除时间")

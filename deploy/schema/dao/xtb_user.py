@@ -52,15 +52,15 @@ class XtbUserModel(baseModel, IDField, RtxIdField, Md5Field, CUDField, StatusFie
     __tablename__ = 'xtb_user'
     __table_args__ = ({'comment': '系统表-用户表'})
 
-    name: Mapped[str] = mapped_column(name="name", type_=String(30), nullable=False, comment="名称")
-    password: Mapped[str] = mapped_column(name="password", type_=String(120), nullable=False, comment="密码[md5加密]")
+    name: Mapped[str] = mapped_column(name="name", type_=String(30), comment="名称")
+    password: Mapped[str] = mapped_column(name="password", type_=String(120), comment="密码[md5加密]")
     salt: Mapped[Optional[str]] = mapped_column(name="salt", type_=String(32), comment="密码盐值，随机MD5-ID[32位]")
-    sex: Mapped[str] = mapped_column(name="sex", type_=String(2), nullable=False, comment="性别")
+    sex: Mapped[str] = mapped_column(name="sex", type_=String(2), comment="性别")
     email: Mapped[Optional[str]] = mapped_column(name="email", type_=String(80), comment="邮箱")
     phone: Mapped[Optional[str]] = mapped_column(name="phone", type_=String(15), comment="电话")
-    avatar: Mapped[str] = mapped_column(name="avatar", type_=String(120), nullable=False, comment="头像地址")
+    avatar: Mapped[str] = mapped_column(name="avatar", type_=String(120), comment="头像地址")
     introduction: Mapped[Optional[str]] = mapped_column(name="introduction", type_=Text, comment="描述")
-    role: Mapped[Optional[str]] = mapped_column(name="role", type_=String(255), nullable=False, comment="角色RTX-ID值（大写），关联role表，多角色用;分割")
+    role: Mapped[Optional[str]] = mapped_column(name="role", type_=String(255), comment="角色RTX-ID值（大写），关联role表，多角色用;分割")
     department: Mapped[Optional[str]] = mapped_column(name="department", type_=String(55), comment="部门MD5-ID值，关联department表")
 
     def __str__(self):
