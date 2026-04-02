@@ -93,14 +93,14 @@ async def depend_token_rtx_valid(
             service = XtbUserService(db_connection=db)
             # 调用 add 方法
             model = await service.depend_user_by_rtx_id(rtx_id=token_rtx_id)
-            # 数据不存在
-            if not model:
-                raise UserInvalidException("用户不存在")
-            # 数据已删除
-            if model.get("status"):
-                raise UserInvalidException("用户已注销")
         except Exception as e:
             raise UserInvalidException("用户信息异常")
+        # 数据不存在
+        if not model:
+            raise UserInvalidException("用户不存在")
+        # 数据已删除
+        if model.get("status"):
+            raise UserInvalidException("用户已注销")
 
     return token_rtx_id
 
