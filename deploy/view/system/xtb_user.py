@@ -42,32 +42,32 @@ from deploy.schema.po.xtb_user import XtbUserBaseModel, XtbUserUpdateModel
 
 
 # router
-router: APIRouter = APIRouter(prefix="/user", tags=["实例代码：系统表-用户增删改查"])
+router: APIRouter = APIRouter(prefix="/user", tags=["系统管理-用户管理"])
 # service
 def get_xtb_user_service(db: AsyncSession = Depends(get_session)) -> XtbUserService:
     return XtbUserService(db_connection=db)
 
 
 @router.get("/list", summary="用户列表")
-async def user_list(
+async def pagination(
     params: dict = Depends(pageable_params),
     token_rtx_id: str = Depends(depend_token_rtx),
     xtb_user_service: XtbUserService = Depends(get_xtb_user_service)
 ) -> Status:
-    return await xtb_user_service.list(rtx_id=token_rtx_id, params=params)
+    return await xtb_user_service.pagination(rtx_id=token_rtx_id, params=params)
 
 
 @router.get("", summary="单条用户")
-async def get_user_by_md5_id(
+async def one_by_md5_id(
     md5_id: str = Query(..., description="用户md5-id"),
     token_rtx_id: str = Depends(depend_token_rtx),
     xtb_user_service: XtbUserService = Depends(get_xtb_user_service)
 ) -> Status:
-    return await xtb_user_service.get_user_by_md5_id(rtx_id=token_rtx_id, md5_id=md5_id)
+    return await xtb_user_service.one_by_md5_id(rtx_id=token_rtx_id, md5_id=md5_id)
 
 
 @router.post("", summary="新增用户")
-async def user_add(
+async def add(
     params: Annotated[XtbUserBaseModel, Body()],
     token_rtx_id: str = Depends(depend_token_rtx),
     xtb_user_service: XtbUserService = Depends(get_xtb_user_service)
@@ -76,7 +76,7 @@ async def user_add(
 
 
 @router.put("", summary="更新用户")
-async def user_update(
+async def update(
     params: Annotated[XtbUserUpdateModel, Body()],
     token_rtx_id: str = Depends(depend_token_rtx),
     xtb_user_service: XtbUserService = Depends(get_xtb_user_service)
@@ -85,7 +85,7 @@ async def user_update(
 
 
 @router.delete("/hard", summary="【硬删除】用户")
-async def user_delete(
+async def delete_hard(
     md5_id: str = Query(..., description="用户md5-id"),
     token_rtx_id: str = Depends(depend_token_rtx),
     xtb_user_service: XtbUserService = Depends(get_xtb_user_service)
@@ -94,7 +94,7 @@ async def user_delete(
 
 
 @router.delete("/soft", summary="【软删除】用户")
-async def user_delete(
+async def delete_soft(
     md5_id: str = Query(..., description="用户md5-id"),
     token_rtx_id: str = Depends(depend_token_rtx),
     xtb_user_service: XtbUserService = Depends(get_xtb_user_service)
@@ -103,7 +103,7 @@ async def user_delete(
 
 
 @router.delete("/batch/hard", summary="【批量硬删除】用户")
-async def user_delete(
+async def batch_delete_hard(
     md5_id: List = Query(..., description="用户md5-id列表"),
     token_rtx_id: str = Depends(depend_token_rtx),
     xtb_user_service: XtbUserService = Depends(get_xtb_user_service)
@@ -112,7 +112,7 @@ async def user_delete(
 
 
 @router.delete("/batch/soft", summary="【批量软删除】用户")
-async def user_delete(
+async def batch_delete_soft(
     md5_id: List = Query(..., description="用户md5-id列表"),
     token_rtx_id: str = Depends(depend_token_rtx),
     xtb_user_service: XtbUserService = Depends(get_xtb_user_service)

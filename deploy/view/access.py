@@ -88,7 +88,7 @@ async def login(
     # 用户信息核对
     # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     username = username.strip()     # 去空格
-    model: Dict = await xtb_user_service.get_login_by_rtx_id(rtx_id=username)
+    model: Dict = await xtb_user_service.login_by_rtx_id(rtx_id=username)
     # >>> 用户不存在
     if not model:
         return FailureStatus(

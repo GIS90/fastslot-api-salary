@@ -81,7 +81,7 @@ class XtbUserService:
         return (True, user if response_type == "model"
                         else await model_converter_dict(model=user, fields=fields, default_value="****"))
 
-    async def list(self, rtx_id: str, params: Dict) -> Status:
+    async def pagination(self, rtx_id: str, params: Dict) -> Status:
         users = await self.xtb_user_curd.get_pagination(
             db=self.db,
             offset=params.get("offset"),
@@ -103,7 +103,7 @@ class XtbUserService:
         }
         return SuccessStatus(data=result)
 
-    async def get_login_by_rtx_id(self, rtx_id: str) -> Dict:
+    async def login_by_rtx_id(self, rtx_id: str) -> Dict:
         __flag, data = await self.__valid_user_by_md5_or_rtx(
             user_id=rtx_id,
             status_check=False,
@@ -113,13 +113,13 @@ class XtbUserService:
         )
         return data if __flag else None
 
-    async def get_user_by_md5_id(self, rtx_id: str, md5_id: str) -> Status:
+    async def one_by_md5_id(self, rtx_id: str, md5_id: str) -> Status:
         __flag, data = await self.__valid_user_by_md5_or_rtx(
             user_id=md5_id, status_check=False, response_type="dict", user_type="md5"
         )
         return SuccessStatus(data=data) if __flag else data
 
-    async def depend_user_by_rtx_id(self, rtx_id: str) -> Dict:
+    async def depend_by_rtx_id(self, rtx_id: str) -> Dict:
         __flag, data = await self.__valid_user_by_md5_or_rtx(
             user_id=rtx_id, status_check=False, response_type="dict", user_type="rtx"
         )
