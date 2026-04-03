@@ -88,7 +88,7 @@ class XtbRequestCurd(BaseCurd):
         try:
             stmt = (select(XtbRequestModel)
                     .where(XtbRequestModel.status != 1)
-                    .order_by(desc(XtbRequestModel.create_time))
+                    .order_by(desc(XtbRequestModel.id))
                     .offset(offset)
                     .limit(limit))
             result = await db.execute(stmt)

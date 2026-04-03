@@ -103,27 +103,30 @@ class XtbRoleService:
 
     async def one_by_md5_id(self, rtx_id: str, md5_id: str) -> Status:
         __flag, data = await self.__valid_model_by_md5(
-            md5_id=md5_id, status_check=False, response_type="dict"
+            md5_id=md5_id,
+            status_check=False,
+            response_type="dict",
+            fields=xtb_role_detail_fields
         )
         return SuccessStatus(data=data) if __flag else data
 
     async def add(self, rtx_id: str, model: Dict) -> Status:
         new_model = await self.xtb_role_curd.new_model()
-        __now = get_now()
-        __password: str = random_string()
-        __salt: str = random_string()
-        # TODO 用户默认的头像、密码可以放在数据库中
-        new_model.md5_id = generator_md5(v=f"{model.get('rtx_id')}-{__now}-{__password}")
-        new_model.avatar = self.DEFAULT_AVATAR
-        new_model.status = False
-        new_model.salt = __salt
-        new_model.create_time = __now
-        new_model.create_rtx = rtx_id
-        new_model.password = generator_md5(v=f"{__password}{__salt}")
-        for k, v in model.items():
-            setattr(new_model, k, v)
-        await self.xtb_role_curd.add(db=self.db, model=new_model)
-        return SuccessStatus(data={"password": __password})
+        # __now = get_now()
+        # __password: str = random_string()
+        # __salt: str = random_string()
+        # # TODO 用户默认的头像、密码可以放在数据库中
+        # new_model.md5_id = generator_md5(v=f"{model.get('rtx_id')}-{__now}-{__password}")
+        # new_model.avatar = self.DEFAULT_AVATAR
+        # new_model.status = False
+        # new_model.salt = __salt
+        # new_model.create_time = __now
+        # new_model.create_rtx = rtx_id
+        # new_model.password = generator_md5(v=f"{__password}{__salt}")
+        # for k, v in model.items():
+        #     setattr(new_model, k, v)
+        # await self.xtb_role_curd.add(db=self.db, model=new_model)
+        return SuccessStatus(data={})
 
     async def update(self, rtx_id: str, model: Dict) -> Status:
         _md5 = model.get("md5_id")

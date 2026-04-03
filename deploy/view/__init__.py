@@ -36,6 +36,7 @@ from deploy.view.api import router as api_router
 from deploy.view.upload import router as upload_router
 
 from deploy.view.system.xtb_user import router as xtb_user_router
+from deploy.view.system.xtb_role import router as xtb_role_router
 
 
 """
@@ -45,8 +46,10 @@ View根据系统设计的api进行模块划分，其中有3个比较特殊（不
 - api：为对外开发的API集合 [不走token验证]
 - upload：文件上传模块 [File UploadFile]
 
-实例模块
-- xtb_user：系统表-用户增删改查
+功能模块
+  系统管理
+    - xtb_user：用户管理
+    - xtb_role：角色管理
 """
 __all__ = ["add_routers"]
 
@@ -54,7 +57,8 @@ __all__ = ["add_routers"]
 add_routers = [
     root_router,
     access_router,
-    upload_router,
     api_router,
+    upload_router,
     xtb_user_router,
+    xtb_role_router,
 ]

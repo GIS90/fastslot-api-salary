@@ -101,7 +101,7 @@ class XtbUserCurd(BaseCurd):
         try:
             stmt = (select(XtbUserModel)
                     .where(XtbUserModel.status != 1)
-                    .order_by(asc(XtbUserModel.create_time))
+                    .order_by(asc(XtbUserModel.id))
                     .offset(offset)
                     .limit(limit))
             result = await db.execute(stmt)
