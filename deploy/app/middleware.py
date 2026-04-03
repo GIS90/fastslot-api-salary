@@ -47,7 +47,7 @@ from deploy.config import (app_secret_key, app_allow_host, app_cors_origin, app_
                            app_session_max_age, app_request_method, app_gzip_size, app_gzip_level,
                            jwt_token_verify)
 from deploy.utils.token import verify_access_token_expire
-from deploy.service.x.request import XtbRequestService
+from deploy.service.x.xtb_request import XtbRequestService
 from deploy.curd.database import get_session_context_manual, AsyncSessionLocal
 
 

@@ -18,26 +18,7 @@ base_info:
 usage:
   
 design:
-    字段含义：
-       - key: 模型中的属性名；
-       - type: 属性的数据类型（如 "str", "int", "datetime" 等），具体含义参考FieldTypeEnum
-       - name: 输出字典中对应的键名
-       - null: 是否允许为空，默认设置False，值为空自动会添加默认值
-    完全体：
-        [
-            {"key": "id", "type": "int", "name": "id", null: False},
-            {"key": "rtx_id", "type": ft.STRING, "name": "rtxId", null: False},
-            {"key": "md5_id", "type": ft.STRING, "name": "md5Id", null: False},
-        ]
-        
-    简版本：
-        [
-            {"key": "id"},
-            {"key": "rtx_id"},
-            {"key": "md5_id"},
-        ]
-        
-        
+
 reference urls:
 
 python version:
@@ -62,16 +43,15 @@ xtb_user_list_fields = [
     {"key": "phone", "type": ft.STR, "name": "phone", "null": False},
     {"key": "avatar", "type": ft.STR, "name": "avatar", "null": False},
     {"key": "introduction", "type": ft.STR, "name": "introduction", "null": True},
-    {"key": "status", "type": ft.BOOLTEXT, "name": "status", "null": False},
     {"key": "create_rtx", "type": ft.STR, "name": "createRtx", "null": True},
     {"key": "create_time", "type": ft.DATETIME, "name": "createTime", "null": True},
     {"key": "update_rtx", "type": ft.STR, "name": "updateRtx", "null": True},
     {"key": "update_time", "type": ft.DATETIME, "name": "updateTime", "null": True},
+    {"key": "status", "type": ft.BOOLTEXT, "name": "status", "null": False},
 ]
 
 
 xtb_user_detail_fields = [
-    {"key": "id"},
     {"key": "rtx_id", "type": ft.STR, "name": "rtxId"},
     {"key": "name"},
     {"key": "sex"},
@@ -84,7 +64,6 @@ xtb_user_detail_fields = [
 
 
 xtb_user_login_fields = [
-    {"key": "id"},
     {"key": "rtx_id", "type": ft.STR, "name": "rtxId"},
     {"key": "password"},
     {"key": "name"},

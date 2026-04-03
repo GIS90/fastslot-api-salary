@@ -31,5 +31,23 @@ Life is short, I use python.
 ------------------------------------------------
 """
 
-if __name__ == '__main__':
-    pass
+"""
+字段含义：
+- key: 模型中的属性名；
+- type: 属性的数据类型（如"str", "int", "datetime"等），具体含义参考FieldTypeEnum
+- name: 输出字典中对应的键名
+- null: 是否允许为空，默认设置False，值为空自动会添加默认值
+完全体：
+[
+    {"key": "id", "type": "int", "name": "id", null: False},
+    {"key": "rtx_id", "type": ft.STRING, "name": "rtxId", null: False},
+    {"key": "md5_id", "type": ft.STRING, "name": "md5Id", null: False},
+]
+
+简版本：
+[
+    {"key": "id"},
+    {"key": "rtx_id"},
+    {"key": "md5_id"},
+]
+"""

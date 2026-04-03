@@ -32,7 +32,7 @@ Life is short, I use python.
 """
 from typing import Optional, List, Any
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy import select, update, delete, insert
+from sqlalchemy import select, update, delete, insert, asc
 from sqlalchemy.orm.attributes import InstrumentedAttribute
 from sqlalchemy import func
 
@@ -88,7 +88,7 @@ class XtbUserCurd(BaseCurd):
     async def get_count(cls, db: AsyncSession) -> int:
         try:
             result = await db.execute(
-                select(func.count(XtbUserModel.id)).where(XtbUserModel.status != 1)
+                select(func.count(XtbUserModel.id))
             )
             return result.scalar()
         except Exception as e:
@@ -99,7 +99,11 @@ class XtbUserCurd(BaseCurd):
         cls, db: AsyncSession, offset: int = 0, limit: int = 15
     ) -> Optional[List]:
         try:
-            stmt = select(XtbUserModel).where(XtbUserModel.status != 1).offset(offset).limit(limit)
+            stmt = (select(XtbUserModel)
+                    .where(XtbUserModel.status != 1)
+                    .order_by(asc(XtbUserModel.create_time))
+                    .offset(offset)
+                    .limit(limit))
             result = await db.execute(stmt)
             return result.scalars().all()
         except Exception as e:
