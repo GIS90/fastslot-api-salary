@@ -109,10 +109,12 @@ class XtbRoleService:
         return SuccessStatus(data=data) if __flag else data
 
     async def add(self, rtx_id: str, model: Dict) -> Status:
+        # 验证角色名称是否已存在
         model = await self.xtb_role_curd.get_by_engname(db=self.db, engname=model.get("engname"))
         if model:
             return FailureStatus(code=status_code.CODE_502_DATA_EXIST_NOT_ADD)
 
+        # 新增角色
         new_model = await self.xtb_role_curd.new_model()
         __now = get_now()
         new_model.md5_id = generator_md5(v=f"{model.get('engname')}-{__now}-{rtx_id}")

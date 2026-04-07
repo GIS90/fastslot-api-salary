@@ -126,6 +126,10 @@ class XtbUserService:
         return data if __flag else {}
 
     async def add(self, rtx_id: str, model: Dict) -> Status:
+        model = await self.xtb_user_curd.get_by_rtx_id(db=self.db, rtx_id=model.get("rtx_id"))
+        if model:
+            return FailureStatus(code=status_code.CODE_502_DATA_EXIST_NOT_ADD)
+
         new_model = await self.xtb_user_curd.new_model()
         __now = get_now()
         __password: str = random_string()
