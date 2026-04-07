@@ -66,8 +66,8 @@ class XtbUserCurd(BaseCurd):
         except Exception as e:
             raise SQLDBHandleException(f"[{self.__class__.__name__}*查询One]{e}")
 
-    async def get_by_id(self, db: AsyncSession, data_id: int):
-        return await self._get_model_by_field(db, XtbUserModel.id, data_id)
+    async def get_by_id(self, db: AsyncSession, _id: int):
+        return await self._get_model_by_field(db, XtbUserModel.id, _id)
 
     async def get_by_rtx_id(self, db: AsyncSession, rtx_id: str):
         return await self._get_model_by_field(db, XtbUserModel.rtx_id, rtx_id)

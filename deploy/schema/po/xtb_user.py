@@ -31,12 +31,15 @@ Life is short, I use python.
 ------------------------------------------------
 """
 from deploy.schema._po_base_model import baseModel
-from pydantic import Field
+from deploy.utils.utils import alphanumeric_only
+from pydantic import Field, field_validator
 from typing import Optional
 
 
-class XtbUserBaseModel(baseModel):
-    rtx_id: str = Field(..., min_length=1, max_length=35, description="用户RTX-ID（唯一标识）", alias="rtxId")
+__all__ = ["XtbUserAddModel", "XtbUserUpdateModel"]
+
+
+class __XtbUserBaseModel(baseModel):
     name: str = Field(..., min_length=1, max_length=30, description="昵称")
     sex: str = Field(..., min_length=1, max_length=2, description="性别")
     email: str = Field(..., min_length=1, max_length=80, description="邮箱")
@@ -46,7 +49,6 @@ class XtbUserBaseModel(baseModel):
     model_config = {
         "json_schema_extra": {
             "example": {
-                "rtxId": "ADC",
                 "name": "abcd木头人",
                 "sex": "M",
                 "email": "gaoming971366@163.com",
@@ -57,18 +59,44 @@ class XtbUserBaseModel(baseModel):
     }
 
 
-class XtbUserUpdateModel(baseModel):
-    md5_id: str = Field(..., min_length=1, max_length=64, description="数据MD5", alias="md5Id")
-    name: str = Field(..., min_length=1, max_length=30, description="昵称")
-    sex: str = Field(..., min_length=1, max_length=2, description="性别")
-    email: str = Field(..., min_length=1, max_length=80, description="邮箱")
-    phone: str = Field(..., min_length=11, max_length=11, description="电话")
-    introduction: Optional[str] = Field(..., max_length=255, description="个性化签名")
+class XtbUserAddModel(__XtbUserBaseModel):
+    rtx_id: str = Field(...,
+                        min_length=1,
+                        max_length=35,
+                        description="用户RTX-ID（唯一标识）",
+                        alias="rtx_id",
+                        validate_default=True)
 
     model_config = {
         "json_schema_extra": {
             "example": {
-                "md5Id": "AAAAAAAAAA",
+                "rtx_id": "ADC",
+                "name": "abcd木头人",
+                "sex": "M",
+                "email": "gaoming971366@163.com",
+                "phone": "13051355646",
+                "introduction": "哈哈哈哈哈"
+            }
+        }
+    }
+
+    # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+    """
+    字段特殊验证：字母+数字
+    """
+    @field_validator("rtx_id")
+    def field_is_alnum(cls, value: str) -> str:
+        return alphanumeric_only(value=value, field="rtx_id")
+    # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+
+class XtbUserUpdateModel(__XtbUserBaseModel):
+    md5_id: str = Field(..., min_length=1, max_length=64, description="数据MD5", alias="md5_id")
+
+    model_config = {
+        "json_schema_extra": {
+            "example": {
+                "md5_id": "AAAAAAAAAA",
                 "name": "adc",
                 "sex": "M",
                 "email": "gaoming971366@163.com",

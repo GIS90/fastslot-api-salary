@@ -60,19 +60,19 @@ class XtbUserService:
 
     async def __valid_model_by_md5_or_rtx(
             self,
-            user_id: str,
+            query_id: str,
             status_check: bool = True,
             response_type: Literal["dict", "model"] = "model",
-            user_type: Literal["md5", "rtx"] = "md5",
+            query_type: Literal["md5", "rtx"] = "md5",
             fields: List[Dict] = xtb_user_detail_fields
     ) -> Tuple[bool, Any]:
-        if not user_id:
+        if not query_id:
             return False, FailureStatus(
                 code=status_code.CODE_400_REQUEST_PARAMETER_MISS,
-                message="缺少md5参数" if user_type == "md5" else "缺少rtx参数")
+                message="缺少md5参数" if query_type == "md5" else "缺少rtx参数")
 
-        model = await self.xtb_user_curd.get_by_md5_id(db=self.db, md5_id=user_id) if user_type == "md5" \
-            else await self.xtb_user_curd.get_by_rtx_id(db=self.db, rtx_id=user_id)
+        model = await self.xtb_user_curd.get_by_md5_id(db=self.db, md5_id=query_id) if query_type == "md5" \
+            else await self.xtb_user_curd.get_by_rtx_id(db=self.db, rtx_id=query_id)
         if not model:
             return False, FailureStatus(code=status_code.CODE_501_DATA_NOT_EXIST)
         if status_check and getattr(model, "status", None):
@@ -105,23 +105,23 @@ class XtbUserService:
 
     async def login_by_rtx_id(self, rtx_id: str) -> Dict:
         __flag, data = await self.__valid_model_by_md5_or_rtx(
-            user_id=rtx_id,
+            query_id=rtx_id,
             status_check=False,
             response_type="dict",
-            user_type="rtx",
+            query_type="rtx",
             fields=xtb_user_login_fields
         )
         return data if __flag else None
 
     async def one_by_md5_id(self, rtx_id: str, md5_id: str) -> Status:
         __flag, data = await self.__valid_model_by_md5_or_rtx(
-            user_id=md5_id, status_check=False, response_type="dict", user_type="md5"
+            query_id=md5_id, status_check=False, response_type="dict", query_type="md5"
         )
         return SuccessStatus(data=data) if __flag else data
 
     async def depend_by_rtx_id(self, rtx_id: str) -> Dict:
         __flag, data = await self.__valid_model_by_md5_or_rtx(
-            user_id=rtx_id, status_check=False, response_type="dict", user_type="rtx"
+            query_id=rtx_id, status_check=False, response_type="dict", query_type="rtx"
         )
         return data if __flag else {}
 
@@ -146,7 +146,7 @@ class XtbUserService:
     async def update(self, rtx_id: str, model: Dict) -> Status:
         _md5 = model.get("md5_id")
         __flag, data = await self.__valid_model_by_md5_or_rtx(
-            user_id=_md5, status_check=True, response_type="model"
+            query_id=_md5, status_check=True, response_type="model"
         )
         if not __flag: return data
 
@@ -162,7 +162,7 @@ class XtbUserService:
 
     async def delete_hard(self, rtx_id: str, md5_id: str) -> Status:
         __flag, data = await self.__valid_model_by_md5_or_rtx(
-            user_id=md5_id, status_check=True, response_type="model", user_type="md5"
+            query_id=md5_id, status_check=True, response_type="model", query_type="md5"
         )
         if not __flag: return data
 
@@ -172,7 +172,7 @@ class XtbUserService:
 
     async def delete_soft(self, rtx_id: str, md5_id: str) -> Status:
         __flag, data = await self.__valid_model_by_md5_or_rtx(
-            user_id=md5_id, status_check=True, response_type="model", user_type="md5"
+            query_id=md5_id, status_check=True, response_type="model", query_type="md5"
         )
         if not __flag: return data
 

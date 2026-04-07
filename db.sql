@@ -74,7 +74,7 @@ delete from xtb_request;
 DROP TABLES IF EXISTS `xtb_role`;
 CREATE TABLE `xtb_role`  (
     `id` int NOT NULL AUTO_INCREMENT COMMENT '主键，自增ID',
-    `engname` varchar(35) NOT NULL COMMENT '角色唯一标识，英文+数字组成',
+    `engname` varchar(35) UNIQUE NOT NULL COMMENT '角色唯一标识，英文+数字组成',
     `chnname` varchar(35) NOT NULL COMMENT '角色中文名称',
     `md5_id` varchar(64) not null unique COMMENT '数据唯一标识：MD5-ID',
     `authority` varchar(255) NULL COMMENT '角色权限ID集合，用英文；分割',

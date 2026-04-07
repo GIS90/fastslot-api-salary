@@ -32,6 +32,7 @@ Life is short, I use python.
 
 ------------------------------------------------
 """
+import re
 import os
 import random
 import string
@@ -42,6 +43,7 @@ import platform
 from typing import List, Tuple, Set, Dict, Union, Optional, Any, Literal
 from datetime import datetime, timedelta
 from pathlib import Path, PurePath
+from fastapi.exceptions import RequestValidationError
 
 """ - - - - - - - - - - - - - - - - - 加密类 - - - - - - - - - - - - - - - - -"""
 
@@ -643,3 +645,10 @@ def get_all_parent_ids_iterative(
                 queue.append(parent_id)
 
     return list(all_ids)
+
+
+""" - - - - - - - - - - - - - - - - - 请求数据模型校验类 - - - - - - - - - - - - - - - - -"""
+def alphanumeric_only(value: str, field: str) -> str:
+    if not re.match(r'^[a-zA-Z0-9]+$', value):
+        raise RequestValidationError(f"{field}字段只能包含字母和数字（不能包含空格、标点等特殊字符）")
+    return value

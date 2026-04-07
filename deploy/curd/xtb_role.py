@@ -66,11 +66,14 @@ class XtbRoleCurd(BaseCurd):
         except Exception as e:
             raise SQLDBHandleException(f"[{self.__class__.__name__}*查询One]{e}")
 
-    async def get_by_id(self, db: AsyncSession, data_id: int):
-        return await self._get_model_by_field(db, XtbRoleModel.id, data_id)
+    async def get_by_id(self, db: AsyncSession, _id: int):
+        return await self._get_model_by_field(db, XtbRoleModel.id, _id)
 
     async def get_by_md5_id(self, db: AsyncSession, md5_id: str):
         return await self._get_model_by_field(db, XtbRoleModel.md5_id, md5_id)
+
+    async def get_by_engname(self, db: AsyncSession, engname: str):
+        return await self._get_model_by_field(db, XtbRoleModel.engname, engname)
 
     @classmethod
     async def get_count(cls, db: AsyncSession) -> int:

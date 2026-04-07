@@ -166,6 +166,7 @@ def register_app_middleware(app: FastAPI, app_headers: Dict):
         """
         if request.url.path == "/" or \
                 request.url.path.startswith("/api/") or \
+                request.url.path.startswith("/static/") or \
                 request.url.path.startswith("/access/"):
             __is_verify_token = False
 

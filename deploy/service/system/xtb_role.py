@@ -36,9 +36,9 @@ from deploy.curd.xtb_role import XtbRoleCurd
 from deploy.utils.status import Status, SuccessStatus, FailureStatus
 from deploy.utils.status_value import (StatusCode as status_code,
                                        StatusMsg as status_msg)
-from deploy.utils.converter import model_converter_dict
+from deploy.utils.converter import model_converter_dict, many_model_converter_dict
 from deploy.schema.dto.xtb_role import xtb_role_list_fields, xtb_role_detail_fields, xtb_role_authority_fields
-from deploy.utils.utils import get_now, random_string, md5 as generator_md5
+from deploy.utils.utils import get_now, md5 as generator_md5
 
 
 class XtbRoleService:
@@ -86,15 +86,13 @@ class XtbRoleService:
         if not models:
             return FailureStatus(code=status_code.CODE_101_SUCCESS_NO_DATA)
 
-        data: List = list()
-        _id = 1
-        for m in models:
-            if not m: continue
-            _model_dict = await model_converter_dict(model=m, fields=xtb_role_list_fields)
-            _model_dict["id"] = _id
-            _id += 1
-            data.append(_model_dict)
-
+        id_value = params.get("offset") * params.get("limit") + 1
+        data: List = await many_model_converter_dict(
+            models=models,
+            fields=xtb_role_list_fields,
+            auto_id=True,
+            auto_id_value=id_value
+        )
         result: Dict = {
             "list": data,
             "total": await self.xtb_role_curd.get_count(self.db)
@@ -111,22 +109,20 @@ class XtbRoleService:
         return SuccessStatus(data=data) if __flag else data
 
     async def add(self, rtx_id: str, model: Dict) -> Status:
+        model = await self.xtb_role_curd.get_by_engname(db=self.db, engname=model.get("engname"))
+        if model:
+            return FailureStatus(code=status_code.CODE_502_DATA_EXIST_NOT_ADD)
+
         new_model = await self.xtb_role_curd.new_model()
-        # __now = get_now()
-        # __password: str = random_string()
-        # __salt: str = random_string()
-        # # TODO 用户默认的头像、密码可以放在数据库中
-        # new_model.md5_id = generator_md5(v=f"{model.get('rtx_id')}-{__now}-{__password}")
-        # new_model.avatar = self.DEFAULT_AVATAR
-        # new_model.status = False
-        # new_model.salt = __salt
-        # new_model.create_time = __now
-        # new_model.create_rtx = rtx_id
-        # new_model.password = generator_md5(v=f"{__password}{__salt}")
-        # for k, v in model.items():
-        #     setattr(new_model, k, v)
-        # await self.xtb_role_curd.add(db=self.db, model=new_model)
-        return SuccessStatus(data={})
+        __now = get_now()
+        new_model.md5_id = generator_md5(v=f"{model.get('engname')}-{__now}-{rtx_id}")
+        new_model.create_time = __now
+        new_model.create_rtx = rtx_id
+        new_model.status = False
+        for k, v in model.items():
+            setattr(new_model, k, v)
+        await self.xtb_role_curd.add(db=self.db, model=new_model)
+        return SuccessStatus()
 
     async def update(self, rtx_id: str, model: Dict) -> Status:
         _md5 = model.get("md5_id")

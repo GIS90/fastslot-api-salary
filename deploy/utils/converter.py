@@ -34,10 +34,13 @@ import datetime
 from typing import Any, List, Dict, Optional
 
 
+__all__ = ["model_converter_dict", "many_model_converter_dict"]
+
+
 async def model_converter_dict(
         model: Any,
         fields: List[Dict] = None,
-        default_value: Any = "-"
+        default_value: str = "-"
 ) -> Optional[Dict[str, Any]]:
     """
     异步函数：将模型对象根据字段定义转换为字典格式。
@@ -55,7 +58,7 @@ async def model_converter_dict(
                 {"key": "rtx_id", "type": "str", "name": "rtxId", "null": False},
                 {"key": "md5_id", "type": "str", "name": "md5Id", "null": False},
             ]
-        default_value (Any, optional): 当模型属性为空时使用的默认值，默认为 "-".
+        default_value (str): 当模型属性为空时使用的默认值，默认为 "-".
 
     返回:
         Dict[str, Any]: 转换后的字典，键为字段定义中的 name，值为对应类型的转换结果。
@@ -120,3 +123,49 @@ async def model_converter_dict(
             model_dict[field_name] = str(field_value)
 
     return model_dict
+
+
+async def many_model_converter_dict(
+        models: Any,
+        fields: List[Dict] = None,
+        default_value: str = "-",
+        auto_id: bool = True,
+        auto_id_value: int = 1,
+        *args,
+        **kwargs
+) -> Optional[List[Dict]]:
+    """
+    批量数据模型转Dict，新增了自增id满足是否添加ID序号需求
+    """
+    if (not models
+            or not fields):
+        return None
+
+    _model_list = list()
+    if auto_id:
+        for model in models:
+            if not model: continue
+            model_dict = await model_converter_dict(
+                model=model,
+                fields=fields,
+                default_value=default_value
+            )
+            if not model_dict: continue
+            model_dict["id"] = auto_id_value
+            auto_id_value += 1
+            _model_list.append(model_dict)
+        else:
+            return _model_list
+    else:
+        for model in models:
+            if not model: continue
+            model_dict = await model_converter_dict(
+                model=model,
+                fields=fields,
+                default_value=default_value
+            )
+            if not model_dict: continue
+            _model_list.append(model_dict)
+        else:
+            return _model_list
+

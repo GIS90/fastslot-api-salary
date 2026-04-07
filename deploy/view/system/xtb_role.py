@@ -38,7 +38,7 @@ from deploy.curd.database import get_session
 from deploy.service.system.xtb_role import XtbRoleService
 from deploy.utils.status import Status
 from deploy.utils.depend import pageable_params, depend_token_rtx
-from deploy.schema.po.xtb_user import XtbUserBaseModel, XtbUserUpdateModel
+from deploy.schema.po.xtb_role import XtbRoleAddModel, XtbRoleUpdateModel
 
 
 # router
@@ -57,7 +57,7 @@ async def pagination(
     return await xtb_role_service.pagination(rtx_id=token_rtx_id, params=params)
 
 
-@router.get("", summary="单条数据")
+@router.get("", summary="通过Md5-Id获取单条数据")
 async def one_by_md5_id(
     md5_id: str = Query(..., description="数据Md5-Id"),
     token_rtx_id: str = Depends(depend_token_rtx),
@@ -68,7 +68,7 @@ async def one_by_md5_id(
 
 @router.post("", summary="新增")
 async def add(
-    params: Annotated[XtbUserBaseModel, Body()],
+    params: Annotated[XtbRoleAddModel, Body()],
     token_rtx_id: str = Depends(depend_token_rtx),
     xtb_role_service: XtbRoleService = Depends(get_xtb_role_service)
 ) -> Status:
@@ -77,7 +77,7 @@ async def add(
 
 @router.put("", summary="更新")
 async def update(
-    params: Annotated[XtbUserUpdateModel, Body()],
+    params: Annotated[XtbRoleUpdateModel, Body()],
     token_rtx_id: str = Depends(depend_token_rtx),
     xtb_role_service: XtbRoleService = Depends(get_xtb_role_service)
 ) -> Status:
