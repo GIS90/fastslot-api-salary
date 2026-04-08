@@ -110,9 +110,10 @@ class XtbRoleService:
 
     async def add(self, rtx_id: str, model: Dict) -> Status:
         # 验证角色名称是否已存在
-        model = await self.xtb_role_curd.get_by_engname(db=self.db, engname=model.get("engname"))
-        if model:
-            return FailureStatus(code=status_code.CODE_502_DATA_EXIST_NOT_ADD)
+        db_model = await self.xtb_role_curd.get_by_engname(db=self.db, engname=model.get("engname"))
+        if db_model:
+            return FailureStatus(code=status_code.CODE_502_DATA_EXIST_NOT_ADD,
+                                 message="角色ID已存在，请更换")
 
         # 新增角色
         new_model = await self.xtb_role_curd.new_model()
