@@ -39,10 +39,7 @@ xtb_role_list_fields = [
     {"key": "authority", "type": ft.SPLITLIST, "name": "authority", "null": True},
     {"key": "introduction", "type": ft.STR, "name": "introduction", "null": True},
     {"key": "create_rtx", "type": ft.STR, "name": "createRtx", "null": True},
-    {"key": "create_time", "type": ft.DATETIME, "name": "createTime", "null": True},
-    {"key": "update_rtx", "type": ft.STR, "name": "updateRtx", "null": True},
-    {"key": "update_time", "type": ft.DATETIME, "name": "updateTime", "null": True},
-    {"key": "status", "type": ft.BOOLTEXT, "name": "status", "null": False},
+    {"key": "create_time", "type": ft.DATETIME, "name": "createTime", "null": True}
 ]
 
 
@@ -51,6 +48,10 @@ xtb_role_detail_fields = [
     {"key": "engname"},
     {"key": "chnname"},
     {"key": "introduction"},
+    {"key": "create_rtx", "type": ft.STR, "name": "createRtx", "null": True},
+    {"key": "create_time", "type": ft.DATETIME, "name": "createTime", "null": True},
+    {"key": "update_rtx", "type": ft.STR, "name": "updateRtx", "null": True},
+    {"key": "update_time", "type": ft.DATETIME, "name": "updateTime", "null": True}
 ]
 
 

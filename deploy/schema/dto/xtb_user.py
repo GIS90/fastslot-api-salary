@@ -45,8 +45,6 @@ xtb_user_list_fields = [
     {"key": "introduction", "type": ft.STR, "name": "introduction", "null": True},
     {"key": "create_rtx", "type": ft.STR, "name": "createRtx", "null": True},
     {"key": "create_time", "type": ft.DATETIME, "name": "createTime", "null": True},
-    {"key": "update_rtx", "type": ft.STR, "name": "updateRtx", "null": True},
-    {"key": "update_time", "type": ft.DATETIME, "name": "updateTime", "null": True},
     {"key": "status", "type": ft.BOOLTEXT, "name": "status", "null": False},
 ]
 
@@ -59,6 +57,10 @@ xtb_user_detail_fields = [
     {"key": "phone"},
     {"key": "avatar"},
     {"key": "introduction"},
+    {"key": "create_rtx", "type": ft.STR, "name": "createRtx", "null": True},
+    {"key": "create_time", "type": ft.DATETIME, "name": "createTime", "null": True},
+    {"key": "update_rtx", "type": ft.STR, "name": "updateRtx", "null": True},
+    {"key": "update_time", "type": ft.DATETIME, "name": "updateTime", "null": True},
     {"key": "status", "type": ft.BOOLTEXT, "name": "status"},
 ]
 
