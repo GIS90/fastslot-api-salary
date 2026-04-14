@@ -4,7 +4,9 @@
 ------------------------------------------------
 
 describe: 
-    xtb_user model
+    model class              DB table               ZH DB table
+    ------------------------------------------------------------------------
+    XtbUserModel             xtb_user               系统表-用户表
 
 base_info:
     __author__ = PyGo

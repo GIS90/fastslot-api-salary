@@ -4,7 +4,9 @@
 ------------------------------------------------
 
 describe: 
-    xtb_request model
+    model class              DB table               ZH DB table
+    ------------------------------------------------------------------------
+    XtbRequestModel          xtb_request            系统表-请求表
 
 base_info:
     __author__ = PyGo

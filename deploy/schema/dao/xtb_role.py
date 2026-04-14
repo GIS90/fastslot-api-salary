@@ -4,7 +4,9 @@
 ------------------------------------------------
 
 describe: 
-    xtb_role model
+    model class              DB table               ZH DB table
+    ------------------------------------------------------------------------
+    XtbRoleModel             xtb_role               系统表-角色表
 
 base_info:
     __author__ = PyGo
