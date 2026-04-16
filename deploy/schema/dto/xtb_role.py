@@ -33,7 +33,7 @@ from deploy.utils.enumeration import FieldTypeEnum as ft
 
 
 xtb_role_list_fields = [
-    {"key": "md5_id", "type": ft.STR, "name": "md5Id", "null": False},
+    {"key": "md5", "type": ft.STR, "name": "md5", "null": False},
     {"key": "engname", "type": ft.STR, "name": "engname", "null": False},
     {"key": "chnname", "type": ft.STR, "name": "chnname", "null": False},
     {"key": "authority", "type": ft.SPLITLIST, "name": "authority", "null": True},
@@ -44,7 +44,7 @@ xtb_role_list_fields = [
 
 
 xtb_role_detail_fields = [
-    {"key": "md5_id"},
+    {"key": "md5"},
     {"key": "engname"},
     {"key": "chnname"},
     {"key": "introduction"},
@@ -56,6 +56,6 @@ xtb_role_detail_fields = [
 
 
 xtb_role_authority_fields = [
-    {"key": "md5_id"},
+    {"key": "md5"},
     {"key": "authority", "type": ft.SPLITLIST, "name": "authority", "null": True},
 ]

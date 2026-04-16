@@ -51,7 +51,7 @@ class RtxIdField:
 
 
 class Md5Field:
-    md5_id: Mapped[str] = mapped_column(name="md5_id", type_=String(64), unique=True, nullable=False, comment="数据唯一标识：MD5-ID")
+    md5: Mapped[str] = mapped_column(name="md5", type_=String(64), unique=True, nullable=False, comment="数据唯一标识：MD5-ID")
 
 
 class CUDField:

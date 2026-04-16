@@ -39,6 +39,7 @@ from deploy.utils.status_value import (StatusCode as status_code,
 from deploy.utils.converter import model_converter_dict, many_model_converter_dict
 from deploy.schema.dto.xtb_role import xtb_role_list_fields, xtb_role_detail_fields, xtb_role_authority_fields
 from deploy.utils.utils import get_now, md5 as generator_md5
+from deploy.config import server_role as SERVER_ROLE_ADMIN
 
 
 class XtbRoleService:
@@ -61,18 +62,21 @@ class XtbRoleService:
             md5_id: str,
             status_check: bool = True,
             response_type: Literal["dict", "model"] = "model",
-            fields: List[Dict] = xtb_role_detail_fields
+            fields: List[Dict] = xtb_role_detail_fields,
+            admin_check: bool = False
     ) -> Tuple[bool, Any]:
         if not md5_id:
             return False, FailureStatus(
                 code=status_code.CODE_400_REQUEST_PARAMETER_MISS,
                 message="缺少md5参数")
 
-        model = await self.xtb_role_curd.get_by_md5_id(db=self.db, md5_id=md5_id)
+        model = await self.xtb_role_curd.get_by_md5(db=self.db, md5=md5_id)
         if not model:
             return False, FailureStatus(code=status_code.CODE_501_DATA_NOT_EXIST)
         if status_check and getattr(model, "status", None):
             return False, FailureStatus(code=status_code.CODE_503_DATA_DELETE_NOT_EDIT)
+        if admin_check and getattr(model, "engname", SERVER_ROLE_ADMIN):
+            return False, FailureStatus(code=status_code.CODE_500_DATA_ADMIN_NOT)
 
         return (True, model if response_type == "model"
                         else await model_converter_dict(model=model, fields=fields, default_value="****"))
@@ -99,12 +103,13 @@ class XtbRoleService:
         }
         return SuccessStatus(data=result)
 
-    async def one_by_md5_id(self, rtx_id: str, md5_id: str) -> Status:
+    async def one_by_md5(self, rtx_id: str, md5: str) -> Status:
         __flag, data = await self.__valid_model_by_md5(
-            md5_id=md5_id,
+            md5_id=md5,
             status_check=False,
             response_type="dict",
-            fields=xtb_role_detail_fields
+            fields=xtb_role_detail_fields,
+            admin_check=False
         )
         return SuccessStatus(data=data) if __flag else data
 
@@ -118,7 +123,7 @@ class XtbRoleService:
         # 新增角色
         new_model = await self.xtb_role_curd.new_model()
         __now = get_now()
-        new_model.md5_id = generator_md5(v=f"{model.get('engname')}-{__now}-{rtx_id}")
+        new_model.md5 = generator_md5(v=f"{model.get('engname')}-{__now}-{rtx_id}")
         new_model.create_time = __now
         new_model.create_rtx = rtx_id
         new_model.status = False
@@ -128,13 +133,13 @@ class XtbRoleService:
         return SuccessStatus()
 
     async def update(self, rtx_id: str, model: Dict) -> Status:
-        _md5 = model.get("md5_id")
+        _md5 = model.get("md5")
         __flag, data = await self.__valid_model_by_md5(
-            md5_id=_md5, status_check=True, response_type="model"
+            md5_id=_md5, status_check=True, response_type="model", admin_check=True
         )
         if not __flag: return data
 
-        del model["md5_id"]
+        del model["md5"]
         model["update_rtx"] = rtx_id
         model["update_time"] = get_now()
         for k, v in model.items():
@@ -142,9 +147,9 @@ class XtbRoleService:
         await self.xtb_role_curd.update(db=self.db, model=data)
         return SuccessStatus()
 
-    async def delete_hard(self, rtx_id: str, md5_id: str) -> Status:
+    async def delete_hard(self, rtx_id: str, md5: str) -> Status:
         __flag, data = await self.__valid_model_by_md5(
-            md5_id=md5_id, status_check=True, response_type="model"
+            md5_id=md5, status_check=True, response_type="model", admin_check=True
         )
         if not __flag: return data
 
@@ -152,9 +157,9 @@ class XtbRoleService:
         return SuccessStatus()
 
 
-    async def delete_soft(self, rtx_id: str, md5_id: str) -> Status:
+    async def delete_soft(self, rtx_id: str, md5: str) -> Status:
         __flag, data = await self.__valid_model_by_md5(
-            md5_id=md5_id, status_check=True, response_type="model"
+            md5_id=md5, status_check=True, response_type="model", admin_check=True
         )
         if not __flag: return data
 
@@ -164,11 +169,24 @@ class XtbRoleService:
         await self.xtb_role_curd.update(db=self.db, model=data)
         return SuccessStatus()
 
-    async def batch_delete_hard(self, rtx_id: str, md5_id: List) -> Status:
-        await self.xtb_role_curd.batch_delete(db=self.db, md5_id=md5_id)
+    async def __verify_contain_admin_role(self, md5_list: List) -> Tuple[bool, Any]:
+        db_model = await self.xtb_role_curd.get_engname_by_md5_list(db=self.db, md5_list=md5_list)
+        if db_model and SERVER_ROLE_ADMIN in db_model:
+            return True, FailureStatus(code=status_code.CODE_500_DATA_ADMIN_NOT, message="管理员角色不允许删除")
+        else:
+            return False, db_model
+
+    async def batch_delete_hard(self, rtx_id: str, md5_list: List) -> Status:
+        __flag, data = await self.__verify_contain_admin_role(md5_list)
+        if __flag: return data
+
+        await self.xtb_role_curd.batch_delete(db=self.db, md5_list=md5_list)
         return SuccessStatus()
 
 
-    async def batch_delete_soft(self, rtx_id: str, md5_id: List) -> Status:
-        await self.xtb_role_curd.batch_soft_delete_update(db=self.db, md5_id=md5_id, rtx_id=rtx_id)
+    async def batch_delete_soft(self, rtx_id: str, md5_list: List) -> Status:
+        __flag, data = await self.__verify_contain_admin_role(md5_list)
+        if __flag: return data
+
+        await self.xtb_role_curd.batch_soft_delete_update(db=self.db, md5_list=md5_list, rtx_id=rtx_id)
         return SuccessStatus()

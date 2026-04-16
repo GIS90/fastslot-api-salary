@@ -69,8 +69,8 @@ class XtbRoleCurd(BaseCurd):
     async def get_by_id(self, db: AsyncSession, _id: int):
         return await self._get_model_by_field(db, XtbRoleModel.id, _id)
 
-    async def get_by_md5_id(self, db: AsyncSession, md5_id: str):
-        return await self._get_model_by_field(db, XtbRoleModel.md5_id, md5_id)
+    async def get_by_md5(self, db: AsyncSession, md5: str):
+        return await self._get_model_by_field(db, XtbRoleModel.md5, md5)
 
     async def get_by_engname(self, db: AsyncSession, engname: str):
         return await self._get_model_by_field(db, XtbRoleModel.engname, engname)
@@ -101,6 +101,17 @@ class XtbRoleCurd(BaseCurd):
             raise SQLDBHandleException(f"[{cls.__name__}*查询All]{e}")
 
     @classmethod
+    async def get_engname_by_md5_list(
+        cls, db: AsyncSession, md5_list: List
+    ) -> Optional[List]:
+        try:
+            stmt = select(XtbRoleModel.engname).where(XtbRoleModel.md5.in_(md5_list))
+            result = await db.execute(stmt)
+            return result.scalars().all()
+        except Exception as e:
+            raise SQLDBHandleException(f"[{cls.__name__}*查询]{e}")
+
+    @classmethod
     async def add(
             cls, db: AsyncSession, model: XtbRoleModel
     ) -> None:
@@ -129,20 +140,20 @@ class XtbRoleCurd(BaseCurd):
 
     @classmethod
     async def batch_delete(
-            cls, db: AsyncSession, md5_id: List[str]
+            cls, db: AsyncSession, md5_list: List[str]
     ) -> None:
         try:
-            stmt = delete(XtbRoleModel).where(XtbRoleModel.md5_id.in_(md5_id))
+            stmt = delete(XtbRoleModel).where(XtbRoleModel.md5.in_(md5_list))
             await db.execute(stmt)
         except Exception as e:
             raise SQLDBHandleException(f"[{cls.__name__}*批量删除]{e}")
 
     @classmethod
     async def batch_soft_delete_update(
-            cls, db: AsyncSession, md5_id: List[str], rtx_id: str
+            cls, db: AsyncSession, md5_list: List[str], rtx_id: str
     ) -> None:
         try:
-            stmt = update(XtbRoleModel).where(XtbRoleModel.md5_id.in_(md5_id)).values(
+            stmt = update(XtbRoleModel).where(XtbRoleModel.md5.in_(md5_list)).values(
                 status = True,
                 delete_rtx = rtx_id,
                 delete_time = func.now(),

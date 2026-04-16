@@ -36,7 +36,7 @@ from deploy.utils.enumeration import FieldTypeEnum as ft
 xtb_user_list_fields = [
     {"key": "id", "type": ft.INT, "name": "id", "null": False},
     {"key": "rtx_id", "type": ft.STR, "name": "rtxId", "null": False},
-    {"key": "md5_id", "type": ft.STR, "name": "md5Id", "null": False},
+    {"key": "md5", "type": ft.STR, "name": "md5", "null": False},
     {"key": "name", "type": ft.STR, "name": "name", "null": False},
     {"key": "sex", "type": ft.STR, "name": "sex", "null": False},
     {"key": "email", "type": ft.STR, "name": "email", "null": False},

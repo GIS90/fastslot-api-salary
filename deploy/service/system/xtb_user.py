@@ -39,6 +39,7 @@ from deploy.utils.status_value import (StatusCode as status_code,
 from deploy.utils.converter import model_converter_dict
 from deploy.schema.dto.xtb_user import xtb_user_list_fields, xtb_user_detail_fields, xtb_user_login_fields
 from deploy.utils.utils import get_now, random_string, md5 as generator_md5
+from deploy.config import server_user as SERVER_USER_ADMIN
 
 
 class XtbUserService:
@@ -71,7 +72,7 @@ class XtbUserService:
                 code=status_code.CODE_400_REQUEST_PARAMETER_MISS,
                 message="缺少md5参数" if query_type == "md5" else "缺少rtx参数")
 
-        model = await self.xtb_user_curd.get_by_md5_id(db=self.db, md5_id=query_id) if query_type == "md5" \
+        model = await self.xtb_user_curd.get_by_md5(db=self.db, md5=query_id) if query_type == "md5" \
             else await self.xtb_user_curd.get_by_rtx_id(db=self.db, rtx_id=query_id)
         if not model:
             return False, FailureStatus(code=status_code.CODE_501_DATA_NOT_EXIST)
@@ -113,9 +114,9 @@ class XtbUserService:
         )
         return data if __flag else None
 
-    async def one_by_md5_id(self, rtx_id: str, md5_id: str) -> Status:
+    async def one_by_md5(self, rtx_id: str, md5: str) -> Status:
         __flag, data = await self.__valid_model_by_md5_or_rtx(
-            query_id=md5_id, status_check=False, response_type="dict", query_type="md5"
+            query_id=md5, status_check=False, response_type="dict", query_type="md5"
         )
         return SuccessStatus(data=data) if __flag else data
 
@@ -136,7 +137,7 @@ class XtbUserService:
         __password: str = random_string()
         __salt: str = random_string()
         # TODO 用户默认的头像、密码可以放在数据库中
-        new_model.md5_id = generator_md5(v=f"{model.get('rtx_id')}-{__now}-{__password}")
+        new_model.md5 = generator_md5(v=f"{model.get('rtx_id')}-{__now}-{__password}")
         new_model.avatar = self.DEFAULT_AVATAR
         new_model.status = False
         new_model.salt = __salt
@@ -149,7 +150,7 @@ class XtbUserService:
         return SuccessStatus(data={"password": __password})
 
     async def update(self, rtx_id: str, model: Dict) -> Status:
-        _md5 = model.get("md5_id")
+        _md5 = model.get("md5")
         __flag, data = await self.__valid_model_by_md5_or_rtx(
             query_id=_md5, status_check=True, response_type="model"
         )
@@ -157,7 +158,7 @@ class XtbUserService:
 
         if model.get("rtx_id"):
             del model["rtx_id"]
-        del model["md5_id"]
+        del model["md5"]
         model["update_rtx"] = rtx_id
         model["update_time"] = get_now()
         for k, v in model.items():
@@ -165,9 +166,9 @@ class XtbUserService:
         await self.xtb_user_curd.update(db=self.db, model=data)
         return SuccessStatus()
 
-    async def delete_hard(self, rtx_id: str, md5_id: str) -> Status:
+    async def delete_hard(self, rtx_id: str, md5: str) -> Status:
         __flag, data = await self.__valid_model_by_md5_or_rtx(
-            query_id=md5_id, status_check=True, response_type="model", query_type="md5"
+            query_id=md5, status_check=True, response_type="model", query_type="md5"
         )
         if not __flag: return data
 
@@ -175,9 +176,9 @@ class XtbUserService:
         return SuccessStatus()
 
 
-    async def delete_soft(self, rtx_id: str, md5_id: str) -> Status:
+    async def delete_soft(self, rtx_id: str, md5: str) -> Status:
         __flag, data = await self.__valid_model_by_md5_or_rtx(
-            query_id=md5_id, status_check=True, response_type="model", query_type="md5"
+            query_id=md5, status_check=True, response_type="model", query_type="md5"
         )
         if not __flag: return data
 
@@ -187,11 +188,24 @@ class XtbUserService:
         await self.xtb_user_curd.update(db=self.db, model=data)
         return SuccessStatus()
 
-    async def batch_delete_hard(self, rtx_id: str, md5_id: List) -> Status:
-        await self.xtb_user_curd.batch_delete(db=self.db, md5_id=md5_id)
+    async def __verify_contain_admin_user(self, md5_list: List) -> Tuple[bool, Any]:
+        db_model = await self.xtb_user_curd.get_rtx_by_md5_list(db=self.db, md5_list=md5_list)
+        if db_model and SERVER_USER_ADMIN in db_model:
+            return True, FailureStatus(code=status_code.CODE_500_DATA_ADMIN_NOT, message="管理员用户不允许删除")
+        else:
+            return False, db_model
+
+    async def batch_delete_hard(self, rtx_id: str, md5_list: List) -> Status:
+        __flag, data = await self.__verify_contain_admin_user(md5_list)
+        if __flag: return data
+
+        await self.xtb_user_curd.batch_delete(db=self.db, md5_list=md5_list)
         return SuccessStatus()
 
 
-    async def batch_delete_soft(self, rtx_id: str, md5_id: List) -> Status:
-        await self.xtb_user_curd.batch_soft_delete_update(db=self.db, md5_id=md5_id, rtx_id=rtx_id)
+    async def batch_delete_soft(self, rtx_id: str, md5_list: List) -> Status:
+        __flag, data = await self.__verify_contain_admin_user(md5_list)
+        if __flag: return data
+
+        await self.xtb_user_curd.batch_soft_delete_update(db=self.db, md5_list=md5_list, rtx_id=rtx_id)
         return SuccessStatus()

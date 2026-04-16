@@ -66,6 +66,8 @@ printer_info(content=f"当前环境：{env}，配置文件：{etc_file}", hr=Tru
 # server
 server_name: str = data["server"].get("name") or "Fastslot-API"
 server_version: str = data["server"].get("version")
+server_user: str = data["server"].get("user")
+server_role: str = data["server"].get("role")
 
 # app
 # ---------- middleware ------------

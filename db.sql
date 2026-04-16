@@ -9,7 +9,7 @@ DROP TABLES IF EXISTS `xtb_user`;
 CREATE TABLE `xtb_user` (
     `id` int NOT NULL AUTO_INCREMENT COMMENT '主键，自增ID',
     `rtx_id` varchar(35) not null unique COMMENT 'RTX-ID唯一标识，英文+数字组成',
-    `md5_id` varchar(64) not null unique COMMENT '数据唯一标识：MD5-ID',
+    `md5` varchar(64) not null unique COMMENT '数据唯一标识：MD5-ID',
     `name` varchar(30) not null COMMENT '名称',
     `password` varchar(120) not null COMMENT '密码[md5加密]',
     `salt` varchar(32) COMMENT '密码盐值，随机MD5-ID[32位]',
@@ -36,7 +36,7 @@ CREATE UNIQUE INDEX xtb_user_rtx_id_index ON xtb_user (`rtx_id`);
 
 -- insert default admin
 insert into
-xtb_user(rtx_id, md5_id, name, `password`, email , phone, avatar, introduction, role, create_rtx, status)
+xtb_user(rtx_id, md5, name, `password`, email , phone, avatar, introduction, role, create_rtx, status)
 VALUES
 ('admin', '21232f297a57a5a743894a0e4a801fc3', 'ADMIN系统管理员', 'e10adc3949ba59abbe56e057f20f883e', 'gaoming971366@163.com', '13051355646',
 'http://pygo2.top/images/article_github.jpg', 'SUPER_ADMIN系统管理员', 'ADMIN', 'admin', FALSE);
@@ -46,7 +46,7 @@ VALUES
 DROP TABLES IF EXISTS `xtb_request`;
 CREATE TABLE `xtb_request`  (
     `id` bigint NOT NULL AUTO_INCREMENT COMMENT '主键，自增ID',
-    `md5_id` varchar(64) NOT NULL unique COMMENT '数据唯一标识：MD5-ID',
+    `md5` varchar(64) NOT NULL unique COMMENT '数据唯一标识：MD5-ID',
     `rtx_id` varchar(35) COMMENT '请求访问用户RTX-ID',
     `ip` varchar(15) NULL COMMENT '用户请求IP',
     `method` varchar(10) NULL COMMENT '请求方法',
@@ -76,7 +76,7 @@ CREATE TABLE `xtb_role`  (
     `id` int NOT NULL AUTO_INCREMENT COMMENT '主键，自增ID',
     `engname` varchar(35) UNIQUE NOT NULL COMMENT '角色唯一标识，英文+数字组成',
     `chnname` varchar(35) NOT NULL COMMENT '角色中文名称',
-    `md5_id` varchar(64) not null unique COMMENT '数据唯一标识：MD5-ID',
+    `md5` varchar(64) not null unique COMMENT '数据唯一标识：MD5-ID',
     `authority` varchar(255) NULL COMMENT '角色权限ID集合，用英文；分割',
     `introduction` text NULL COMMENT '描述',
     `create_rtx` varchar(35) COMMENT '创建用户RTX-ID',
@@ -88,13 +88,13 @@ CREATE TABLE `xtb_role`  (
     `status` bool default False COMMENT '状态：1注销/删除；0启用/正常（默认）',
 
     PRIMARY KEY (`id`),
-    UNIQUE INDEX `xtb_role_md5_index`(`md5_id`) USING HASH COMMENT 'md5唯一索引',
+    UNIQUE INDEX `xtb_role_md5_index`(`md5`) USING HASH COMMENT 'md5唯一索引',
     UNIQUE INDEX `xtb_role_engname_index`(`engname`) USING HASH COMMENT 'engname唯一索引'
 ) COMMENT='系统表-角色权限表';
 
 -- insert default role
 insert into
-xtb_role(engname, chnname, md5_id,  authority, introduction, create_rtx, status)
+xtb_role(engname, chnname, md5,  authority, introduction, create_rtx, status)
 VALUES
 ('ADMIN', 'Super管理员', '21232f297a57a5a743894a0e4a801fc3', '', '系统所有功能权限', 'admin', FALSE);
 -- = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =

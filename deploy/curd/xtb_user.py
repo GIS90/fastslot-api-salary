@@ -72,8 +72,8 @@ class XtbUserCurd(BaseCurd):
     async def get_by_rtx_id(self, db: AsyncSession, rtx_id: str):
         return await self._get_model_by_field(db, XtbUserModel.rtx_id, rtx_id)
 
-    async def get_by_md5_id(self, db: AsyncSession, md5_id: str):
-        return await self._get_model_by_field(db, XtbUserModel.md5_id, md5_id)
+    async def get_by_md5(self, db: AsyncSession, md5: str):
+        return await self._get_model_by_field(db, XtbUserModel.md5, md5)
 
     async def get_by_name(self, db: AsyncSession, name: str):
         return await self._get_model_by_field(db, XtbUserModel.name, name)
@@ -110,6 +110,17 @@ class XtbUserCurd(BaseCurd):
             raise SQLDBHandleException(f"[{cls.__name__}*查询All]{e}")
 
     @classmethod
+    async def get_rtx_by_md5_list(
+        cls, db: AsyncSession, md5_list: List
+    ) -> Optional[List]:
+        try:
+            stmt = select(XtbUserModel.rtx_id).where(XtbUserModel.md5.in_(md5_list))
+            result = await db.execute(stmt)
+            return result.scalars().all()
+        except Exception as e:
+            raise SQLDBHandleException(f"[{cls.__name__}*查询]{e}")
+
+    @classmethod
     async def add(
             cls, db: AsyncSession, model: XtbUserModel
     ) -> None:
@@ -138,20 +149,20 @@ class XtbUserCurd(BaseCurd):
 
     @classmethod
     async def batch_delete(
-            cls, db: AsyncSession, md5_id: List[str]
+            cls, db: AsyncSession, md5_list: List[str]
     ) -> None:
         try:
-            stmt = delete(XtbUserModel).where(XtbUserModel.md5_id.in_(md5_id))
+            stmt = delete(XtbUserModel).where(XtbUserModel.md5.in_(md5_list))
             await db.execute(stmt)
         except Exception as e:
             raise SQLDBHandleException(f"[{cls.__name__}*批量删除]{e}")
 
     @classmethod
     async def batch_soft_delete_update(
-            cls, db: AsyncSession, md5_id: List[str], rtx_id: str
+            cls, db: AsyncSession, md5_list: List[str], rtx_id: str
     ) -> None:
         try:
-            stmt = update(XtbUserModel).where(XtbUserModel.md5_id.in_(md5_id)).values(
+            stmt = update(XtbUserModel).where(XtbUserModel.md5.in_(md5_list)).values(
                 status = True,
                 delete_rtx = rtx_id,
                 delete_time = func.now(),

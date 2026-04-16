@@ -91,12 +91,12 @@ class XtbUserAddModel(__XtbUserBaseModel):
 
 
 class XtbUserUpdateModel(__XtbUserBaseModel):
-    md5_id: str = Field(..., min_length=1, max_length=64, description="数据MD5", alias="md5_id")
+    md5: str = Field(..., min_length=1, max_length=64, description="数据MD5", alias="md5")
 
     model_config = {
         "json_schema_extra": {
             "example": {
-                "md5_id": "AAAAAAAAAA",
+                "md5": "AAAAAAAAAA",
                 "name": "adc",
                 "sex": "M",
                 "email": "gaoming971366@163.com",
