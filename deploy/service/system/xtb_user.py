@@ -34,6 +34,7 @@ from datetime import datetime
 from typing import Dict, List, Tuple, Literal, Any
 from sqlalchemy.ext.asyncio import AsyncSession
 from deploy.curd.xtb_user import XtbUserCurd
+from deploy.schema.dao.xtb_user import XtbUserModel
 from deploy.utils.status import Status, SuccessStatus, FailureStatus
 from deploy.utils.status_value import (StatusCode as status_code,
                                        StatusMsg as status_msg)
@@ -73,7 +74,7 @@ class XtbUserService:
                 code=status_code.CODE_400_REQUEST_PARAMETER_MISS,
                 message="缺少md5参数" if query_type == "md5" else "缺少rtx参数")
 
-        model = await self.xtb_user_curd.get_by_md5(db=self.db, md5=query_id) if query_type == "md5" \
+        model: XtbUserModel = await self.xtb_user_curd.get_by_md5(db=self.db, md5=query_id) if query_type == "md5" \
             else await self.xtb_user_curd.get_by_rtx_id(db=self.db, rtx_id=query_id)
         if not model:
             return False, FailureStatus(code=status_code.CODE_501_DATA_NOT_EXIST)
@@ -84,7 +85,7 @@ class XtbUserService:
                         else await model_converter_dict(model=model, fields=fields, default_value="****"))
 
     async def pagination(self, rtx_id: str, params: Dict) -> Status:
-        models = await self.xtb_user_curd.get_pagination(
+        models: List = await self.xtb_user_curd.get_pagination(
             db=self.db,
             offset=params.get("offset"),
             limit=params.get("limit")
@@ -128,21 +129,20 @@ class XtbUserService:
         return data if __flag else {}
 
     async def add(self, rtx_id: str, model: Dict) -> Status:
-        db_model = await self.xtb_user_curd.get_by_rtx_id(db=self.db, rtx_id=model.get("rtx_id"))
+        db_model: XtbUserModel = await self.xtb_user_curd.get_by_rtx_id(db=self.db, rtx_id=model.get("rtx_id"))
         if db_model:
             return FailureStatus(code=status_code.CODE_502_DATA_EXIST_NOT_ADD,
                                  message="用户rtx_id已存在，请更换")
 
-        new_model = await self.xtb_user_curd.new_model()
-        __now = get_now()
+        new_model: XtbUserModel = await self.xtb_user_curd.new_model()
         __password: str = random_string()
         __salt: str = random_string()
         # TODO 用户默认的头像、密码可以放在数据库中
-        new_model.md5 = generator_md5(v=f"{model.get('rtx_id')}-{__now}-{__password}")
+        new_model.md5 = generator_md5(v=f"{model.get('rtx_id')}-{get_now()}-{__password}")
         new_model.avatar = self.DEFAULT_AVATAR
         new_model.status = False
         new_model.salt = __salt
-        new_model.create_time = __now
+        new_model.create_time = datetime.now()
         new_model.create_rtx = rtx_id
         new_model.password = generator_md5(v=f"{__password}{__salt}")
         for k, v in model.items():
@@ -151,7 +151,7 @@ class XtbUserService:
         return SuccessStatus(data={"password": __password})
 
     async def update(self, rtx_id: str, model: Dict) -> Status:
-        _md5 = model.get("md5")
+        _md5: str = model.get("md5")
         __flag, data = await self.__valid_model_by_md5_or_rtx(
             query_id=_md5, status_check=True, response_type="model"
         )
@@ -190,7 +190,7 @@ class XtbUserService:
         return SuccessStatus()
 
     async def __verify_contain_admin_user(self, md5_list: List) -> Tuple[bool, Any]:
-        db_model = await self.xtb_user_curd.get_rtx_by_md5_list(db=self.db, md5_list=md5_list)
+        db_model: List = await self.xtb_user_curd.get_rtx_by_md5_list(db=self.db, md5_list=md5_list)
         if db_model and SERVER_USER_ADMIN in db_model:
             return True, FailureStatus(code=status_code.CODE_500_DATA_ADMIN_NOT, message="管理员用户不允许删除")
         else:
