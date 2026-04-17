@@ -44,7 +44,7 @@ from deploy.utils.exception import SQLDBHandleException
 class XtbRoleCurd(BaseCurd):
 
     @staticmethod
-    async def new_model():
+    async def new_model() -> XtbRoleModel:
         return XtbRoleModel()
 
     async def _get_model_by_field(

@@ -30,9 +30,11 @@ Life is short, I use python.
 
 ------------------------------------------------
 """
+from datetime import datetime
 from typing import Dict, List, Tuple, Literal, Any
 from sqlalchemy.ext.asyncio import AsyncSession
 from deploy.curd.xtb_role import XtbRoleCurd
+from deploy.schema.dao.xtb_role import XtbRoleModel
 from deploy.utils.status import Status, SuccessStatus, FailureStatus
 from deploy.utils.status_value import (StatusCode as status_code,
                                        StatusMsg as status_msg)
@@ -49,7 +51,7 @@ class XtbRoleService:
         XtbRoleService class initialize
         """
         self.db: AsyncSession = db_connection
-        self.xtb_role_curd = XtbRoleCurd()
+        self.xtb_role_curd: XtbRoleCurd = XtbRoleCurd()
 
     def __str__(self):
         print("XtbRoleService class.")
@@ -70,7 +72,7 @@ class XtbRoleService:
                 code=status_code.CODE_400_REQUEST_PARAMETER_MISS,
                 message="缺少md5参数")
 
-        model = await self.xtb_role_curd.get_by_md5(db=self.db, md5=md5_id)
+        model: XtbRoleModel = await self.xtb_role_curd.get_by_md5(db=self.db, md5=md5_id)
         if not model:
             return False, FailureStatus(code=status_code.CODE_501_DATA_NOT_EXIST)
         if status_check and getattr(model, "status", None):
@@ -82,7 +84,7 @@ class XtbRoleService:
                         else await model_converter_dict(model=model, fields=fields, default_value="****"))
 
     async def pagination(self, rtx_id: str, params: Dict) -> Status:
-        models = await self.xtb_role_curd.get_pagination(
+        models: List[XtbRoleModel] = await self.xtb_role_curd.get_pagination(
             db=self.db,
             offset=params.get("offset"),
             limit=params.get("limit")
@@ -90,7 +92,7 @@ class XtbRoleService:
         if not models:
             return FailureStatus(code=status_code.CODE_101_SUCCESS_NO_DATA)
 
-        id_value = params.get("offset") * params.get("limit") + 1
+        id_value: int = params.get("offset") * params.get("limit") + 1
         data: List = await many_model_converter_dict(
             models=models,
             fields=xtb_role_list_fields,
@@ -115,16 +117,17 @@ class XtbRoleService:
 
     async def add(self, rtx_id: str, model: Dict) -> Status:
         # 验证角色名称是否已存在
-        db_model = await self.xtb_role_curd.get_by_engname(db=self.db, engname=model.get("engname"))
+        db_model: XtbRoleModel = await self.xtb_role_curd.get_by_engname(
+            db=self.db,
+            engname=model.get("engname"))
         if db_model:
             return FailureStatus(code=status_code.CODE_502_DATA_EXIST_NOT_ADD,
                                  message="角色ID已存在，请更换")
 
         # 新增角色
-        new_model = await self.xtb_role_curd.new_model()
-        __now = get_now()
-        new_model.md5 = generator_md5(v=f"{model.get('engname')}-{__now}-{rtx_id}")
-        new_model.create_time = __now
+        new_model: XtbRoleModel = await self.xtb_role_curd.new_model()
+        new_model.md5 = generator_md5(v=f"{model.get('engname')}-{get_now()}-{rtx_id}")
+        new_model.create_time = datetime.now()
         new_model.create_rtx = rtx_id
         new_model.status = False
         for k, v in model.items():
@@ -133,7 +136,7 @@ class XtbRoleService:
         return SuccessStatus()
 
     async def update(self, rtx_id: str, model: Dict) -> Status:
-        _md5 = model.get("md5")
+        _md5: str = model.get("md5")
         __flag, data = await self.__valid_model_by_md5(
             md5_id=_md5, status_check=True, response_type="model", admin_check=True
         )
@@ -170,7 +173,7 @@ class XtbRoleService:
         return SuccessStatus()
 
     async def __verify_contain_admin_role(self, md5_list: List) -> Tuple[bool, Any]:
-        db_model = await self.xtb_role_curd.get_engname_by_md5_list(db=self.db, md5_list=md5_list)
+        db_model: List = await self.xtb_role_curd.get_engname_by_md5_list(db=self.db, md5_list=md5_list)
         if db_model and SERVER_ROLE_ADMIN in db_model:
             return True, FailureStatus(code=status_code.CODE_500_DATA_ADMIN_NOT, message="管理员角色不允许删除")
         else:
@@ -179,14 +182,20 @@ class XtbRoleService:
     async def batch_delete_hard(self, rtx_id: str, md5_list: List) -> Status:
         __flag, data = await self.__verify_contain_admin_role(md5_list)
         if __flag: return data
-
+        query_count: int = len(data)
+        request_count: int = len(md5_list)
         await self.xtb_role_curd.batch_delete(db=self.db, md5_list=md5_list)
-        return SuccessStatus()
+        return SuccessStatus() if query_count == len(md5_list) \
+            else FailureStatus(code=status_code.CODE_508_DATA_PART_DELETE,
+                               message=f"总数{request_count}，成功删除{query_count}，查询失败{request_count-query_count}")
 
 
     async def batch_delete_soft(self, rtx_id: str, md5_list: List) -> Status:
         __flag, data = await self.__verify_contain_admin_role(md5_list)
         if __flag: return data
-
+        query_count: int = len(data)
+        request_count: int = len(md5_list)
         await self.xtb_role_curd.batch_soft_delete_update(db=self.db, md5_list=md5_list, rtx_id=rtx_id)
-        return SuccessStatus()
+        return SuccessStatus() if query_count == len(md5_list) \
+            else FailureStatus(code=status_code.CODE_508_DATA_PART_DELETE,
+                               message=f"总数{request_count}，成功删除{query_count}，查询失败{request_count - query_count}")
