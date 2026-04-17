@@ -57,7 +57,7 @@ class XtbRoleService:
         print("XtbRoleService class.")
 
     def __repr__(self):
-        self.__str__()
+        return self.__str__()
 
     async def __valid_model_by_md5(
             self,

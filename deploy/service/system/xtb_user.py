@@ -30,6 +30,7 @@ Life is short, I use python.
 
 ------------------------------------------------
 """
+from datetime import datetime
 from typing import Dict, List, Tuple, Literal, Any
 from sqlalchemy.ext.asyncio import AsyncSession
 from deploy.curd.xtb_user import XtbUserCurd
@@ -44,20 +45,20 @@ from deploy.config import server_user as SERVER_USER_ADMIN
 
 class XtbUserService:
 
-    DEFAULT_AVATAR = "http://pygo2.top/images/article_github.jpg"
+    DEFAULT_AVATAR: str = "http://pygo2.top/images/article_github.jpg"
 
     def __init__(self, db_connection: AsyncSession):
         """
         XtbUserService class initialize
         """
         self.db: AsyncSession = db_connection
-        self.xtb_user_curd = XtbUserCurd()
+        self.xtb_user_curd: XtbUserCurd = XtbUserCurd()
 
     def __str__(self):
         print("XtbUserService class.")
 
     def __repr__(self):
-        self.__str__()
+        return self.__str__()
 
     async def __valid_model_by_md5_or_rtx(
             self,
@@ -198,14 +199,19 @@ class XtbUserService:
     async def batch_delete_hard(self, rtx_id: str, md5_list: List) -> Status:
         __flag, data = await self.__verify_contain_admin_user(md5_list)
         if __flag: return data
-
+        query_count: int = len(data)
+        request_count: int = len(md5_list)
         await self.xtb_user_curd.batch_delete(db=self.db, md5_list=md5_list)
-        return SuccessStatus()
-
+        return SuccessStatus() if query_count == len(md5_list) \
+            else FailureStatus(code=status_code.CODE_508_DATA_PART_DELETE,
+                               message=f"总数{request_count}，成功删除{query_count}，查询失败{request_count - query_count}")
 
     async def batch_delete_soft(self, rtx_id: str, md5_list: List) -> Status:
         __flag, data = await self.__verify_contain_admin_user(md5_list)
         if __flag: return data
-
+        query_count: int = len(data)
+        request_count: int = len(md5_list)
         await self.xtb_user_curd.batch_soft_delete_update(db=self.db, md5_list=md5_list, rtx_id=rtx_id)
-        return SuccessStatus()
+        return SuccessStatus() if query_count == len(md5_list) \
+            else FailureStatus(code=status_code.CODE_508_DATA_PART_DELETE,
+                               message=f"总数{request_count}，成功删除{query_count}，查询失败{request_count - query_count}")
