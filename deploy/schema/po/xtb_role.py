@@ -82,7 +82,7 @@ class XtbRoleAddModel(__XtbRoleBaseModel):
 
 
 class XtbRoleUpdateModel(__XtbRoleBaseModel):
-    md5: str = Field(..., min_length=1, max_length=64, description="数据MD5-ID", alias="md5")
+    md5: str = Field(..., min_length=1, max_length=64, description="数据Md5-Id", alias="md5")
 
     model_config = {
             "json_schema_extra": {
