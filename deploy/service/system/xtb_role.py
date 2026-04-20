@@ -40,7 +40,7 @@ from deploy.utils.status_value import (StatusCode as status_code,
                                        StatusMsg as status_msg)
 from deploy.utils.converter import model_converter_dict, many_model_converter_dict
 from deploy.schema.dto.xtb_role import xtb_role_list_fields, xtb_role_detail_fields, xtb_role_authority_fields
-from deploy.utils.utils import get_now, md5 as generator_md5
+from deploy.utils.utils import get_now, d2s, md5 as generator_md5
 from deploy.config import server_role as SERVER_ROLE_ADMIN
 
 
@@ -77,7 +77,7 @@ class XtbRoleService:
             return False, FailureStatus(code=status_code.CODE_501_DATA_NOT_EXIST)
         if status_check and getattr(model, "status", None):
             return False, FailureStatus(code=status_code.CODE_503_DATA_DELETE_NOT_EDIT)
-        if admin_check and getattr(model, "engname", SERVER_ROLE_ADMIN):
+        if admin_check and getattr(model, "engname") == SERVER_ROLE_ADMIN:
             return False, FailureStatus(code=status_code.CODE_500_DATA_ADMIN_NOT)
 
         return (True, model if response_type == "model"
@@ -126,8 +126,9 @@ class XtbRoleService:
 
         # 新增角色
         new_model: XtbRoleModel = await self.xtb_role_curd.new_model()
-        new_model.md5 = generator_md5(v=f"{model.get('engname')}-{get_now()}-{rtx_id}")
-        new_model.create_time = datetime.now()
+        __now = datetime.now()
+        new_model.md5 = generator_md5(v=f"{model.get('engname')}-{d2s(__now)}-{rtx_id}")
+        new_model.create_time = __now
         new_model.create_rtx = rtx_id
         new_model.status = False
         for k, v in model.items():
@@ -185,7 +186,7 @@ class XtbRoleService:
         query_count: int = len(data)
         request_count: int = len(md5_list)
         await self.xtb_role_curd.batch_delete(db=self.db, md5_list=md5_list)
-        return SuccessStatus() if query_count == len(md5_list) \
+        return SuccessStatus() if query_count == request_count \
             else FailureStatus(code=status_code.CODE_508_DATA_PART_DELETE,
                                message=f"总数{request_count}，成功删除{query_count}，查询失败{request_count-query_count}")
 
@@ -196,6 +197,6 @@ class XtbRoleService:
         query_count: int = len(data)
         request_count: int = len(md5_list)
         await self.xtb_role_curd.batch_soft_delete_update(db=self.db, md5_list=md5_list, rtx_id=rtx_id)
-        return SuccessStatus() if query_count == len(md5_list) \
+        return SuccessStatus() if query_count == request_count \
             else FailureStatus(code=status_code.CODE_508_DATA_PART_DELETE,
                                message=f"总数{request_count}，成功删除{query_count}，查询失败{request_count - query_count}")

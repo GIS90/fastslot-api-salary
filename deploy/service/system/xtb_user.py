@@ -67,12 +67,13 @@ class XtbUserService:
             status_check: bool = True,
             response_type: Literal["dict", "model"] = "model",
             query_type: Literal["md5", "rtx"] = "md5",
-            fields: List[Dict] = xtb_user_detail_fields
+            fields: List[Dict] = xtb_user_detail_fields,
+            admin_check: bool = False
     ) -> Tuple[bool, Any]:
         if not query_id:
             return False, FailureStatus(
                 code=status_code.CODE_400_REQUEST_PARAMETER_MISS,
-                message="缺少md5参数" if query_type == "md5" else "缺少rtx参数")
+                message="缺少md5参数" if query_type == "md5" else "缺少rtx-id参数")
 
         model: XtbUserModel = await self.xtb_user_curd.get_by_md5(db=self.db, md5=query_id) if query_type == "md5" \
             else await self.xtb_user_curd.get_by_rtx_id(db=self.db, rtx_id=query_id)
@@ -80,6 +81,8 @@ class XtbUserService:
             return False, FailureStatus(code=status_code.CODE_501_DATA_NOT_EXIST)
         if status_check and getattr(model, "status", None):
             return False, FailureStatus(code=status_code.CODE_503_DATA_DELETE_NOT_EDIT)
+        if admin_check and getattr(model, "rtx_id") ==  SERVER_USER_ADMIN:
+            return False, FailureStatus(code=status_code.CODE_500_DATA_ADMIN_NOT)
 
         return (True, model if response_type == "model"
                         else await model_converter_dict(model=model, fields=fields, default_value="****"))
@@ -202,7 +205,7 @@ class XtbUserService:
         query_count: int = len(data)
         request_count: int = len(md5_list)
         await self.xtb_user_curd.batch_delete(db=self.db, md5_list=md5_list)
-        return SuccessStatus() if query_count == len(md5_list) \
+        return SuccessStatus() if query_count == request_count \
             else FailureStatus(code=status_code.CODE_508_DATA_PART_DELETE,
                                message=f"总数{request_count}，成功删除{query_count}，查询失败{request_count - query_count}")
 
@@ -212,6 +215,6 @@ class XtbUserService:
         query_count: int = len(data)
         request_count: int = len(md5_list)
         await self.xtb_user_curd.batch_soft_delete_update(db=self.db, md5_list=md5_list, rtx_id=rtx_id)
-        return SuccessStatus() if query_count == len(md5_list) \
+        return SuccessStatus() if query_count == request_count \
             else FailureStatus(code=status_code.CODE_508_DATA_PART_DELETE,
                                message=f"总数{request_count}，成功删除{query_count}，查询失败{request_count - query_count}")
