@@ -115,19 +115,20 @@ class XtbUserService:
             status_check=False,
             response_type="dict",
             query_type="rtx",
-            fields=xtb_user_login_fields
+            fields=xtb_user_login_fields,
+            admin_check=False
         )
         return data if __flag else None
 
     async def one_by_md5(self, rtx_id: str, md5: str) -> Status:
         __flag, data = await self.__valid_model_by_md5_or_rtx(
-            query_id=md5, status_check=False, response_type="dict", query_type="md5"
+            query_id=md5, status_check=False, response_type="dict", query_type="md5", admin_check=False
         )
         return SuccessStatus(data=data) if __flag else data
 
     async def depend_by_rtx_id(self, rtx_id: str) -> Dict:
         __flag, data = await self.__valid_model_by_md5_or_rtx(
-            query_id=rtx_id, status_check=False, response_type="dict", query_type="rtx"
+            query_id=rtx_id, status_check=False, response_type="dict", query_type="rtx", admin_check=False
         )
         return data if __flag else {}
 
@@ -156,7 +157,7 @@ class XtbUserService:
     async def update(self, rtx_id: str, model: Dict) -> Status:
         _md5: str = model.get("md5")
         __flag, data = await self.__valid_model_by_md5_or_rtx(
-            query_id=_md5, status_check=True, response_type="model"
+            query_id=_md5, status_check=True, response_type="model", admin_check=True
         )
         if not __flag: return data
 
@@ -172,7 +173,7 @@ class XtbUserService:
 
     async def delete_hard(self, rtx_id: str, md5: str) -> Status:
         __flag, data = await self.__valid_model_by_md5_or_rtx(
-            query_id=md5, status_check=True, response_type="model", query_type="md5"
+            query_id=md5, status_check=True, response_type="model", query_type="md5", admin_check=True
         )
         if not __flag: return data
 
@@ -182,7 +183,7 @@ class XtbUserService:
 
     async def delete_soft(self, rtx_id: str, md5: str) -> Status:
         __flag, data = await self.__valid_model_by_md5_or_rtx(
-            query_id=md5, status_check=True, response_type="model", query_type="md5"
+            query_id=md5, status_check=True, response_type="model", query_type="md5", admin_check=True
         )
         if not __flag: return data
 
