@@ -118,3 +118,11 @@ async def batch_delete_soft(
     xtb_role_service: XtbRoleService = Depends(get_xtb_role_service)
 ) -> Status:
     return await xtb_role_service.batch_delete_soft(rtx_id=token_rtx_id, md5_list=md5_list)
+
+@router.get("/auth", summary="角色权限菜单列表")
+async def auth(
+    md5: str = Query(..., description="数据Md5-Id"),
+    token_rtx_id: str = Depends(depend_token_rtx),
+    xtb_role_service: XtbRoleService = Depends(get_xtb_role_service)
+) -> Status:
+    return await xtb_role_service.auth(rtx_id=token_rtx_id, md5=md5)

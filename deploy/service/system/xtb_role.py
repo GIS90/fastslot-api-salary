@@ -200,3 +200,6 @@ class XtbRoleService:
         return SuccessStatus() if query_count == request_count \
             else FailureStatus(code=status_code.CODE_508_DATA_PART_DELETE,
                                message=f"总数{request_count}，成功删除{query_count}，查询失败{request_count - query_count}")
+
+    async def auth(self, rtx_id: str, md5: str) -> Status:
+        ...

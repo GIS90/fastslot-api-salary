@@ -103,4 +103,3 @@ VALUES
 -- = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
 -- = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
 -- = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
-/opt/anaconda3/envs/fastslot-api-salary/bin/python3.12: can't open file '//create': [Errno 2] No such file or directory
