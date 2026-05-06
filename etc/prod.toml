@@ -26,6 +26,10 @@ static = "static"  # 静态资源目录名称，并且固定在deploy目录下
 [db]
 link = "mysql+asyncmy://salary:28aa838315633f0e44049ce88de36803@127.0.0.1:3306/salary"
 
+# 菜单
+[menu]
+root = 1
+
 # Redis
 [redis]
 host = "127.0.0.1"

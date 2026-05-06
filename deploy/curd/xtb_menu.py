@@ -4,16 +4,16 @@
 ------------------------------------------------
 
 describe: 
-    xtb_role curd
+    xtb_menu curd
     
 base_info:
     __author__ = PyGo
-    __time__ = 2026/4/2 23:26
+    __time__ = 2026/5/6 21:02
     __version__ = v.1.0.0
     __mail__ = gaoming971366@163.com
     __blog__ = www.pygo2.top
     __project__ = fastslot-api-salary
-    __file_name__ = xtb_role.py
+    __file_name__ = xtb_menu.py
 
 usage:
     
@@ -32,54 +32,55 @@ Life is short, I use python.
 """
 from typing import Optional, List, Any
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy import select, update, delete, insert, desc
+from sqlalchemy import select, update, delete, insert, desc, asc
 from sqlalchemy.orm.attributes import InstrumentedAttribute
-from sqlalchemy import func
+from sqlalchemy import func, and_
 
 from deploy.curd.base_curd import BaseCurd
-from deploy.schema.dao.xtb_role import XtbRoleModel
+from deploy.schema.dao.xtb_menu import XtbMenuModel
 from deploy.utils.exception import SQLDBHandleException
+from deploy.config import menu_root as MENU_ROOT_ID
 
 
-class XtbRoleCurd(BaseCurd):
+class XtbMenuCurd(BaseCurd):
 
     @staticmethod
-    async def new_model() -> XtbRoleModel:
-        return XtbRoleModel()
+    async def new_model() -> XtbMenuModel:
+        return XtbMenuModel()
 
     async def _get_model_by_field(
         self,
         db: AsyncSession,
         field: str | InstrumentedAttribute,
         value: Any
-    ) -> Optional[XtbRoleModel]:
+    ) -> Optional[XtbMenuModel]:
         try:
             if isinstance(field, str):
-                if not hasattr(XtbRoleModel, field):
+                if not hasattr(XtbMenuModel, field):
                     return None
-                _field = getattr(XtbRoleModel, field)
+                _field = getattr(XtbMenuModel, field)
             else:
                 _field = field
 
-            result = await db.execute(select(XtbRoleModel).where(_field == value))
+            result = await db.execute(select(XtbMenuModel).where(_field == value))
             return result.scalar_one_or_none()
         except Exception as e:
             raise SQLDBHandleException(f"[{self.__class__.__name__}*查询One]{e}")
 
     async def get_by_id(self, db: AsyncSession, _id: int):
-        return await self._get_model_by_field(db, XtbRoleModel.id, _id)
+        return await self._get_model_by_field(db, XtbMenuModel.id, _id)
 
     async def get_by_md5(self, db: AsyncSession, md5: str):
-        return await self._get_model_by_field(db, XtbRoleModel.md5, md5)
+        return await self._get_model_by_field(db, XtbMenuModel.md5, md5)
 
-    async def get_by_engname(self, db: AsyncSession, engname: str):
-        return await self._get_model_by_field(db, XtbRoleModel.engname, engname)
+    async def get_by_name(self, db: AsyncSession, name: str):
+        return await self._get_model_by_field(db, XtbMenuModel.name, name)
 
     @classmethod
     async def get_count(cls, db: AsyncSession) -> int:
         try:
             result = await db.execute(
-                select(func.count(XtbRoleModel.id)).where(XtbRoleModel.status != 1)
+                select(func.count(XtbMenuModel.id)).where(XtbMenuModel.status != 1)
             )
             return result.scalar()
         except Exception as e:
@@ -90,9 +91,9 @@ class XtbRoleCurd(BaseCurd):
         cls, db: AsyncSession, offset: int = 0, limit: int = 15
     ) -> Optional[List]:
         try:
-            stmt = (select(XtbRoleModel)
-                    .where(XtbRoleModel.status != 1)
-                    .order_by(desc(XtbRoleModel.id))
+            stmt = (select(XtbMenuModel)
+                    .where(XtbMenuModel.status != 1)
+                    .order_by(asc(XtbMenuModel.order_id), asc(XtbMenuModel.id))
                     .offset(offset)
                     .limit(limit))
             result = await db.execute(stmt)
@@ -101,30 +102,26 @@ class XtbRoleCurd(BaseCurd):
             raise SQLDBHandleException(f"[{cls.__name__}*查询All]{e}")
 
     @classmethod
-    async def get_engname_by_md5_list(
-        cls, db: AsyncSession, md5_list: List
+    async def get_all(
+        cls, db: AsyncSession, root: bool = True
     ) -> Optional[List]:
         try:
-            stmt = select(XtbRoleModel.engname).where(XtbRoleModel.md5.in_(md5_list))
+            if root:
+                stmt = (select(XtbMenuModel)
+                        .where(XtbMenuModel.status != 1)
+                        .order_by(asc(XtbMenuModel.order_id), asc(XtbMenuModel.id)))
+            else:
+                stmt = (select(XtbMenuModel)
+                        .where(XtbMenuModel.status != 1, XtbMenuModel.id != MENU_ROOT_ID)
+                        .order_by(asc(XtbMenuModel.order_id), asc(XtbMenuModel.id)))
             result = await db.execute(stmt)
             return result.scalars().all()
         except Exception as e:
-            raise SQLDBHandleException(f"[{cls.__name__}*查询]{e}")
-
-    @classmethod
-    async def get_model_by_engname_list(
-            cls, db: AsyncSession, engname_list: List
-    ) -> Optional[List]:
-        try:
-            stmt = select(XtbRoleModel).where(XtbRoleModel.engname.in_(engname_list))
-            result = await db.execute(stmt)
-            return result.scalars().all()
-        except Exception as e:
-            raise SQLDBHandleException(f"[{cls.__name__}*查询]{e}")
+            raise SQLDBHandleException(f"[{cls.__name__}*查询All]{e}")
 
     @classmethod
     async def add(
-            cls, db: AsyncSession, model: XtbRoleModel
+            cls, db: AsyncSession, model: XtbMenuModel
     ) -> None:
         try:
             db.add(model)
@@ -133,7 +130,7 @@ class XtbRoleCurd(BaseCurd):
 
     @classmethod
     async def update(
-            cls, db: AsyncSession, model: XtbRoleModel
+            cls, db: AsyncSession, model: XtbMenuModel
     ) -> None:
         try:
             await db.merge(model)
@@ -142,7 +139,7 @@ class XtbRoleCurd(BaseCurd):
 
     @classmethod
     async def delete(
-            cls, db: AsyncSession, model: XtbRoleModel
+            cls, db: AsyncSession, model: XtbMenuModel
     ) -> None:
         try:
             await db.delete(model)
@@ -154,7 +151,7 @@ class XtbRoleCurd(BaseCurd):
             cls, db: AsyncSession, md5_list: List[str]
     ) -> None:
         try:
-            stmt = delete(XtbRoleModel).where(XtbRoleModel.md5.in_(md5_list))
+            stmt = delete(XtbMenuModel).where(XtbMenuModel.md5.in_(md5_list))
             await db.execute(stmt)
         except Exception as e:
             raise SQLDBHandleException(f"[{cls.__name__}*批量删除]{e}")
@@ -164,7 +161,7 @@ class XtbRoleCurd(BaseCurd):
             cls, db: AsyncSession, md5_list: List[str], rtx_id: str
     ) -> None:
         try:
-            stmt = update(XtbRoleModel).where(XtbRoleModel.md5.in_(md5_list)).values(
+            stmt = update(XtbMenuModel).where(XtbMenuModel.md5.in_(md5_list)).values(
                 status = True,
                 delete_rtx = rtx_id,
                 delete_time = func.now(),

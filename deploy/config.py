@@ -97,6 +97,9 @@ if not db_link:
     printer_error(content="配置文件[db->link]数据库连接地址空，系统退出！", hr=True)
     sys.exit(1)
 
+# menu
+menu_root: int = data["menu"].get("root") or 0
+
 # redis
 redis_host: str = data["redis"].get("host")
 redis_port: int = data["redis"].get("port")

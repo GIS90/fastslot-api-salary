@@ -66,3 +66,6 @@ class CUDField:
 class StatusField:
     status: Mapped[bool] = mapped_column(name="status", type_=Boolean(), default=False, comment="状态：1注销/删除；0启用/正常（默认）")
 
+
+class OrderIdFiled:
+    order_id: Mapped[int] = mapped_column(name="order_id", type_=Integer, comment="数据排序ID")

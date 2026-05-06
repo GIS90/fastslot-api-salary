@@ -32,18 +32,20 @@ Life is short, I use python.
 """
 from deploy.view.root import router as root_router
 from deploy.view.access import router as access_router
+from deploy.view.x import router as x_router
 from deploy.view.api import router as api_router
 from deploy.view.upload import router as upload_router
 
-from deploy.view.system.xtb_user import router as xtb_user_router
-from deploy.view.system.xtb_role import router as xtb_role_router
+from deploy.view.system.xtb_user import router as system_xtb_user_router
+from deploy.view.system.xtb_role import router as system_xtb_role_router
 
 
 """
 View根据系统设计的api进行模块划分，其中有3个比较特殊（不为系统模块设计API）
 - root：路径为/，系统首页
-- access：JWT Token系统验证 [不走token验证]
-- api：为对外开发的API集合 [不走token验证]
+- access：系统登录、退出API，采用JWT Token系统验证 [不走token验证]
+- x：系统正常运行的API集合
+- api：对外开发的API集合 [不走token验证]
 - upload：文件上传模块 [File UploadFile]
 
 功能模块
@@ -57,8 +59,9 @@ __all__ = ["add_routers"]
 add_routers = [
     root_router,
     access_router,
+    x_router,
     api_router,
     upload_router,
-    xtb_user_router,
-    xtb_role_router,
+    system_xtb_user_router,
+    system_xtb_role_router,
 ]

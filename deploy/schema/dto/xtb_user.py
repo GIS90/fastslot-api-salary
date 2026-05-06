@@ -50,6 +50,7 @@ xtb_user_list_fields = [
 
 
 xtb_user_detail_fields = [
+    {"key": "id", "type": ft.INT},
     {"key": "rtx_id", "type": ft.STR, "name": "rtxId"},
     {"key": "name"},
     {"key": "sex"},

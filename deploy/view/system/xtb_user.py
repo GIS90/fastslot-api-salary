@@ -4,7 +4,7 @@
 ------------------------------------------------
 
 describe: 
-    xtb_user view
+    system xtb_user view
 
 base_info:
     __author__ = PyGo
@@ -118,3 +118,4 @@ async def batch_delete_soft(
     xtb_user_service: XtbUserService = Depends(get_xtb_user_service)
 ) -> Status:
     return await xtb_user_service.batch_delete_soft(rtx_id=token_rtx_id, md5_list=md5_list)
+

@@ -4,16 +4,16 @@
 ------------------------------------------------
 
 describe: 
-    system xtb_role view
+    system xtb_menu view
 
 base_info:
     __author__ = PyGo
-    __time__ = 2026/4/2 23:29
+    __time__ = 2026/5/6 21:06
     __version__ = v.1.0.0
     __mail__ = gaoming971366@163.com
     __blog__ = www.pygo2.top
     __project__ = fastslot-api-salary
-    __file_name__ = xtb_role.py
+    __file_name__ = xtb_menu.py
 
 usage:
     
@@ -42,7 +42,7 @@ from deploy.schema.po.xtb_role import XtbRoleAddModel, XtbRoleUpdateModel
 
 
 # router
-router: APIRouter = APIRouter(prefix="/system/role", tags=["系统管理-角色管理"])
+router: APIRouter = APIRouter(prefix="/system/menu", tags=["系统管理-菜单管理"])
 # service
 def get_xtb_role_service(db: AsyncSession = Depends(get_session)) -> XtbRoleService:
     return XtbRoleService(db_connection=db)
@@ -118,3 +118,4 @@ async def batch_delete_soft(
     xtb_role_service: XtbRoleService = Depends(get_xtb_role_service)
 ) -> Status:
     return await xtb_role_service.batch_delete_soft(rtx_id=token_rtx_id, md5_list=md5_list)
+

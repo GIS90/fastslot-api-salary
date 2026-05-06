@@ -4,6 +4,7 @@
 ------------------------------------------------
 
 describe: 
+    xtb_role fields
 
 base_info:
     __author__ = PyGo

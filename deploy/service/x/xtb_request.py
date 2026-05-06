@@ -72,17 +72,18 @@ class XtbRequestService:
 
         # 基本信息
         new_model = await self.xtb_request_curd.new_model()
-        new_model.md5_id = md5_func(
+        new_model.md5 = md5_func(
             "%s-%s-%s-%s-%s" % (now, rtx_id, request_body.client.host, path, request_body.method)
         )  # md5
         new_model.rtx_id = rtx_id
         new_model.ip = request_body.client.host
-        new_model.params = request_body.query_params
+        if request_body.query_params:
+            new_model.params = request_body.query_params
         new_model.method = request_body.method
         new_model.path = path
         new_model.full_path = f"{path}{request_body.url.query}"
-        new_model.host_url = f"{request_body.url.scheme}//{request_body.url.netloc}"
-        new_model.url = request_body.url
+        new_model.host_url = f"{request_body.url.scheme}://{request_body.url.netloc}"
+        new_model.url = str(request_body.url)
         new_model.cost = cost
         # 其他信息
         new_model.create_time = now
