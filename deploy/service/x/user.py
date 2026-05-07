@@ -29,13 +29,10 @@ Life is short, I use python.
 
 ------------------------------------------------
 """
-from datetime import datetime
-from typing import Dict, List, Tuple, Literal, Any
 from sqlalchemy.ext.asyncio import AsyncSession
 from deploy.curd.xtb_user import XtbUserCurd
 from deploy.curd.xtb_role import XtbRoleCurd
 from deploy.curd.xtb_menu import XtbMenuCurd
-from deploy.schema.dao.xtb_user import XtbUserModel
 from deploy.utils.status import Status, SuccessStatus, FailureStatus
 from deploy.utils.status_value import (StatusCode as status_code,
                                        StatusMsg as status_msg)
@@ -48,7 +45,6 @@ from deploy.config import (server_user as SERVER_USER_ADMIN,
 
 
 class UserService:
-
 
     def __init__(self, db_connection: AsyncSession):
         """
