@@ -56,10 +56,10 @@ CREATE TABLE `xtb_request`  (
     `host_url` varchar(100) COMMENT '请求HOST',
     `url` varchar(255) COMMENT '请求全路径',
     `cost` decimal(10, 4) COMMENT '运行时间',
-    `create_time` timestamp not null default CURRENT_TIMESTAMP COMMENT '创建时间',
+    `create_time` datetime default CURRENT_TIMESTAMP COMMENT '创建时间',
     `create_date` date not null COMMENT '创建日期',
-    `delete_time` timestamp COMMENT '删除时间',
-    `delete_rtx` varchar(35) COMMENT '删除用户',
+    `delete_rtx` varchar(35) COMMENT '删除用户RTX-ID',
+    `delete_time` datetime COMMENT '删除时间',
     `status` bool default False COMMENT '状态：1注销/删除；0启用/正常（默认）',
 
     PRIMARY KEY (`id`),
@@ -110,6 +110,7 @@ CREATE TABLE `xtb_menu`  (
     `level` int default 1 NOT NULL COMMENT '菜单级别，默认1级菜单，根节点为0',
     `md5` varchar(64) NOT NULL unique COMMENT '数据唯一标识：MD5-ID',
     `type` varchar(35) default 'MENU' NOT NULL COMMENT '菜单类型：MENU=菜单，LINK=外链，BUTTON=按钮',
+    `link` varchar(100) COMMENT '菜单类型=LINK的时候，外链接地址',
     `component` varchar(255) NOT NULL COMMENT '路由组件，与Vue router mappings映射[注：需要与父节点连接映射]',
     `hidden` bool default False COMMENT '是否在SideBar显示，默认为false',
     `redirect` varchar(255) COMMENT '菜单重定向，主要用于URL一级菜单跳转',
@@ -150,6 +151,17 @@ VALUES
 (3, '控制台', 'HomeDashboard', '/dashboard', 2, 2, '7e359079d011694cfb41d864ea66a5da', '/home/index', FALSE, '', 'Grid', TRUE, TRUE, FALSE, 'MENU', TRUE, 2, 'admin', FALSE, FALSE, ''),
 (4, '数据面板', 'HomeDataPan', '/datapan', 2, 2, 'd97c7ab6c1fb8827f81a21c2b8dff8c4', '/home/dataPan', FALSE, '', 'Histogram', TRUE, TRUE, FALSE, 'MENU', TRUE, 3, 'admin', FALSE, FALSE, ''),
 
+
+-- 工资模块[一级菜单]
+(5, '工资', 'Salary', '/salary', 1, 1, 'b083a446a3588547410dbd6c571c2a09', '/salary', FALSE, '', 'Briefcase', TRUE, FALSE, FALSE, 'MENU', TRUE, 100, 'admin', FALSE, FALSE, ''),
+--   > 通知管理[二级菜单]
+(15, '消息通知', 'ToolNotify', '/salary/notify', 5, 2, '365fc754afb9cf062b6563eae3894f55', '/salary/notify', FALSE, '', 'BellFilled', TRUE, FALSE, FALSE, 'MENU', TRUE, 110, 'admin', FALSE, FALSE, ''),
+--   >> [三级级菜单]
+(16, '钉钉绩效', 'ToolNotifyDtalk', '/salary/notify/dtalk', 15, 3, '735d60bec2c85e6b9b82b40e0bbbcc3f', '/salary/notify/dtalk/index', FALSE, '', '', TRUE, FALSE, FALSE, 'MENU', TRUE, 111, 'admin', FALSE, TRUE, ''),
+(17, '企微通知', 'ToolNotifyQywx', '/salary/notify/qywx', 15, 3, '288da65f09e781e8406aa6e20ad73843', '/salary/notify/qywx/index', FALSE, '', '', TRUE, FALSE, FALSE, 'MENU', TRUE, 112, 'admin', FALSE, TRUE, ''),
+(18, '邮件通知', 'ToolNotifyMessage', '/salary/notify/message', 15, 3, '55c26864748b7cd5e79c3cf71ff54c48', '/salary/notify/message/index', FALSE, '', '', TRUE, FALSE, FALSE, 'MENU', TRUE, 113, 'admin', FALSE, TRUE, ''),
+(18, '短信通知', 'ToolNotifyMessage', '/salary/notify/message', 15, 3, '55c26864748b7cd5e79c3cf71ff54c48', '/salary/notify/message/index', FALSE, '', '', TRUE, FALSE, FALSE, 'MENU', TRUE, 113, 'admin', FALSE, TRUE, ''),
+
 -- 工具模块[一级菜单]
 (5, '工具', 'Tool', '/tool', 1, 1, 'd421fd439cd14456726791338b3b397e', '/tool', FALSE, '', 'Briefcase', TRUE, FALSE, FALSE, 'MENU', TRUE, 100, 'admin', FALSE, FALSE, ''),
 -- = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
@@ -168,12 +180,7 @@ VALUES
 (13, '问题检索', 'ToolSearchProbase', '/tool/search/probase', 11, 3, '07059a7d498655c21282f08f807d0251', '/tool/search/probase/index', FALSE, '', '', TRUE, FALSE, FALSE, 'MENU', TRUE, 108, 'admin', FALSE, TRUE, ''),
 (14, '知识分享', 'ToolSearchShare', '/tool/search/share', 11, 3, '1fb353280f4bf05af34c7b971d5c9a2b', '/tool/search/share/index', FALSE, '', '', TRUE, FALSE, FALSE, 'MENU', TRUE, 109, 'admin', FALSE, TRUE, ''),
 -- ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^
---   > 通知管理[二级菜单]
-(15, '消息通知', 'ToolNotify', '/tool/notify', 5, 2, '365fc754afb9cf062b6563eae3894f55', '/tool/notify', FALSE, '', 'BellFilled', TRUE, FALSE, FALSE, 'MENU', TRUE, 110, 'admin', FALSE, FALSE, ''),
---   >> [三级级菜单]
-(16, '钉钉绩效', 'ToolNotifyDtalk', '/tool/notify/dtalk', 15, 3, '735d60bec2c85e6b9b82b40e0bbbcc3f', '/tool/notify/dtalk/index', FALSE, '', '', TRUE, FALSE, FALSE, 'MENU', TRUE, 111, 'admin', FALSE, TRUE, ''),
-(17, '企微通知', 'ToolNotifyQywx', '/tool/notify/qywx', 15, 3, '288da65f09e781e8406aa6e20ad73843', '/tool/notify/qywx/index', FALSE, '', '', TRUE, FALSE, FALSE, 'MENU', TRUE, 112, 'admin', FALSE, TRUE, ''),
-(18, '短信通知', 'ToolNotifyMessage', '/tool/notify/message', 15, 3, '55c26864748b7cd5e79c3cf71ff54c48', '/tool/notify/message/index', FALSE, '', '', TRUE, FALSE, FALSE, 'MENU', TRUE, 113, 'admin', FALSE, TRUE, ''),
+
 -- & & & & & & & & & & & & & & & & & & & & & & & & & & & & & & & & & & & & & & & & & & & & & & & & & & & & & & & &
 --   > 其他工具[二级菜单]
 (19, '其他工具', 'ToolOther', '/tool/other', 5, 2, '86be6c29afcab6c8908e11b3ff238491', '/tool/other', FALSE, '', 'Opportunity', TRUE, FALSE, FALSE, 'MENU', TRUE, 900, 'admin', FALSE, FALSE, ''),

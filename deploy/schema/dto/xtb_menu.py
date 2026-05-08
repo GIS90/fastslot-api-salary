@@ -75,7 +75,7 @@ xtb_tree_detail_fields = [
     {"key": "breadcrumb", "type": ft.BOOL},
     {"key": "shortcut", "type": ft.BOOL, "null": True},
     {"key": "tag", "null": True},
-    {"key": "order_id", "type": ft.INT, "name": "orderId"}
+    {"key": "order_id", "type": ft.INT}
 ]
 
 

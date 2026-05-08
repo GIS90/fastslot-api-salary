@@ -29,6 +29,7 @@ Life is short, I use python.
 
 ------------------------------------------------
 """
+from typing import Dict
 from sqlalchemy.ext.asyncio import AsyncSession
 from deploy.curd.xtb_user import XtbUserCurd
 from deploy.curd.xtb_role import XtbRoleCurd
@@ -45,6 +46,11 @@ from deploy.config import (server_user as SERVER_USER_ADMIN,
 
 
 class UserService:
+
+    __xtb_menu_tree_attrs = [
+        'id', 'name', 'path', 'pid', 'level', 'md5', 'component', 'type', 'link', 'redirect', 'order_id',
+        'title', 'icon', 'cache', 'affix', 'full', 'hidden', 'tag', 'breadcrumb'
+    ]
 
     def __init__(self, db_connection: AsyncSession):
         """
@@ -64,6 +70,63 @@ class UserService:
     @staticmethod
     async def __contain_admin_role(roles: list) -> bool:
         return SERVER_ROLE_ADMIN in roles
+
+    async def __xtb_menu_model_to_tree_dict(self, model) -> Dict:
+        if not model:
+            return {}
+
+        _res = dict()
+        _meta = dict()
+        for attr in self.__xtb_menu_tree_attrs:
+            if attr == 'id':
+                _res[attr] = model.id
+            elif attr == 'name':
+                _res[attr] = model.name
+            elif attr == 'path':
+                _res[attr] = model.path
+            elif attr == 'pid':
+                _res[attr] = model.pid
+            elif attr == 'level':
+                _res[attr] = model.level
+            elif attr == 'md5':
+                _res[attr] = model.md5
+            elif attr == 'order_id':
+                _res[attr] = model.order_id
+            elif attr == 'component':
+                _res[attr] = model.component
+            elif attr == 'redirect':
+                _res[attr] = model.redirect
+            # * * * * * * * * * * * * * * * * * * * * * * * *
+            elif attr == 'type':
+                # 此菜单类型，MENU=菜单，LINK=外链，BUTTON=按钮
+                _meta[attr] = model.type or "MENU"
+            elif attr == 'title':
+                # 菜单标题
+                _meta[attr] = model.title
+            elif attr == 'icon':
+                # 菜单图标
+                _meta[attr] = model.icon
+            elif attr == 'cache':
+                # 是否缓存路由
+                _meta["isKeepAlive"] = True if model.cache else False
+            elif attr == 'affix':
+                # 菜单是否固定在标签页中 (首页通常是固定项)
+                _meta["isAffix"] = True if model.affix else False
+            elif attr == 'full':
+                # 菜单是否全屏 (示例：数据大屏页面)
+                _meta["isFull"] = True if model.full else False
+            elif attr == 'hidden':
+                # 是否在菜单中隐藏
+                _meta["isHide"] = True if model.hidden else False
+            elif attr == 'breadcrumb':
+                # 是否在面包屑菜单中显示
+                _meta["isBreadcrumb"] = True if model.breadcrumb else False
+            elif attr == 'tag':
+                _meta[attr] = model.tag
+            # * * * * * * * * * * * * * * * * * * * * * * * *
+        else:
+            _res['meta'] = _meta
+            return _res
 
     async def auth(self, token_rtx_id: str) -> Status:
         """
@@ -117,7 +180,7 @@ class UserService:
                     or getattr(menu, "hidden"):
                 continue
 
-            _d = await model_converter_dict(menu, fields=xtb_tree_detail_fields)
+            _d = await self.__xtb_menu_model_to_tree_dict(model=menu)
             if not _d: continue
             _all_menus_dict_list.append(_d)
 
