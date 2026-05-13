@@ -49,7 +49,7 @@ class ApiService:
         super(ApiService, self).__init__()
 
     def __str__(self):
-        print("ApiService class.")
+        return "ApiService class."
 
     def __repr__(self):
         self.__str__()

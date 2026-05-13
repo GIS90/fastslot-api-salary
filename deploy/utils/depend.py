@@ -40,7 +40,7 @@ from deploy.config import redis_host, redis_port, redis_db, redis_password
 from deploy.schema.po.x import PageListModel, DownloadFileModel
 from deploy.schema.po.menu import MenuBaseModel, MenuEditModel
 from deploy.curd.database import get_session_context
-from deploy.service.system.xtb_user import XtbUserService
+from deploy.service.system.main.user import SystemMainUserService
 
 
 # redis-cli
@@ -90,7 +90,7 @@ async def depend_token_rtx_valid(
     # 用户数据验证
     async with get_session_context() as db:
         try:
-            service = XtbUserService(db_connection=db)
+            service = SystemMainUserService(db_connection=db)
             # 调用 add 方法
             model = await service.depend_by_rtx_id(rtx_id=token_rtx_id)
         except Exception as e:

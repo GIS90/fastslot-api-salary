@@ -44,19 +44,19 @@ from deploy.utils.utils import get_now, random_string, md5 as generator_md5
 from deploy.config import server_user as SERVER_USER_ADMIN
 
 
-class XtbUserService:
+class SystemMainUserService:
 
     DEFAULT_AVATAR: str = "http://pygo2.top/images/article_github.jpg"
 
     def __init__(self, db_connection: AsyncSession):
         """
-        XtbUserService class initialize
+        SystemMainUserService class initialize
         """
         self.db: AsyncSession = db_connection
         self.xtb_user_curd: XtbUserCurd = XtbUserCurd()
 
     def __str__(self):
-        print("XtbUserService class.")
+        return "SystemMainUserService class."
 
     def __repr__(self):
         return self.__str__()

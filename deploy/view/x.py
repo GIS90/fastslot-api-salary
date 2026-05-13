@@ -34,20 +34,20 @@ from fastapi import APIRouter, Depends
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from deploy.curd.database import get_session
-from deploy.service.x.user import UserService
+from deploy.service.x.user import XUserService
 from deploy.utils.status import Status
 from deploy.utils.depend import depend_token_rtx
 
 # router
 router: APIRouter = APIRouter(prefix="/x", tags=["系统正常运行相关APIs"])
 # service
-def get_user_service(db: AsyncSession = Depends(get_session)) -> UserService:
-    return UserService(db_connection=db)
+def get_user_service(db: AsyncSession = Depends(get_session)) -> XUserService:
+    return XUserService(db_connection=db)
 
 
 @router.get("/auth", summary="用户菜单权限，用于系统登录后获取用户权限菜单树")
 async def auth(
     token_rtx_id: str = Depends(depend_token_rtx),
-    user_service: UserService = Depends(get_user_service)
+    user_service: XUserService = Depends(get_user_service)
 ) -> Status:
     return await user_service.auth(token_rtx_id)

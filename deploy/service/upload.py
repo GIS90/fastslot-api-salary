@@ -59,7 +59,7 @@ class UploadService:
         super(UploadService, self).__init__()
 
     def __str__(self):
-        print("UploadService class.")
+        return "UploadService class."
 
     def __repr__(self):
         self.__str__()

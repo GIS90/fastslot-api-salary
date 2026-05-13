@@ -54,7 +54,7 @@ class XtbMenuService:
         self.xtb_role_curd: XtbRoleCurd = XtbRoleCurd()
 
     def __str__(self):
-        print("XtbMenuService class.")
+        return "XtbMenuService class."
 
     def __repr__(self):
         return self.__str__()

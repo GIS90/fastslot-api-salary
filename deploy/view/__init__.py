@@ -36,8 +36,8 @@ from deploy.view.x import router as x_router
 from deploy.view.api import router as api_router
 from deploy.view.upload import router as upload_router
 
-from deploy.view.system.xtb_user import router as system_xtb_user_router
-from deploy.view.system.xtb_role import router as system_xtb_role_router
+from deploy.view.system.main.user import router as system_main_user_router
+from deploy.view.system.main.role import router as system_mian_role_router
 
 
 """
@@ -62,6 +62,6 @@ add_routers = [
     x_router,
     api_router,
     upload_router,
-    system_xtb_user_router,
-    system_xtb_role_router,
+    system_main_user_router,
+    system_mian_role_router,
 ]

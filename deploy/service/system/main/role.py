@@ -44,17 +44,17 @@ from deploy.utils.utils import get_now, d2s, md5 as generator_md5
 from deploy.config import server_role as SERVER_ROLE_ADMIN
 
 
-class XtbRoleService:
+class SystemMainRoleService:
 
     def __init__(self, db_connection: AsyncSession):
         """
-        XtbRoleService class initialize
+        SystemMainRoleService class initialize
         """
         self.db: AsyncSession = db_connection
         self.xtb_role_curd: XtbRoleCurd = XtbRoleCurd()
 
     def __str__(self):
-        print("XtbRoleService class.")
+        return "SystemMainRoleService class."
 
     def __repr__(self):
         return self.__str__()

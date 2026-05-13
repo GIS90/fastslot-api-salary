@@ -47,7 +47,7 @@ from deploy.config import (app_secret_key, app_allow_host, app_cors_origin, app_
                            app_session_max_age, app_request_method, app_gzip_size, app_gzip_level,
                            jwt_token_verify)
 from deploy.utils.token import verify_access_token_expire
-from deploy.service.x.xtb_request import XtbRequestService
+from deploy.service.x.request import XRequestService
 from deploy.curd.database import get_session_context_manual, AsyncSessionLocal
 
 
@@ -220,9 +220,9 @@ def register_app_middleware(app: FastAPI, app_headers: Dict):
         """
         async with AsyncSessionLocal() as db:
             try:
-                xtb_request_service = XtbRequestService(db_connection=db)
+                request_service = XRequestService(db_connection=db)
                 # 调用 add 方法
-                await xtb_request_service.add(
+                await request_service.add(
                     rtx_id=__token_rtx_id or request.headers.get('X-Token'),
                     request_body=request,
                     cost=cost
