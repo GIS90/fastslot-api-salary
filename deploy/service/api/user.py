@@ -45,7 +45,7 @@ from deploy.config import (server_user as SERVER_USER_ADMIN,
                            menu_root as MENU_ROOT_ID)
 
 
-class XUserService:
+class ApiUserService:
 
     __xtb_menu_tree_attrs = [
         'id', 'name', 'path', 'pid', 'level', 'md5', 'component', 'type', 'link', 'redirect', 'order_id',
@@ -54,7 +54,7 @@ class XUserService:
 
     def __init__(self, db_connection: AsyncSession):
         """
-        XUserService class initialize
+        ApiUserService class initialize
         """
         self.db: AsyncSession = db_connection
         self.xtb_user_curd: XtbUserCurd = XtbUserCurd()
@@ -62,7 +62,7 @@ class XUserService:
         self.xtb_menu_curd: XtbMenuCurd = XtbMenuCurd()
 
     def __str__(self):
-        return "XUserService class."
+        return "ApiUserService class."
 
     def __repr__(self):
         return self.__str__()

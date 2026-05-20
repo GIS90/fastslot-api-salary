@@ -17,8 +17,8 @@ request_method = ["GET", "POST", "PUT", "DELETE", "OPTIONS"]  # 允许通过的�
 gzip_size = 1000
 gzip_level = 6
 # docs
-openapi_url = "/api/documentation/v1/openapi.json"
-docs_url = "/api/documentation/v1/docs"
+openapi_url = "/api/open/documentation/openapi.json"
+docs_url = "/api/open/documentation/docs"
 # 静态资源
 static = "static"  # 静态资源目录名称，并且固定在deploy目录下
 

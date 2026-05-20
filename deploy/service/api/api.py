@@ -31,7 +31,7 @@ Life is short, I use python.
 ------------------------------------------------
 """
 
-class ApiService:
+class ApiOpenService:
     """
     API Service
     """
@@ -46,10 +46,10 @@ class ApiService:
         """
         ApiService class initialize
         """
-        super(ApiService, self).__init__()
+        super(ApiOpenService, self).__init__()
 
     def __str__(self):
-        return "ApiService class."
+        return "ApiOpenService class."
 
     def __repr__(self):
         self.__str__()

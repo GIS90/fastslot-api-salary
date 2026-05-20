@@ -47,7 +47,7 @@ from deploy.config import (app_secret_key, app_allow_host, app_cors_origin, app_
                            app_session_max_age, app_request_method, app_gzip_size, app_gzip_level,
                            jwt_token_verify)
 from deploy.utils.token import verify_access_token_expire
-from deploy.service.x.request import XRequestService
+from deploy.service.api.request import ApiRequestService
 from deploy.curd.database import get_session_context_manual, AsyncSessionLocal
 
 
@@ -165,7 +165,7 @@ def register_app_middleware(app: FastAPI, app_headers: Dict):
           - access: login in and login out APIs
         """
         if request.url.path == "/" or \
-                request.url.path.startswith("/api/") or \
+                request.url.path.startswith("/api/open") or \
                 request.url.path.startswith("/static/") or \
                 request.url.path.startswith("/access/"):
             __is_verify_token = False
@@ -220,7 +220,7 @@ def register_app_middleware(app: FastAPI, app_headers: Dict):
         """
         async with AsyncSessionLocal() as db:
             try:
-                request_service: XRequestService = XRequestService(db_connection=db)
+                request_service: ApiRequestService = ApiRequestService(db_connection=db)
                 # 调用 add 方法
                 await request_service.add(
                     rtx_id=__token_rtx_id or request.headers.get('X-Token'),

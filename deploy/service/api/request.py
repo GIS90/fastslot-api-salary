@@ -38,17 +38,17 @@ from deploy.curd.xtb_request import XtbRequestCurd
 from deploy.utils.utils import md5 as md5_func
 
 
-class XRequestService:
+class ApiRequestService:
 
     def __init__(self, db_connection: AsyncSession):
         """
-        XRequestService class initialize
+        ApiRequestService class initialize
         """
         self.db: AsyncSession = db_connection
         self.xtb_request_curd = XtbRequestCurd()
 
     def __str__(self):
-        return "XRequestService class."
+        return "ApiRequestService class."
 
     def __repr__(self):
         self.__str__()
