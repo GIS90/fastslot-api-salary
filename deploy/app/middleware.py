@@ -220,7 +220,7 @@ def register_app_middleware(app: FastAPI, app_headers: Dict):
         """
         async with AsyncSessionLocal() as db:
             try:
-                request_service = XRequestService(db_connection=db)
+                request_service: XRequestService = XRequestService(db_connection=db)
                 # 调用 add 方法
                 await request_service.add(
                     rtx_id=__token_rtx_id or request.headers.get('X-Token'),

@@ -51,3 +51,19 @@ async def auth(
     user_service: XUserService = Depends(get_user_service)
 ) -> Status:
     return await user_service.auth(token_rtx_id)
+
+
+@router.get('/dashboard', summary="[USER]用户Dashboard")
+async def dashboard(
+    token_rtx_id: str = Depends(depend_token_rtx),
+    user_service: XUserService = Depends(get_user_service)
+) -> Status:
+    return await user_service.dashboard(token_rtx_id)
+
+
+# @user.get('/task', summary="[USER]用户Task列表")
+# async def task(
+#         params: dict = Depends(pageable_params),
+#         token_rtx_id: str = Depends(depend_token_rtx)
+# ) -> Status:
+#     return await user_service.task(token_rtx_id, params)

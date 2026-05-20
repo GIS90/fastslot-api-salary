@@ -72,25 +72,29 @@ class XtbRequestCurd(BaseCurd):
         return await self._get_model_by_field(db, XtbRequestModel.md5, md5)
 
     @classmethod
-    async def get_count(cls, db: AsyncSession) -> int:
+    async def get_count(cls, db: AsyncSession, rtx_id: Optional[str] = None) -> int:
         try:
-            result = await db.execute(
-                select(func.count(XtbRequestModel.id)).where(XtbRequestModel.status != 1)
-            )
+            stmt = select(func.count(XtbRequestModel.id)).where(XtbRequestModel.status != 1)
+            if rtx_id:
+                stmt = stmt.where(XtbRequestModel.rtx_id == rtx_id)
+            result = await db.execute(stmt)
             return result.scalar()
         except Exception as e:
             raise SQLDBHandleException(f"[{cls.__name__}*总数]{e}")
 
     @classmethod
     async def get_pagination(
-        cls, db: AsyncSession, offset: int = 0, limit: int = 15
+        cls, db: AsyncSession, offset: int = 0, limit: int = 15, rtx_id: Optional[str] = None, **kwargs
     ) -> Optional[List]:
         try:
-            stmt = (select(XtbRequestModel)
-                    .where(XtbRequestModel.status != 1)
+            stmt = select(XtbRequestModel).where(XtbRequestModel.status != 1)
+            if rtx_id:
+                stmt = stmt.where(XtbRequestModel.rtx_id == rtx_id)
+            stmt = (stmt
                     .order_by(desc(XtbRequestModel.id))
                     .offset(offset)
                     .limit(limit))
+
             result = await db.execute(stmt)
             return result.scalars().all()
         except Exception as e:

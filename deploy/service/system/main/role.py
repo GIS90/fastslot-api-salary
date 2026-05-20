@@ -92,7 +92,7 @@ class SystemMainRoleService:
         if not models:
             return FailureStatus(code=status_code.CODE_101_SUCCESS_NO_DATA)
 
-        id_value: int = params.get("offset") * params.get("limit") + 1
+        id_value: int = params.get("offset") + 1
         data: List = await many_model_converter_dict(
             models=models,
             fields=xtb_role_list_fields,

@@ -46,7 +46,7 @@ from deploy.config import server_user as SERVER_USER_ADMIN
 
 class SystemMainUserService:
 
-    DEFAULT_AVATAR: str = "http://pygo2.top/images/article_github.jpg"
+    DEFAULT_AVATAR: str = "http://2lstore.pygo.space/avatars/default.png"
 
     def __init__(self, db_connection: AsyncSession):
         """

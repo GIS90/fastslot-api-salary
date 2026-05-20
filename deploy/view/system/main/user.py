@@ -38,7 +38,7 @@ from deploy.curd.database import get_session
 from deploy.service.system.main.user import SystemMainUserService
 from deploy.utils.status import Status
 from deploy.utils.depend import pageable_params, depend_token_rtx
-from deploy.schema.po.xtb_user import XtbUserAddModel, XtbUserUpdateModel
+from deploy.schema.po.system_main_user import XtbUserAddModel, XtbUserUpdateModel
 
 
 # router

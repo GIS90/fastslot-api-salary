@@ -170,3 +170,31 @@ _config = {
 
 Enjoy the good life every day！！！
 
+
+
+支持多个动态条件
+async def get_pagination(
+    cls, db: AsyncSession, offset: int = 0, limit: int = 15, 
+    filters: Optional[dict] = None, *args, **kwargs
+) -> Optional[List]:
+    try:
+        stmt = select(XtbRequestModel).where(XtbRequestModel.status != 1)
+        
+        # 动态添加过滤条件
+        if filters:
+            for field, value in filters.items():
+                if value is not None and hasattr(XtbRequestModel, field):
+                    stmt = stmt.where(getattr(XtbRequestModel, field) == value)
+        
+        stmt = (stmt
+                .order_by(desc(XtbRequestModel.id))
+                .offset(offset)
+                .limit(limit))
+        
+        result = await db.execute(stmt)
+        return result.scalars().all()
+    except Exception as e:
+        raise SQLDBHandleException(f"[{cls.__name__}*查询All]{e}")
+
+# 调用方式
+await get_pagination(db, offset=0, limit=15, filters={'user_id': 123})

@@ -206,3 +206,371 @@ class XUserService:
         # menus_tree = build_menu_tree_fci(flat_menus=menu, parent_id=MENU_ROOT_ID, id_key="id", parent_key="pid", children_key="children")   # 方式一
         menus_tree = build_menu_tree_iterative(flat_menus=__menu, root_id=MENU_ROOT_ID, id_key="id", parent_key="pid", children_key="children")  # 方式二
         return SuccessStatus(data={"menu": menus_tree})
+
+    async def dashboard(self, token_rtx_id: str) -> Status:
+        """
+        Dashboard
+        :param rtx_id:
+        :return:
+        """
+        data = {
+            "columnChart": {
+                "grid": {
+                    "bottom": "3%",
+                    "containLabel": True,
+                    "left": "3%",
+                    "right": "4%"
+                },
+                "legend": {
+                    "textStyle": {
+                        "color": "#a1a1a1"
+                    }
+                },
+                "series": [
+                    {
+                        "data": [
+                            320,
+                            332,
+                            301,
+                            334,
+                            390,
+                            330,
+                            320
+                        ],
+                        "emphasis": {
+                            "focus": "series"
+                        },
+                        "name": "Direct",
+                        "type": "bar"
+                    },
+                    {
+                        "data": [
+                            120,
+                            132,
+                            101,
+                            134,
+                            90,
+                            230,
+                            210
+                        ],
+                        "emphasis": {
+                            "focus": "series"
+                        },
+                        "name": "Email",
+                        "stack": "Ad",
+                        "type": "bar"
+                    },
+                    {
+                        "data": [
+                            220,
+                            182,
+                            191,
+                            234,
+                            290,
+                            330,
+                            310
+                        ],
+                        "emphasis": {
+                            "focus": "series"
+                        },
+                        "name": "Union Ads",
+                        "stack": "Ad",
+                        "type": "bar"
+                    },
+                    {
+                        "data": [
+                            150,
+                            232,
+                            201,
+                            154,
+                            190,
+                            330,
+                            410
+                        ],
+                        "emphasis": {
+                            "focus": "series"
+                        },
+                        "name": "Video Ads",
+                        "stack": "Ad",
+                        "type": "bar"
+                    },
+                    {
+                        "data": [
+                            862,
+                            1018,
+                            964,
+                            1026,
+                            1679,
+                            1600,
+                            1570
+                        ],
+                        "emphasis": {
+                            "focus": "series"
+                        },
+                        "markLine": {
+                            "data": [
+                                [
+                                    {
+                                        "type": "min"
+                                    },
+                                    {
+                                        "type": "max"
+                                    }
+                                ]
+                            ],
+                            "lineStyle": {
+                                "type": "dashed"
+                            }
+                        },
+                        "name": "Search Engine",
+                        "type": "bar"
+                    },
+                    {
+                        "barWidth": 5,
+                        "data": [
+                            620,
+                            732,
+                            701,
+                            734,
+                            1090,
+                            1130,
+                            1120
+                        ],
+                        "emphasis": {
+                            "focus": "series"
+                        },
+                        "name": "Baidu",
+                        "stack": "Search Engine",
+                        "type": "bar"
+                    },
+                    {
+                        "data": [
+                            120,
+                            132,
+                            101,
+                            134,
+                            290,
+                            230,
+                            220
+                        ],
+                        "emphasis": {
+                            "focus": "series"
+                        },
+                        "name": "Google",
+                        "stack": "Search Engine",
+                        "type": "bar"
+                    },
+                    {
+                        "data": [
+                            60,
+                            72,
+                            71,
+                            74,
+                            190,
+                            130,
+                            110
+                        ],
+                        "emphasis": {
+                            "focus": "series"
+                        },
+                        "name": "Bing",
+                        "stack": "Search Engine",
+                        "type": "bar"
+                    }
+                ],
+                "tooltip": {
+                    "axisPointer": {
+                        "type": "shadow"
+                    },
+                    "trigger": "axis"
+                },
+                "xAxis": [
+                    {
+                        "axisLabel": {
+                            "color": "#a1a1a1"
+                        },
+                        "data": [
+                            "Mon",
+                            "Tue",
+                            "Wed",
+                            "Thu",
+                            "Fri",
+                            "Sat",
+                            "Sun"
+                        ],
+                        "type": "category"
+                    }
+                ],
+                "yAxis": [
+                    {
+                        "axisLabel": {
+                            "color": "#a1a1a1"
+                        },
+                        "type": "value"
+                    }
+                ]
+            },
+            "lineChart": {
+                "grid": {
+                    "bottom": "3%",
+                    "containLabel": True,
+                    "left": "3%",
+                    "right": "4%"
+                },
+                "legend": {
+                    "data": [
+                        "Email",
+                        "Union Ads",
+                        "Video Ads",
+                        "Direct",
+                        "Search Engine"
+                    ],
+                    "textStyle": {
+                        "color": "#a1a1a1"
+                    }
+                },
+                "series": [
+                    {
+                        "areaStyle": {},
+                        "data": [
+                            120,
+                            132,
+                            101,
+                            134,
+                            90,
+                            230,
+                            210
+                        ],
+                        "emphasis": {
+                            "focus": "series"
+                        },
+                        "name": "Email",
+                        "stack": "Total",
+                        "type": "line"
+                    },
+                    {
+                        "areaStyle": {},
+                        "data": [
+                            220,
+                            182,
+                            191,
+                            234,
+                            290,
+                            330,
+                            310
+                        ],
+                        "emphasis": {
+                            "focus": "series"
+                        },
+                        "name": "Union Ads",
+                        "stack": "Total",
+                        "type": "line"
+                    },
+                    {
+                        "areaStyle": {},
+                        "data": [
+                            150,
+                            232,
+                            201,
+                            154,
+                            190,
+                            330,
+                            410
+                        ],
+                        "emphasis": {
+                            "focus": "series"
+                        },
+                        "name": "Video Ads",
+                        "stack": "Total",
+                        "type": "line"
+                    },
+                    {
+                        "areaStyle": {},
+                        "data": [
+                            320,
+                            332,
+                            301,
+                            334,
+                            390,
+                            330,
+                            320
+                        ],
+                        "emphasis": {
+                            "focus": "series"
+                        },
+                        "name": "Direct",
+                        "stack": "Total",
+                        "type": "line"
+                    },
+                    {
+                        "areaStyle": {},
+                        "data": [
+                            820,
+                            932,
+                            901,
+                            934,
+                            1290,
+                            1330,
+                            1320
+                        ],
+                        "emphasis": {
+                            "focus": "series"
+                        },
+                        "label": {
+                            "position": "top",
+                            "show": True
+                        },
+                        "name": "Search Engine",
+                        "stack": "Total",
+                        "type": "line"
+                    }
+                ],
+                "title": {
+                    "text": "堆积图",
+                    "textStyle": {
+                        "color": "#a1a1a1"
+                    }
+                },
+                "toolbox": {
+                    "feature": {
+                        "saveAsImage": {}
+                    }
+                },
+                "tooltip": {
+                    "axisPointer": {
+                        "label": {
+                            "backgroundColor": "#6a7985"
+                        },
+                        "type": "cross"
+                    },
+                    "trigger": "axis"
+                },
+                "xAxis": [
+                    {
+                        "axisLabel": {
+                            "color": "#a1a1a1"
+                        },
+                        "boundaryGap": False,
+                        "data": [
+                            "Mon",
+                            "Tue",
+                            "Wed",
+                            "Thu",
+                            "Fri",
+                            "Sat",
+                            "Sun"
+                        ],
+                        "type": "category"
+                    }
+                ],
+                "yAxis": [
+                    {
+                        "axisLabel": {
+                            "color": "#a1a1a1"
+                        },
+                        "type": "value"
+                    }
+                ]
+            }
+        }
+        return SuccessStatus(data=data)
