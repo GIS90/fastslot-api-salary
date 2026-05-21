@@ -30,18 +30,18 @@ Life is short, I use python.
 ------------------------------------------------
 """
 from typing import Annotated
-from fastapi import APIRouter, Depends, Query, Body
+from fastapi import APIRouter, Depends, Query, Body, UploadFile, File
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from deploy.curd.database import get_session
 from deploy.service.setter.profile import SetterProfileService
 from deploy.utils.status import Status
-from deploy.utils.depend import depend_token_rtx, pageable_params
+from deploy.utils.depend import depend_token_rtx, pageable_params, depend_token_rtx_valid
 from deploy.schema.po.setter_profile import ProfileUserBaseModel, ProfileUserPasswordModel
 
 
 # router
-router: APIRouter = APIRouter(prefix="/setter", tags=["设置-个人中心"])
+router: APIRouter = APIRouter(prefix="/setter", tags=["设置->个人中心"])
 # service
 def get_profile_service(db: AsyncSession = Depends(get_session)) -> SetterProfileService:
     return SetterProfileService(db_connection=db)
@@ -76,7 +76,17 @@ async def profile_password(
 @router.get('/profile/log', summary="系统用户日志")
 async def profile_log(
         params: dict = Depends(pageable_params),
-        token_rtx_id: str = Depends(depend_token_rtx),
+        token_rtx_id: str = Depends(depend_token_rtx_valid),
         profile_service: SetterProfileService = Depends(get_profile_service)
 ) -> Status:
     return await profile_service.profile_log(rtx_id=token_rtx_id, params=params)
+
+
+@router.post('/profile/avatar', summary="系统用户头像上传")
+async def profile_avatar(
+        file: UploadFile = File(...),
+        token_rtx_id: str = Depends(depend_token_rtx),
+        profile_service: SetterProfileService = Depends(get_profile_service)
+) -> Status:
+    return await profile_service.profile_avatar(rtx_id=token_rtx_id, image_file=file)
+

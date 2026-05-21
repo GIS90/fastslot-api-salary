@@ -74,7 +74,7 @@ cache = "/Users/gaomingliang/Downloads/_CACHE"
 # 7牛云存储
 yun_access = "mRF0cKGUJcfv7ry_Wyvc24cDNWEQz9DAKo_UOn0G"
 yun_secret = "xabmlB9zZ_MRwtgofQJzUxINnmcO_VUfkXYILx_Q"
-yun_base = "https://2lstore.pygo2.top"
+yun_base = "http://2lstore.pygo.space"
 yun_space = "open2lstore"
 
 # 图片

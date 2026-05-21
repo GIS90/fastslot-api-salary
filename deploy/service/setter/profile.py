@@ -29,6 +29,7 @@ Life is short, I use python.
 
 ------------------------------------------------
 """
+from fastapi import UploadFile
 from typing import Dict, List, Tuple, Literal, Any
 from sqlalchemy.ext.asyncio import AsyncSession
 from deploy.curd.xtb_user import XtbUserCurd
@@ -42,6 +43,9 @@ from deploy.schema.dto.xtb_user import xtb_user_detail_fields
 from deploy.schema.dto.xtb_request import profile_request_list_fields
 from deploy.utils.utils import get_now, md5 as generator_md5
 from deploy.config import server_user as SERVER_USER_ADMIN
+from deploy.delib.image_lib import ImageLib
+from deploy.delib.store_lib import QiNiuStoreLib
+from deploy.config import store_yun_base, store_yun_space
 
 
 class SetterProfileService:
@@ -53,6 +57,11 @@ class SetterProfileService:
         self.db: AsyncSession = db_connection
         self.xtb_user_curd: XtbUserCurd = XtbUserCurd()
         self.xtb_request_curd: XtbRequestCurd = XtbRequestCurd()
+        self.image_lib: ImageLib = ImageLib()
+        self.qiniu_store_lib: QiNiuStoreLib = QiNiuStoreLib(
+            space_url=store_yun_base,
+            space_name=store_yun_space
+        )
 
     def __str__(self):
         return "SetterProfileService class."
@@ -115,7 +124,7 @@ class SetterProfileService:
 
     async def profile_update(self, rtx_id: str, model: Dict) -> Status:
         __flag, data = await self.__valid_model_by_rtx(
-            rtx_id=rtx_id, status_check=False, response_type="model", admin_check=False
+            rtx_id=rtx_id, status_check=True, response_type="model", admin_check=False
         )
         if not __flag: return data
 
@@ -131,7 +140,7 @@ class SetterProfileService:
 
     async def profile_password(self, rtx_id: str, model: dict) -> Status:
         __flag, data = await self.__valid_model_by_rtx(
-            rtx_id=rtx_id, status_check=False, response_type="model", admin_check=False
+            rtx_id=rtx_id, status_check=True, response_type="model", admin_check=False
         )
         if not __flag: return data
 
@@ -187,38 +196,35 @@ class SetterProfileService:
         }
         return SuccessStatus(data=result)
 
-    # async def profile_avatar(self, token_rtx_id: str, image_file: UploadFile) -> Status:
-    #     # ============= 1、image format check =============
-    #     image_name = image_file.filename
-    #     if not self.image_lib.legal(image_name):
-    #         return FailureStatus(
-    #             status_id=Status_code.CODE_454_REQUEST_FILE_NOT_SUPPORT.value,
-    #             message="图片格式不支持")
-    #     # ============= 2、local store =============
-    #     local_res = await self.image_lib.save(image_file, compress=False, _type="uf")
-    #     if local_res.get('status_id') != 100:
-    #         return FailureStatus(
-    #             status_id=Status_code.CODE_456_REQUEST_FILE_LOCAL_STORE_FAILURE.value,
-    #             message=local_res.get('message') or '服务器本地存储失败')
-    #
-    #     local_image_file = local_res.get('data').get('file')
-    #     # local_image_file_info = self.image_lib.scan(local_image_file)     # 图片信息
-    #     # ============= 3、cloud store =============
-    #     cloud_image_name = '%s/%s' % (get_now(format="%Y%m%d"), local_res.get('data').get('name'))
-    #     cloud_res = self.cloud_lib.upload(store_name=cloud_image_name, local_file=local_image_file)
-    #     if cloud_res.get('status_id') != 100:
-    #         return FailureStatus(
-    #             status_id=Status_code.CODE_457_REQUEST_FILE_YUN_STORE_FAILURE.value,
-    #             message=local_res.get('message') or '服务器云存储失败')
-    #     # ============= 4、更新数据 =============
-    #     new_image_url = cloud_res.get('data').get('url')
-    #     try:
-    #         user_model = self._get_valid_user(rtx_id=token_rtx_id, format_dict=False)
-    #         setattr(user_model, "avatar", new_image_url)
-    #         self.xtb_sysuser_bo.merge_model(user_model)
-    #     except:
-    #         return FailureStatus(
-    #             status_id=Status_code.CODE_603_DB_UPDATE_FAILURE.value)
-    #
-    #     return SuccessStatus(data={"url": new_image_url})
-    #
+    async def profile_avatar(self, rtx_id: str, image_file: UploadFile) -> Status:
+        # ======================= 1、data legal check =======================
+        __flag, data = await self.__valid_model_by_rtx(
+            rtx_id=rtx_id, status_check=True, response_type="model", admin_check=False
+        )
+        if not __flag: return data
+        # ============= 2、image format check =============
+        image_name = image_file.filename
+        if not await self.image_lib.allow_format_img(image_name):
+            return FailureStatus(
+                code=status_code.CODE_454_REQUEST_FILE_NOT_SUPPORT.value,
+                message="图片格式不支持")
+        # ============= 3、local store =============
+        local_res = await self.image_lib.store_local(image_file, compress=False, _type="uf")
+        if local_res.get('code') != 100:
+            return FailureStatus(
+                code=status_code.CODE_456_REQUEST_FILE_LOCAL_STORE_FAILURE.value,
+                message=local_res.get('message') or '服务器本地存储失败')
+        local_image_file = local_res.get('data').get('file')
+        # ============= 4、cloud store =============
+        cloud_image_name = '%s/%s' % (get_now(format="%Y%m%d"), local_res.get('data').get('name'))
+        cloud_res = await self.qiniu_store_lib.upload(store_name=cloud_image_name, local_file=local_image_file)
+        if cloud_res.get('code') != 100:
+            return FailureStatus(
+                code=status_code.CODE_457_REQUEST_FILE_YUN_STORE_FAILURE.value,
+                message=local_res.get('message') or '服务器云存储失败')
+        # ============= 5、data update =============
+        new_image_url = cloud_res.get('data').get('url')
+        setattr(data, "avatar", new_image_url)
+        await self.xtb_user_curd.update(db=self.db, model=data)
+        return SuccessStatus(data={"url": new_image_url})
+

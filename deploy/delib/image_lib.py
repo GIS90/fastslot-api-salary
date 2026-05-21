@@ -32,7 +32,7 @@ Life is short, I use python.
 """
 import os
 from PIL import Image
-from typing import Dict, List, Optional
+from typing import Dict, List, Union
 
 from deploy.utils.utils import filename2md5, \
     get_now, mk_dirs
@@ -74,9 +74,12 @@ class ImageLib:
         return self.__str__()
 
     @staticmethod
-    def visual_value(code: int, message: str, data: Optional[List, Dict]) -> Dict:
+    def visual_value(code: int, message: str, data: Union[List, Dict, None]) -> Dict:
         """
         方法请求结果格式化
+        status_id: code id
+        message: message
+        data: data
         """
         if data is None: data = []
         return {
@@ -85,7 +88,7 @@ class ImageLib:
             'data': data
         }
 
-    def allow_format_img(self, name: str) -> bool:
+    async def allow_format_img(self, name: str) -> bool:
         """
         image格式判断
         :param name: image name
@@ -97,7 +100,7 @@ class ImageLib:
             else False
 
     @staticmethod
-    def scan(image_file: str) -> Dict:
+    async def scan(image_file: str) -> Dict:
         """
         查看图片的基础信息
         image_file: image file
@@ -115,11 +118,12 @@ class ImageLib:
         }
         return res
 
-    def store_local(self, image_file: str, compress: bool = False) -> Dict:
+    async def store_local(self, image_file, compress: bool = False, _type="byte") -> Dict:
         """
         图片本地化存储
         :param image_file: image file stream
         :param compress: image 是否进行压缩
+        :param _type: 文件类型 byte UploadFile（简写uf）,类型不同，存储的方式不同
         """
         if not image_file:
             return self.visual_value(
@@ -135,7 +139,16 @@ class ImageLib:
             image_name = image_file.filename
             _, store_name_md5 = filename2md5(file_name=image_name, _type='image')
             image_real_file = os.path.join(real_store_dir, store_name_md5)
-            image_file.save(image_real_file)
+            if _type == "byte":
+                await image_file.save(image_real_file)
+            elif _type == "uf":
+                with open(image_real_file, "wb") as f:
+                    while content := await image_file.read(1024 * 1024):
+                        f.write(content)
+            else:
+                return self.visual_value(
+                    404, "图片存储类型不合法")
+
             # 是否进行图片压缩
             if compress:
                 small_img = Image.open(image_real_file)
@@ -153,7 +166,7 @@ class ImageLib:
             LOG.error(_message)
             return self.visual_value(456, _message, {})
 
-    def update_size(self, image_file: str, length: int = 280, width: int = 280) -> Dict:
+    async def update_size(self, image_file: str, length: int = 280, width: int = 280) -> Dict:
         """
         update image size: length with
         """

@@ -79,7 +79,7 @@ Life is short, I use python.
 import os
 import hashlib
 import requests
-from typing import Dict, Optional, List
+from typing import Dict, Optional, List, Union
 from qiniu import Auth, put_file, BucketManager
 from deploy.config import store_yun_access, store_yun_secret, store_yun_base, store_yun_space
 from datetime import datetime
@@ -114,17 +114,17 @@ class QiNiuStoreLib:
         return self.__str__()
 
     @staticmethod
-    def visual_value(status_id: int, message: str, data: Optional[Dict, List]) -> Dict:
+    def visual_value(code: int, message: str, data: Union[List, Dict, None]) -> Dict:
         """
-        请求方法请求结果格式化
-
-        status_id: response status id
+        方法请求结果格式化
+        status_id: code id
         message: message
         data: data
         """
+        if data is None: data = []
         return {
-            'status_id': status_id,
-            'message': message if message else status_msg.get(status_id),
+            'code': code,
+            'message': message if message else status_msg.get(code),
             'data': data
         }
 
@@ -189,7 +189,7 @@ class QiNiuStoreLib:
             v = v.encode('utf-8')
         return hashlib.md5(v).hexdigest()
 
-    def upload(self, space_name: str = None, store_name: str = None, local_file: str = None,
+    async def upload(self, space_name: str = None, store_name: str = None, local_file: str = None,
                version: str = 'v2', timeout: int = 3600) -> Dict:
         """
         上传本地文件/图片的方法
@@ -237,7 +237,7 @@ class QiNiuStoreLib:
             return self.visual_value(
                 902, _message, {})
 
-    def scrapy(self, space_name: str = None, store_name: str = None, remote_url: str = None) -> Dict:
+    async def scrapy(self, space_name: str = None, store_name: str = None, remote_url: str = None) -> Dict:
         """
         上传远程或者网络上的文件/图片方法
         space_name：存储对象的空间名称
@@ -274,12 +274,12 @@ class QiNiuStoreLib:
             return self.visual_value(
                 902, _message, {})
 
-    def open_download_url(self, space_url: str = None, store_name: str = None) -> Optional[str]:
+    async def open_download_url(self, space_url: str = None, store_name: str = None) -> Optional[str]:
         bucket_url = space_url if space_url \
             else self.space_url
         return '%s/%s' % (bucket_url, store_name) if store_name else ''
 
-    def open_download(self, space_url: str = None, store_name: str = None) -> Dict:
+    async def open_download(self, space_url: str = None, store_name: str = None) -> Dict:
         """
         公开空间下载文件/图片的方法
         space_url：存储对象空间的域名
@@ -309,7 +309,7 @@ class QiNiuStoreLib:
             return self.visual_value(
                 902, _message, {})
 
-    def private_download(self, space_url: str = None, store_name: str = None, timeout: int = 120) -> Dict:
+    async def private_download(self, space_url: str = None, store_name: str = None, timeout: int = 120) -> Dict:
         """
         私有空间下载文件/图片的方法
         space_url：存储对象空间的域名
@@ -342,7 +342,7 @@ class QiNiuStoreLib:
             return self.visual_value(
                 902, _message, {})
 
-    def delete(self, space_name: str = None, store_name: str = None) -> Dict:
+    async def delete(self, space_name: str = None, store_name: str = None) -> Dict:
         """
         删除文件/图片的方法
         space_name：存储对象的空间名称
@@ -370,7 +370,7 @@ class QiNiuStoreLib:
             return self.visual_value(
                 902, _message, {})
 
-    def get_file_info(self, space_name: str = None, store_name: str = None) -> Dict:
+    async def get_file_info(self, space_name: str = None, store_name: str = None) -> Dict:
         """
         获取文件/图片的基本信息
         space_name：存储对象的空间名称
@@ -399,7 +399,7 @@ class QiNiuStoreLib:
             return self.visual_value(
                 902, _message, {})
 
-    def move(self, src_space_name: str = None, src_store_name: str = None,
+    async def move(self, src_space_name: str = None, src_store_name: str = None,
              tar_space_name: str = None, tar_store_name: str = None,
              overwrite: bool = True) -> Dict:
         """
@@ -440,7 +440,7 @@ class QiNiuStoreLib:
             return self.visual_value(
                 902, _message, {})
 
-    def copy(self, src_space_name: str = None, src_store_name: str = None,
+    async def copy(self, src_space_name: str = None, src_store_name: str = None,
              tar_space_name: str = None, tar_store_name: str = None) -> Dict:
         """
         存储对象的移动，可以跨存储空间

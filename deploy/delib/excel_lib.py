@@ -42,7 +42,7 @@ import xlrd
 import openpyxl
 import zipfile
 from openpyxl.styles import colors
-from typing import List, Dict, Tuple, Optional
+from typing import List, Dict, Tuple, Optional, Union
 
 from deploy.utils.utils import mk_dirs
 from deploy.utils.utils import get_now
@@ -84,13 +84,17 @@ class ExcelLib:
         return self.__str__()
 
     @staticmethod
-    def format_res(status_id: int, message: str, data: Optional[List, Dict]) -> Dict:
+    def visual_value(code: int, message: str, data: Union[List, Dict, None]) -> Dict:
         """
         方法请求结果格式化
+        status_id: code id
+        message: message
+        data: data
         """
+        if data is None: data = []
         return {
-            'status_id': status_id,
-            'message': message if message else status_msg.get(status_id),
+            'code': code,
+            'message': message if message else status_msg.get(code),
             'data': data
         }
 
@@ -240,16 +244,16 @@ class ExcelLib:
         if not new_name:
             new_name = 'MERGE-%s%s' % (get_now(format="%Y-%m-%d-%H-%M-%S"), self.DEFAULT_NEW_V_PREFIX)
         if not file_list:
-            return self.format_res(
+            return self.visual_value(
                 400, '合并文件列表参数不存在', {})
         # check merge excel file list
         for _f in file_list:
             if not _f or not _f.get('file'): continue   # no file -> continue
             if not os.path.exists(_f.get('file')):      # not exist -> return
-                return self.format_res(
+                return self.visual_value(
                     451, '%s文件不存在，请重新上传' % _f.get('file'), {})
             if os.path.splitext(_f.get('file'))[-1] == '.xls':      # not support .xls format
-                return self.format_res(
+                return self.visual_value(
                     454, '%s不支持.xls格式' % _f.get('file'), {})
         if os.path.splitext(new_name)[-1] not in self.prefix_list:
             new_name = '%s%s' % (new_name, self.DEFAULT_NEW_V_PREFIX)
@@ -302,11 +306,11 @@ class ExcelLib:
                     """
             real_store_file, new_file_name = self.get_real_file(new_name, _type=2)
             new_excel.save(real_store_file)
-            return self.format_res(
+            return self.visual_value(
                 100, 'success', {'name': new_file_name, 'path': real_store_file})
         except Exception as error:
             LOG.error("merge_openpyxl occur exception: %s" % error)
-            return self.format_res(
+            return self.visual_value(
                 999, str(error), {})
 
     def merge_xlrw(self, new_name: str, file_list: list, **kwargs) ->Dict:
@@ -337,13 +341,13 @@ class ExcelLib:
         if not new_name:
             new_name = 'MERGE-%s%s' % (get_now(format="%Y-%m-%d-%H-%M-%S"), self.DEFAULT_OLD_V_PREFIX)
         if not file_list:
-            return self.format_res(
+            return self.visual_value(
                 400, '合并文件列表参数不存在', {})
         # check merge excel file list: no file or not exist
         for _f in file_list:
             if not _f or not _f.get('file'): continue
             if not os.path.exists(_f.get('file')):
-                return self.format_res(
+                return self.visual_value(
                     451, '%s文件不存在，请重新上传' % _f.get('file'), {})
         if os.path.splitext(new_name)[-1] not in self.prefix_list:
             new_name = '%s%s' % (new_name, self.DEFAULT_OLD_V_PREFIX)
@@ -375,11 +379,11 @@ class ExcelLib:
                     sum_row += (sheet_row + blank)
             real_store_file, new_file_name = self.get_real_file(new_name, _type=1)
             new_excel.save(real_store_file)
-            return self.format_res(
+            return self.visual_value(
                 100, 'success', {'name': new_file_name, 'path': real_store_file})
         except Exception as error:
             LOG.error("merge_xlrw occur exception: %s" % error)
-            return self.format_res(
+            return self.visual_value(
                 999, str(error), {})
 
     def merge_new(self, new_name: str, file_list: list, **kwargs) -> Dict:
@@ -421,13 +425,13 @@ class ExcelLib:
         if not new_name:
             new_name = 'MERGE-%s%s' % (get_now(format="%Y-%m-%d-%H-%M-%S"), self.DEFAULT_NEW_V_PREFIX)
         if not file_list:
-            return self.format_res(
+            return self.visual_value(
                 400, '合并文件列表参数不存在', {})
         # check merge excel file list
         for _f in file_list:
             if not _f or not _f.get('file'): continue   # no file -> continue
             if not os.path.exists(_f.get('file')):      # not exist -> return
-                return self.format_res(
+                return self.visual_value(
                     451, '%s文件不存在，请重新上传' % _f.get('file'), {})
         if os.path.splitext(new_name)[-1] not in self.prefix_list:
             new_name = '%s%s' % (new_name, self.DEFAULT_NEW_V_PREFIX)
@@ -477,11 +481,11 @@ class ExcelLib:
                     sum_row += (sheet_row + blank)
             real_store_file, new_file_name = self.get_real_file(new_name, _type=2)
             new_excel.save(real_store_file)
-            return self.format_res(
+            return self.visual_value(
                 100, 'success', {'name': new_file_name, 'path': real_store_file})
         except Exception as error:
             LOG.error("merge_new occur exception: %s" % error)
-            return self.format_res(
+            return self.visual_value(
                 999, str(error), {})
 
     def compress_zip(self, files, zip_name) -> Optional[bool, str]:
@@ -525,7 +529,7 @@ class ExcelLib:
         title: 1有标题 0无标题
         """
         if not file or not os.path.exists(file):
-            return self.format_res(
+            return self.visual_value(
                 451, '文件不存在', {})
 
         name = kwargs.get('name')
@@ -548,13 +552,13 @@ class ExcelLib:
         title = str(kwargs.get('title')) \
             if kwargs.get('title') else '1'  # default is 1 有标题
         if rc not in EXCEL_NUM:
-            return self.format_res(
+            return self.visual_value(
                 404, '请求参数split不合法', {})
         if store not in EXCEL_SPLIT_STORE:
-            return self.format_res(
+            return self.visual_value(
                 404, '请求参数store不合法', {})
         if title not in BOOL:
-            return self.format_res(
+            return self.visual_value(
                 404, '请求参数header不合法', {})
 
         # ================ name check ================
@@ -565,7 +569,7 @@ class ExcelLib:
         max_nsheet = len(reader_excel.sheet_names())
         index_int = int(sheet)
         if index_int >= max_nsheet:
-            return self.format_res(
+            return self.visual_value(
                 452, '超出操作的sheet索引', {})
 
         # 压缩 文件目录参数
@@ -650,11 +654,11 @@ class ExcelLib:
                 real_store_file, new_excel_name = self.get_real_file(new_excel_name, _type=1)
                 write_excel.save(real_store_file)
                 # no compress, return
-                return self.format_res(
+                return self.visual_value(
                     100, 'success', {'name': new_excel_name, 'path': real_store_file, 'compress': False})
             else:
                 # 行拆分其他
-                return self.format_res(
+                return self.visual_value(
                     404, '请求参数store不合法', {})
         # type 2 col 列拆分
         elif rc == '2':
@@ -706,33 +710,33 @@ class ExcelLib:
                 real_store_file, new_excel_name = self.get_real_file(new_excel_name, _type=1)
                 write_excel.save(real_store_file)
                 # no compress, return
-                return self.format_res(
+                return self.visual_value(
                     100, 'success', {'name': new_excel_name, 'path': real_store_file, 'compress': False})
         else:
             # 列拆分其他
-            return self.format_res(
+            return self.visual_value(
                 404, '请求参数store不合法', {})
 
         # <<<<<<<<<<<<<<<<<<<<<<< start compress >>>>>>>>>>>>>>>>>>>>>>>>>>>
         if is_compress:
             if not os.path.exists(real_dir) or not os.path.isdir(real_dir):
-                return self.format_res(
+                return self.visual_value(
                     464, '文件存储目录不存在', {})
             try:
                 zip_files = [os.path.join(real_dir, x) for x in os.listdir(real_dir)]
                 is_ok = self.compress_zip(files=zip_files,
                                           zip_name=os.path.join(real_dir, compress_name))
                 if is_ok:
-                    return self.format_res(
+                    return self.visual_value(
                         100,
                         'success',
                         {'name': compress_name, 'path': os.path.join(real_dir, compress_name), 'nfile': len(zip_files), 'compress': True}
                     )
             except:
-                return self.format_res(
+                return self.visual_value(
                     465, '压缩文件有误', {})
 
-        return self.format_res(
+        return self.visual_value(
             999, '暂无其他处理方式', {})
 
     def read(self, read_file: str, sheet: int = 0, rows: list = [], columns: list = [], **kwargs) -> Dict:
@@ -752,7 +756,7 @@ class ExcelLib:
         if (not read_file
                 or not os.path.exists(read_file)
                 or not os.path.isfile(read_file)):
-            return self.format_res(
+            return self.visual_value(
                 451, '读取的excel数据不存在', {})
 
         request_title: bool = False if kwargs.get('request_title') is False else True
@@ -771,7 +775,7 @@ class ExcelLib:
         except:
             sheet = 0
         if sheet > len(excel_sheet_names) or sheet < 0:
-            return self.format_res(
+            return self.visual_value(
                 452, '读取的sheet页不存在', {})
 
         excel_sheet = excel_object.sheet_by_index(sheet)
@@ -802,7 +806,7 @@ class ExcelLib:
                 # TODO 是否添加空标题、重复标题等标题判断
                 # 目前，定位空活着列值重复均可以
                 # if not excel_sheet.cell_value(0, col) or excel_sheet.cell_value(0, col) in resp_header:
-                #     return self.format_res(
+                #     return self.visual_value(
                 #         452, '读取的第%s列值为空' % col, {})
                 resp_header.append(excel_sheet.cell_value(0, col))
         # 读取表数据
@@ -814,6 +818,6 @@ class ExcelLib:
                 if col < 0: continue
                 _d.append(excel_sheet.cell_value(row, col))
             if _d: resp_data.append(_d)
-        return self.format_res(
+        return self.visual_value(
             100, 'success', {'header': resp_header, 'data': resp_data})
 

@@ -35,7 +35,7 @@ import os
 import multiprocessing
 from multiprocessing import cpu_count
 from pdf2docx import Converter
-from typing import Dict, List, Optional
+from typing import Dict, List, Union
 
 from deploy.utils.utils import filename2md5, \
     get_now, mk_dirs, md5
@@ -110,9 +110,12 @@ class FileLib:
         return self.__str__()
 
     @staticmethod
-    def visual_value(code: int, message: str, data: Optional[List, Dict]) -> Dict:
+    def visual_value(code: int, message: str, data: Union[List, Dict, None]) -> Dict:
         """
         方法请求结果格式化
+        status_id: code id
+        message: message
+        data: data
         """
         if data is None: data = []
         return {

@@ -128,7 +128,7 @@ class SystemMainUserService:
 
     async def depend_by_rtx_id(self, rtx_id: str) -> Dict:
         __flag, data = await self.__valid_model_by_md5_or_rtx(
-            query_id=rtx_id, status_check=False, response_type="dict", query_type="rtx", admin_check=False
+            query_id=rtx_id, status_check=False, response_type="model", query_type="rtx", admin_check=False
         )
         return data if __flag else {}
 
