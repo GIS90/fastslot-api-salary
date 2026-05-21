@@ -209,9 +209,9 @@ class ApiUserService:
 
     async def dashboard(self, token_rtx_id: str) -> Status:
         """
-        Dashboard
-        :param rtx_id:
-        :return:
+        用户系统Dashboard
+        :param token_rtx_id: [str]token_rtx_id
+        :return: [dict]status model
         """
         data = {
             "columnChart": {
@@ -573,4 +573,6 @@ class ApiUserService:
                 ]
             }
         }
+
+        # data.update({"tip": "系统系统系统系统系统系统系统系统系统系统系统系统系统系统"})
         return SuccessStatus(data=data)
