@@ -159,7 +159,7 @@ class SystemMainUserService:
         return __value
 
     async def default_pwd(self, rtx_id: str) -> Status:
-        return SuccessStatus(data={"password": "abcd12345"})
+        return SuccessStatus(data={"password": await self.__generator_default_password()})
 
     async def reset_pwd(self, rtx_id: str, md5: str) -> Status:
         __flag, data = await self.__valid_model_by_md5_or_rtx(
