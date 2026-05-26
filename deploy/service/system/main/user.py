@@ -97,12 +97,17 @@ class SystemMainUserService:
             return FailureStatus(code=status_code.CODE_101_SUCCESS_NO_DATA)
 
         data: List = list()
-        data.extend(
-            filter(
-                lambda x: x is not None and x is not {},
-                [await model_converter_dict(model=u, fields=xtb_user_list_fields) for u in models if u]
-            )
-        )
+        for model in models:
+            if not model: continue
+            _d = await model_converter_dict(model=model, fields=xtb_user_list_fields)
+            if not _d: continue
+            if _d["sex"] == "M":
+                _d["sex"] = "男"
+            elif _d["sex"] == "F":
+                _d["sex"] = "女"
+            else:
+                _d["sex"] = "未知"
+            data.append(_d)
         result: Dict = {
             "list": data,
             "total": await self.xtb_user_curd.get_count(self.db)
@@ -132,6 +137,32 @@ class SystemMainUserService:
         )
         return data if __flag else {}
 
+    async def status(self, token_rtx_id: str, md5: str, value: bool) -> Status:
+        __flag, data = await self.__valid_model_by_md5_or_rtx(
+            query_id=md5, status_check=False, response_type="model", admin_check=True
+        )
+        if not __flag: return data
+
+        setattr(data, "status", value)
+        setattr(data, "delete_rtx", token_rtx_id)
+        setattr(data, "delete_time", get_now())
+        await self.xtb_user_curd.update(db=self.db, model=data)
+        return SuccessStatus()
+
+    async def __generator_user_password(self, password: str="abcd1234") -> str:
+        """生成用户密码"""
+        return generator_md5(v=password)
+
+    async def resetPwd(self, rtx_id: str, md5: str) -> Status:
+        __flag, data = await self.__valid_model_by_md5_or_rtx(
+            query_id=md5, status_check=True, response_type="model", admin_check=True
+        )
+        if not __flag: return data
+
+        setattr(data, "password", await self.__generator_user_password())
+        await self.xtb_user_curd.update(db=self.db, model=data)
+        return SuccessStatus()
+    
     async def add(self, rtx_id: str, model: Dict) -> Status:
         db_model: XtbUserModel = await self.xtb_user_curd.get_by_rtx_id(db=self.db, rtx_id=model.get("rtx_id"))
         if db_model:
@@ -139,7 +170,7 @@ class SystemMainUserService:
                                  message="用户rtx_id已存在，请更换")
 
         new_model: XtbUserModel = await self.xtb_user_curd.new_model()
-        __password: str = random_string()
+        __password: str = await self.__generator_user_password()
         __salt: str = random_string()
         # TODO 用户默认的头像、密码可以放在数据库中
         new_model.md5 = generator_md5(v=f"{model.get('rtx_id')}-{get_now()}-{__password}")
@@ -148,7 +179,7 @@ class SystemMainUserService:
         new_model.salt = __salt
         new_model.create_time = datetime.now()
         new_model.create_rtx = rtx_id
-        new_model.password = generator_md5(v=f"{__password}{__salt}")
+        new_model.password = __password
         for k, v in model.items():
             setattr(new_model, k, v)
         await self.xtb_user_curd.add(db=self.db, model=new_model)

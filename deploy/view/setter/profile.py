@@ -64,7 +64,7 @@ async def profile_update(
     return await profile_service.profile_update(rtx_id=token_rtx_id, model=data.model_dump())
 
 
-@router.put('/profile/password', summary="系统用户密码更新")
+@router.put('/profile.password', summary="系统用户密码更新")
 async def profile_password(
         data: Annotated[ProfileUserPasswordModel, Body()],
         token_rtx_id: str = Depends(depend_token_rtx),
@@ -73,7 +73,7 @@ async def profile_password(
     return await profile_service.profile_password(rtx_id=token_rtx_id, model=data.model_dump())
 
 
-@router.get('/profile/log', summary="系统用户日志")
+@router.get('/profile.log', summary="系统用户日志")
 async def profile_log(
         params: dict = Depends(pageable_params),
         token_rtx_id: str = Depends(depend_token_rtx_valid),
@@ -82,7 +82,7 @@ async def profile_log(
     return await profile_service.profile_log(rtx_id=token_rtx_id, params=params)
 
 
-@router.post('/profile/avatar', summary="系统用户头像上传")
+@router.post('/profile.avatar', summary="系统用户头像上传")
 async def profile_avatar(
         file: UploadFile = File(...),
         token_rtx_id: str = Depends(depend_token_rtx),

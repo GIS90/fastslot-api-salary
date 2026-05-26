@@ -100,7 +100,7 @@ class XtbUserCurd(BaseCurd):
     ) -> Optional[List]:
         try:
             stmt = (select(XtbUserModel)
-                    .where(XtbUserModel.status != 1)
+                    # .where(XtbUserModel.status != 1)
                     .order_by(asc(XtbUserModel.id))
                     .offset(offset)
                     .limit(limit))

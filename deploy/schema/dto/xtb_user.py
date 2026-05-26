@@ -43,9 +43,10 @@ xtb_user_list_fields = [
     {"key": "phone", "type": ft.STR, "name": "phone", "null": False},
     {"key": "avatar", "type": ft.STR, "name": "avatar", "null": False},
     {"key": "introduction", "type": ft.STR, "name": "introduction", "null": True},
+    {"key": "department", "type": ft.STR, "name": "department", "null": False},
     {"key": "create_rtx", "type": ft.STR, "name": "createRtx", "null": True},
     {"key": "create_time", "type": ft.DATETIME, "name": "createTime", "null": True},
-    {"key": "status", "type": ft.BOOLTEXT, "name": "status", "null": False},
+    {"key": "status", "type": ft.BOOL, "name": "status", "null": False},
 ]
 
 

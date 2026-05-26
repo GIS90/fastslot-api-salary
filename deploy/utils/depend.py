@@ -31,7 +31,7 @@ Life is short, I use python.
 ------------------------------------------------
 """
 from fastapi import Header, Query
-from typing import Optional, Dict
+from typing import Optional, Dict, List
 
 from deploy.utils.token import decode_access_token_rtx
 from deploy.utils.exception import JwtCredentialsException, UserInvalidException
@@ -107,14 +107,30 @@ async def depend_token_rtx_valid(
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 """
+md5参数请求
+> md5_params：Md5单条参数请求体
+> md5_list_params：Md5列表参数请求体
+"""
+async def md5_params(
+    md5: str = Query(..., min_length=MIN_LENGTH, max_length=MAX_LENGTH, description="数据Md5-Id")
+) -> str:
+    return md5
+
+
+async def md5_list_params(
+    md5: List[str] = Query(..., description="数据Md5-Id列表")
+) -> List:
+    return md5
+
+
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+"""
 Pageable-Params依赖
 > pageable_params：分页参数
 > pageable_query_params：分页参数 + 非模糊查询
 > pageable_like_params：分页参数 + 模糊查询
 > pageable_model_params：分页参数 + 条件数据模型（type：dict）
 """
-
-
 async def pageable_params(
     page: int = Query(default=1, ge=MIN_LENGTH, description="页码"),
     pageSize: int = Query(default=15, ge=MIN_LENGTH, description="条数"),

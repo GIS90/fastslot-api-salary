@@ -47,7 +47,7 @@ class RequestMd5Model(baseModel):
     Md5通用参数请求体
     单条数据：str类型
     """
-    md5: str = Query(..., min_length=MIN_LENGTH, max_length=MAX_LENGTH, description="数据MD5")
+    md5: str = Query(..., min_length=MIN_LENGTH, max_length=MAX_LENGTH, description="数据Md5-Id")
 
     model_config = {
         "json_schema_extra": {
@@ -69,6 +69,22 @@ class RequestMd5Models(baseModel):
         "json_schema_extra": {
             "example": {
                 "md5": ["A", "B", "C"]
+            }
+        }
+    }
+
+
+class RequestIDModel(baseModel):
+    """
+    ID通用参数请求体
+    单条数据：int类型
+    """
+    id: int = Query(..., description="数据ID列表")
+
+    model_config = {
+        "json_schema_extra": {
+            "example": {
+                "id": 1
             }
         }
     }

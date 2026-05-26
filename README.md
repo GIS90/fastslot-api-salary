@@ -198,3 +198,12 @@ async def get_pagination(
 
 # 调用方式
 await get_pagination(db, offset=0, limit=15, filters={'user_id': 123})
+
+filter格式化数据
+data: List = list()
+    data.extend(
+        filter(
+            lambda x: x is not None and x is not {},
+            [await model_converter_dict(model=u, fields=xtb_user_list_fields) for u in models if u]
+        )
+    )
