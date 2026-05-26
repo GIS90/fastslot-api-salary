@@ -153,7 +153,10 @@ class SystemMainUserService:
         """生成用户密码"""
         return generator_md5(v=password)
 
-    async def resetPwd(self, rtx_id: str, md5: str) -> Status:
+    async def default_pwd(self, rtx_id: str) -> Status:
+        return SuccessStatus(data={"password": "abcd12345"})
+
+    async def reset_pwd(self, rtx_id: str, md5: str) -> Status:
         __flag, data = await self.__valid_model_by_md5_or_rtx(
             query_id=md5, status_check=True, response_type="model", admin_check=True
         )

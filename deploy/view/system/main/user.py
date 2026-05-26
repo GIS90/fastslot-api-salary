@@ -58,7 +58,7 @@ async def pagination(
 
 
 @router.delete('/user.status', summary="启用/注销")
-async def user_status(
+async def status(
     md5: str = Query(..., description="数据Md5-Id"),
     value: bool = Query(..., description="状态"),
     token_rtx_id: str = Depends(depend_token_rtx),
@@ -67,13 +67,21 @@ async def user_status(
     return await user_service.status(token_rtx_id, md5, value)
 
 
-@router.put('/user/resetPwd', summary="重置密码")
-async def user_reset_pwd(
+@router.get('/user.defaultPwd', summary="默认密码")
+async def default_pwd(
+    token_rtx_id: str = Depends(depend_token_rtx),
+    user_service: SystemMainUserService = Depends(get_user_service)
+) -> Status:
+    return await user_service.default_pwd(rtx_id=token_rtx_id)
+
+
+@router.put('/user.resetPwd', summary="重置密码")
+async def reset_pwd(
     md5: str = Depends(md5_params),
     token_rtx_id: str = Depends(depend_token_rtx),
     user_service: SystemMainUserService = Depends(get_user_service)
 ) -> Status:
-    return await user_service.resetPwd(rtx_id=token_rtx_id, md5=md5)
+    return await user_service.reset_pwd(rtx_id=token_rtx_id, md5=md5)
 
 
 @router.get("/user", summary="通过Md5-Id获取单条数据")
