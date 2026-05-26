@@ -34,6 +34,7 @@ from datetime import datetime
 from typing import Dict, List, Tuple, Literal, Any
 from sqlalchemy.ext.asyncio import AsyncSession
 from deploy.curd.xtb_user import XtbUserCurd
+from deploy.curd.xtb_xtcs import XtbXtcsCurd
 from deploy.schema.dao.xtb_user import XtbUserModel
 from deploy.utils.status import Status, SuccessStatus, FailureStatus
 from deploy.utils.status_value import (StatusCode as status_code,
@@ -42,6 +43,7 @@ from deploy.utils.converter import model_converter_dict
 from deploy.schema.dto.xtb_user import xtb_user_list_fields, xtb_user_detail_fields, xtb_user_login_fields
 from deploy.utils.utils import get_now, random_string, md5 as generator_md5
 from deploy.config import server_user as SERVER_USER_ADMIN
+from deploy.utils.enumeration import XtbXtcsKEY
 
 
 class SystemMainUserService:
@@ -54,6 +56,7 @@ class SystemMainUserService:
         """
         self.db: AsyncSession = db_connection
         self.xtb_user_curd: XtbUserCurd = XtbUserCurd()
+        self.xtb_xtcs_curd: XtbXtcsCurd = XtbXtcsCurd()
 
     def __str__(self):
         return "SystemMainUserService class."
@@ -149,9 +152,11 @@ class SystemMainUserService:
         await self.xtb_user_curd.update(db=self.db, model=data)
         return SuccessStatus()
 
-    async def __generator_user_password(self, password: str="abcd1234") -> str:
+    async def __generator_default_password(self, password: str="abcd1234") -> str:
         """生成用户密码"""
-        return generator_md5(v=password)
+        default_password: str = await self.xtb_xtcs_curd.get_by_key(db=self.db, key=XtbXtcsKEY.USER_DEFAULT_PASSWORD.value)
+        __value: str = password if not default_password else getattr(default_password, "value")
+        return __value
 
     async def default_pwd(self, rtx_id: str) -> Status:
         return SuccessStatus(data={"password": "abcd12345"})
@@ -162,10 +167,16 @@ class SystemMainUserService:
         )
         if not __flag: return data
 
-        setattr(data, "password", await self.__generator_user_password())
+        setattr(data, "password", await self.__generator_default_password())
         await self.xtb_user_curd.update(db=self.db, model=data)
         return SuccessStatus()
-    
+
+    async def __default_avatar(self, avatar: str="http://2lstore.pygo.space/avatars/default.png") -> str:
+        """用户默认头像"""
+        default_avatar: str = await self.xtb_xtcs_curd.get_by_key(db=self.db, key=XtbXtcsKEY.USER_DEFAULT_AVATAR.value)
+        __value: str = avatar if not default_avatar else getattr(default_avatar, "value")
+        return __value
+
     async def add(self, rtx_id: str, model: Dict) -> Status:
         db_model: XtbUserModel = await self.xtb_user_curd.get_by_rtx_id(db=self.db, rtx_id=model.get("rtx_id"))
         if db_model:
@@ -173,16 +184,15 @@ class SystemMainUserService:
                                  message="用户rtx_id已存在，请更换")
 
         new_model: XtbUserModel = await self.xtb_user_curd.new_model()
-        __password: str = await self.__generator_user_password()
-        __salt: str = random_string()
-        # TODO 用户默认的头像、密码可以放在数据库中
-        new_model.md5 = generator_md5(v=f"{model.get('rtx_id')}-{get_now()}-{__password}")
-        new_model.avatar = self.DEFAULT_AVATAR
+        __password: str = await self.__generator_default_password()
+        __salt: str = random_string(length=16)
+        new_model.md5 = generator_md5(v=f"{model.get('rtx_id')}-{get_now()}-{__salt}")
+        new_model.avatar = await self.__default_avatar()
         new_model.status = False
         new_model.salt = __salt
         new_model.create_time = datetime.now()
         new_model.create_rtx = rtx_id
-        new_model.password = __password
+        new_model.password = generator_md5(v=__password)
         for k, v in model.items():
             setattr(new_model, k, v)
         await self.xtb_user_curd.add(db=self.db, model=new_model)

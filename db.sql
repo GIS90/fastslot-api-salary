@@ -77,8 +77,8 @@ CREATE TABLE `xtb_role`  (
     `engname` varchar(35) UNIQUE NOT NULL COMMENT '角色唯一标识，英文+数字组成',
     `chnname` varchar(35) NOT NULL COMMENT '角色中文名称',
     `md5` varchar(64) not null unique COMMENT '数据唯一标识：MD5-ID',
-    `authority` varchar(255) NULL COMMENT '角色权限ID集合，用英文；分割',
-    `introduction` text NULL COMMENT '描述',
+    `authority` varchar(255) COMMENT '角色权限ID集合，用英文；分割',
+    `introduction` text COMMENT '描述',
     `create_rtx` varchar(35) COMMENT '创建用户RTX-ID',
     `create_time` datetime default CURRENT_TIMESTAMP COMMENT '创建时间',
     `update_rtx` varchar(35) COMMENT '更新用户RTX-ID',
@@ -131,8 +131,8 @@ CREATE TABLE `xtb_menu`  (
     `status` bool default False COMMENT '状态：1注销/删除；0启用/正常（默认）',
 
     PRIMARY KEY (`id`),
-    UNIQUE INDEX `xtb_menu_md5_index`(`md5`) USING HASH COMMENT '菜单md5唯一索引',
-    UNIQUE INDEX `xtb_menu_name_index`(`name`) USING HASH COMMENT '菜单name唯一索引'
+    UNIQUE INDEX `xtb_menu_md5_index`(`md5`) USING HASH COMMENT 'md5唯一索引',
+    UNIQUE INDEX `xtb_menu_name_index`(`name`) USING HASH COMMENT 'name唯一索引'
 ) COMMENT='系统表-菜单';
 
 -- insert default menu
@@ -240,6 +240,33 @@ VALUES
 (48, '个人中心', 'SetterProfile', '/setter/profile', 47, 2, 'cce99c598cfdb9773ab041d54c3d973a', '/setter/profile/index', FALSE, '', 'User', TRUE, FALSE, FALSE, 'MENU', TRUE, 11001, 'admin', FALSE, TRUE, ''),
 (49, '系统向导', 'SetterGuide', '/setter/guide', 47, 2, '6602bbeb2956c035fb4cb5e844a4861b', '/setter/guide/index', FALSE, '', 'Guide', TRUE, FALSE, FALSE, 'MENU', TRUE, 11002, 'admin', FALSE, TRUE, '');
 -- = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
+-- 系统表-系统参数
+-- create table && index
+DROP TABLES IF EXISTS `xtb_xtcs`;
+CREATE TABLE `xtb_xtcs`  (
+    `id` int NOT NULL AUTO_INCREMENT COMMENT '主键，自增ID',
+    `key` varchar(35) NOT NULL COMMENT '参数KEY',
+    `md5` varchar(64) NOT NULL UNIQUE COMMENT '数据唯一标识：MD5-ID',
+    `remark` varchar(35) NOT NULL COMMENT '参数说明',
+    `value` varchar(255) NOT NULL COMMENT '参数值',
+    `create_rtx` varchar(35) COMMENT '创建用户RTX-ID',
+    `create_time` datetime default CURRENT_TIMESTAMP COMMENT '创建时间',
+    `update_rtx` varchar(35) COMMENT '更新用户RTX-ID',
+    `update_time` datetime COMMENT '更新时间',
+    `delete_rtx` varchar(35) COMMENT '删除用户RTX-ID',
+    `delete_time` datetime COMMENT '删除时间',
+    `status` bool default False COMMENT '状态：1注销/删除；0启用/正常（默认）',
+    `order_id` int COMMENT '排序ID',
+
+    PRIMARY KEY (`id`),
+    UNIQUE INDEX `xtb_xtcs_md5_index`(`md5`) USING HASH COMMENT 'md5唯一索引'
+) COMMENT='系统表-系统参数';
+
+delete from xtb_xtcs;
+
+insert into xtb_xtcs(`key`, `md5`, `remark`, `value`, `create_rtx`, `status`, `order_id`) VALUES
+('USER-DEFAULT-PASSWORD', '2560983a81db89c5f8ac7bc59ceec23e', '用户默认密码', 'abcd1234@', 'admin', False, 1),
+('USER-DEFAULT-AVATAR', 'ef2cee999bde28a0f2b2485127d8a389', '用户默认头像', 'http://2lstore.pygo.space/avatars/default.png', 'admin', False, 2);
 -- = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
 -- = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
 -- = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =

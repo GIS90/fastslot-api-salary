@@ -42,6 +42,7 @@ __all__ = [
     'fontPrinter',
     'FileTypeEnum',
     'FieldTypeEnum',
+    'XtbXtcsKEY',
 ]
 
 
@@ -176,3 +177,12 @@ class FieldTypeEnum(StrEnum):
     LIST = "list"
     DICT = "dict"
     SPLITLIST = "split_list"
+
+
+@unique
+class XtbXtcsKEY(StrEnum):
+    """
+    系统表-系统参数（xtb-xtcs）KEY值枚举
+    """
+    USER_DEFAULT_PASSWORD = "USER-DEFAULT-PASSWORD"
+    USER_DEFAULT_AVATAR = "USER-DEFAULT-AVATAR"
