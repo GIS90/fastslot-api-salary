@@ -26,7 +26,7 @@ CREATE TABLE `xtb_user` (
     `update_time` datetime COMMENT '更新时间',
     `delete_rtx` varchar(35) COMMENT '删除用户RTX-ID',
     `delete_time` datetime COMMENT '删除时间',
-    `status` bool default False COMMENT '状态：1注销/删除；0启用/正常（默认）',
+    `status` bool default False COMMENT '数据状态：1注销；0启用（默认）',
 
     PRIMARY KEY (`id`)
 ) COMMENT='系统表-用户表';
@@ -60,7 +60,7 @@ CREATE TABLE `xtb_request`  (
     `create_date` date not null COMMENT '创建日期',
     `delete_rtx` varchar(35) COMMENT '删除用户RTX-ID',
     `delete_time` datetime COMMENT '删除时间',
-    `status` bool default False COMMENT '状态：1注销/删除；0启用/正常（默认）',
+    `status` bool default False COMMENT '数据状态：1删除；0正常（默认）',
 
     PRIMARY KEY (`id`),
     UNIQUE INDEX `index_id`(`id`) USING HASH COMMENT 'id索引'
@@ -85,7 +85,7 @@ CREATE TABLE `xtb_role`  (
     `update_time` datetime COMMENT '更新时间',
     `delete_rtx` varchar(35) COMMENT '删除用户RTX-ID',
     `delete_time` datetime COMMENT '删除时间',
-    `status` bool default False COMMENT '状态：1注销/删除；0启用/正常（默认）',
+    `status` bool default False COMMENT '数据状态：1删除；0正常（默认）',
 
     PRIMARY KEY (`id`),
     UNIQUE INDEX `xtb_role_md5_index`(`md5`) USING HASH COMMENT 'md5唯一索引',
@@ -128,7 +128,7 @@ CREATE TABLE `xtb_menu`  (
     `update_time` datetime COMMENT '更新时间',
     `delete_rtx` varchar(35) COMMENT '删除用户RTX-ID',
     `delete_time` datetime COMMENT '删除时间',
-    `status` bool default False COMMENT '状态：1注销/删除；0启用/正常（默认）',
+    `status` bool default False COMMENT '数据状态：1删除；0正常（默认）',
 
     PRIMARY KEY (`id`),
     UNIQUE INDEX `xtb_menu_md5_index`(`md5`) USING HASH COMMENT 'md5唯一索引',
@@ -221,6 +221,7 @@ VALUES
 --   >> [三级级菜单]
 (37, '部门架构', 'SystemOpsDepart', '/system/ops/depart', 36, 3, '1d17cb9923b99f823da9f5a16dc460e5', '/system/ops/depart/index', FALSE, '', '', TRUE, FALSE, FALSE, 'MENU', TRUE, 10101, 'admin', FALSE, TRUE, ''),
 (38, '数据字典', 'SystemOpsDict', '/system/ops/dict', 36, 3, '91516e7a50ce0a67a8eb1f9229c293d1', '/system/ops/dict/index', FALSE, '', '', TRUE, FALSE, FALSE, 'MENU', TRUE, 10102, 'admin', FALSE, TRUE, ''),
+缺少系统表-系统参数 数据字典KEY 数据字典VALUE
 (39, '后台API', 'SystemOpsApi', '/system/ops/api', 36, 3, '4ae6c8f4429f7bacb050c9c980cf51d3', '/system/ops/api/index', FALSE, '', '', TRUE, FALSE, FALSE, 'MENU', TRUE, 10103, 'admin', FALSE, TRUE, ''),
 (40, '头像管理', 'SystemOpsAvatar', '/system/ops/avatar', 36, 3, 'eafdc02f3b847285bf1815f55f1f4e46', '/system/ops/avatar/index', FALSE, '', '', TRUE, FALSE, FALSE, 'MENU', TRUE, 10104, 'admin', FALSE, TRUE, ''),
 (41, '系统日志', 'SystemOpsLog', '/system/ops/log', 36, 3, 'fa83d9352d3c8fab04893bbf60be7e06', '/system/ops/log/index', FALSE, '', '', TRUE, FALSE, FALSE, 'MENU', TRUE, 10105, 'admin', FALSE, TRUE, ''),
@@ -245,17 +246,18 @@ VALUES
 DROP TABLES IF EXISTS `xtb_xtcs`;
 CREATE TABLE `xtb_xtcs`  (
     `id` int NOT NULL AUTO_INCREMENT COMMENT '主键，自增ID',
-    `key` varchar(35) NOT NULL COMMENT '参数KEY',
+    `key` varchar(35) NOT NULL COMMENT '参数KEY（大写）',
     `md5` varchar(64) NOT NULL UNIQUE COMMENT '数据唯一标识：MD5-ID',
-    `remark` varchar(35) NOT NULL COMMENT '参数说明',
-    `value` varchar(255) NOT NULL COMMENT '参数值',
+    `remark` varchar(35) COMMENT '参数说明',
+    `value` varchar(255) COMMENT '参数值',
     `create_rtx` varchar(35) COMMENT '创建用户RTX-ID',
     `create_time` datetime default CURRENT_TIMESTAMP COMMENT '创建时间',
     `update_rtx` varchar(35) COMMENT '更新用户RTX-ID',
     `update_time` datetime COMMENT '更新时间',
     `delete_rtx` varchar(35) COMMENT '删除用户RTX-ID',
     `delete_time` datetime COMMENT '删除时间',
-    `status` bool default False COMMENT '状态：1注销/删除；0启用/正常（默认）',
+    `lock` bool default False COMMENT '锁定状态：1锁定；0非锁定',
+    `status` bool default False COMMENT '数据状态：1删除；0正常（默认）',
     `order_id` int COMMENT '排序ID',
 
     PRIMARY KEY (`id`),
@@ -264,10 +266,155 @@ CREATE TABLE `xtb_xtcs`  (
 
 delete from xtb_xtcs;
 
-insert into xtb_xtcs(`key`, `md5`, `remark`, `value`, `create_rtx`, `status`, `order_id`) VALUES
-('USER-DEFAULT-PASSWORD', '2560983a81db89c5f8ac7bc59ceec23e', '用户默认密码', 'abcd1234@', 'admin', False, 1),
-('USER-DEFAULT-AVATAR', 'ef2cee999bde28a0f2b2485127d8a389', '用户默认头像', 'http://2lstore.pygo.space/avatars/default.png', 'admin', False, 2);
+insert into xtb_xtcs(`key`, `md5`, `remark`, `value`, `create_rtx`, `lock`, `status`, `order_id`) VALUES
+('USER-DEFAULT-PASSWORD', '2560983a81db89c5f8ac7bc59ceec23e', '用户默认密码', 'abcd1234@', 'admin', False, False, 1),
+('USER-DEFAULT-AVATAR', 'ef2cee999bde28a0f2b2485127d8a389', '用户默认头像', 'http://2lstore.pygo.space/avatars/default.png', 'admin', False, False, 2),
+('SYSTEM-TITLE', '1700a58b93fe99d9edf8eec318737f1e', '系统登录页信息展示：系统标题', '智行工具平台', 'admin', False, False, 3),
+('SYSTEM-VERSION', '7bf8a92528d9e53f020bb24d80bfb967', '系统登录页信息展示：系统版本', '1.1.2', 'admin', False, False, 4),
+('SYSTEM-FEATURE', 'c827459d2ee5da92adfd826355588039', '系统登录页信息展示：系统特色', '定制化 / 高性能 / 精优雅', 'admin', False, False, 5),
+('SYSTEM-SUMMARY', 'b48ef16d13363753454a38b1ccf255a4', '系统登录页信息展示：系统简述', '践行践远，智慧前行，总有一款工具让工作变得更加轻松，助你提质增效。', 'admin', False, False, 6);
 -- = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
+-- CSB_ENUM_EKY 枚举Key表
+-- create table && index
+DROP TABLES IF EXISTS `csb_enum_key`;
+CREATE TABLE `csb_enum_key`  (
+    `id` int NOT NULL AUTO_INCREMENT COMMENT '主键，自增ID',
+    `key` varchar(35) NOT NULL COMMENT '枚举KEY值RTX-ID',
+    `md5` varchar(64) NOT NULL UNIQUE COMMENT '数据唯一标识：MD5-ID',
+    `remark` varchar(35) COMMENT '说明',
+    `create_rtx` varchar(35) COMMENT '创建用户RTX-ID',
+    `create_time` datetime default CURRENT_TIMESTAMP COMMENT '创建时间',
+    `update_rtx` varchar(35) COMMENT '更新用户RTX-ID',
+    `update_time` datetime COMMENT '更新时间',
+    `delete_rtx` varchar(35) COMMENT '删除用户RTX-ID',
+    `delete_time` datetime COMMENT '删除时间',
+    `lock` bool default False COMMENT '锁定状态：1锁定；0非锁定',
+    `status` bool default False COMMENT '数据状态：1删除；0正常（默认）',
+    `order_id` int COMMENT '排序ID',
+
+    PRIMARY KEY (`id`),
+    UNIQUE INDEX `index_id`(`id`) USING HASH COMMENT 'id索引'
+) COMMENT='参数表-ENUM枚举Key表';
+
+delete from csb_enum_key;
+
+insert into csb_enum_key(`key`, `md5`, `remark`, `lock`, `status`, `create_rtx`, `order_id`) VALUES
+('bool-type', '5886ecb16dfd303f97ef685f943f4735', '布尔', False, False, 'admin', 1),
+('sex-type', 'ce765ac3af6fc7823db049d70b3aa33d', '性别', False, False, 'admin', 2),
+('download-select', 'ccf0ffc2e43a2bc62cb89b69834ad0ce', '表格下载方式', False, False, 'admin', 3),
+('download-format', '894b127df244af241341d04ae290fdcf', '表格下载格式', False, False, 'admin', 4),
+('menu-type', 'e32c70446571ce05a25702889c56cbac', '菜单类型', False, False, 'admin', 5),
+('menu-level', 'cde5d071f0b5bbb56033121304b6604a', '菜单级别', False, False, 'admin', 6),
+('api-type', 'ddf8dac28ba9f6a1d86d2b79b6e9cbe9', '请求类型', False, False, 'admin', 7),
+('task-status', 'a4115b287aab1804586eb9390841ab6b', '任务状态', False, False, 'admin', 7);
+
+-- CSB_ENUM_VALUE枚举 Value表
+-- create table && index
+DROP TABLES IF EXISTS `csb_enum_value`;
+CREATE TABLE `csb_enum_value`  (
+    `id` int NOT NULL AUTO_INCREMENT COMMENT '主键，自增ID',
+    `name` varchar(35) NOT NULL COMMENT '枚举VALUE值RTX-ID',
+    `md5` varchar(64) NOT NULL UNIQUE COMMENT '数据唯一标识：MD5-ID',
+    `key` varchar(35) NOT NULL COMMENT '枚举子集对应的key（csb_enum_key）',
+    `value` varchar(35) COMMENT '枚举子集对应的value',
+    `remark` text COMMENT '枚举子集对应的value说明',
+    `create_rtx` varchar(35) COMMENT '创建用户RTX-ID',
+    `create_time` datetime default CURRENT_TIMESTAMP COMMENT '创建时间',
+    `update_rtx` varchar(35) COMMENT '更新用户RTX-ID',
+    `update_time` datetime COMMENT '更新时间',
+    `delete_rtx` varchar(35) COMMENT '删除用户RTX-ID',
+    `delete_time` datetime COMMENT '删除时间',
+    `lock` bool default False COMMENT '锁定状态：1锁定；0非锁定',
+    `status` bool default False COMMENT '数据状态：1删除；0正常（默认）',
+    `order_id` int COMMENT '排序ID',
+
+    PRIMARY KEY (`id`),
+    UNIQUE INDEX `index_id`(`id`) USING HASH COMMENT 'id索引'
+) COMMENT='参数表-ENUM枚举Value表';
+
+delete from csb_enum_value;
+
+insert into csb_enum_value(`name`, `md5_id`, `key`, `value`, `description`, `lock`, `status`, `create_rtx`, `order_id`) VALUES
+('bool-type', '9a5f13cb385c7fa20c2242a657896aca', 'Y', '是', '布尔枚举值：YES', False, False, 'admin', 1),
+('bool-type', '771e7a50ad44f434ef93958fb9a1a8aa', 'N', '否', '布尔枚举值：NO', False, False, 'admin', 2),
+('sex-type', '228708a5966408d2dbd19f1976270223', 'NO', '保密', '性别枚举值：NO', False, False, 'admin', 1),
+('sex-type', '63889cfb9d3cbe05d1bd2be5cc9953fd', 'M', '男', '性别枚举值：Male', False, False, 'admin', 2),
+('sex-type', '1f856b81d54a3c3f966336f54f59576a', 'F', '女', '性别枚举值：Female', False, False, 'admin', 3),
+('download-select', 'bc1c7c26bfeac3a75a5a07a9926b8d08', 'ALL', '全部数据', '表格下载方式 > 全部数据', False, False, 'admin', 1),
+('download-select', 'ced53e5b8a5f4835eaf895b966d02fd9', 'SELECT', '选择数据', '表格下载方式 > 已选择数据', False, False, 'admin', 2),
+('download-format', '48a12305af5c8e87edefaeaf8b139bda', '.xls', '.xls', '表格下载文件保存格式 > .xls', False, False, 'admin', 1),
+('download-format', '7078549a73f443430b655112015b3f91', '.xlsx', '.xlsx', '表格下载文件保存格式 > .xlsx', False, False, 'admin', 2),
+('menu-type', 'de11acf0945e056b6111df2344b61e56', 'MENU', '菜单', '菜单类型 > 菜单', False, False, 'admin', 1),
+('menu-type', '3d26943e03fc06d7942bb94e2768cdd1', 'LINK', '链接', '菜单类型 > 链接', False, False, 'admin', 2),
+('menu-type', '989708ebdc1349a0ecb161bce861e6ba', 'BUTTON', '按钮', '菜单类型 > 按钮', False, False, 'admin', 3),
+('menu-level', 'd000c56ed7f06f4ab0e49749ff9e7219', '0', '根目录', '菜单级别 > 根目录', False, False, 'admin', 1),
+('menu-level', 'fae5bfbcfdebe7d1a522fd2d10c91284', '1', '一级菜单', '菜单级别 > 一级菜单', False, False, 'admin', 2),
+('menu-level', '7da62425a607c5fc8d0e5f4d07875a1f', '2', '二级菜单', '菜单级别 > 二级菜单', False, False, 'admin', 3),
+('menu-level', '2d86b6dc56da98dc0eb1f35ebf3bbda1', '3', '三级菜单', '菜单级别 > 三级菜单', False, False, 'admin', 4),
+('menu-level', 'dd521a6f75a7145e327abf945c588acf', '4', '四级菜单', '菜单级别 > 四级菜单', False, False, 'admin', 5),
+('menu-level', 'be1be8e2be606888227b2a18393b6cd9', '5', '五级菜单', '菜单级别 > 五级菜单', False, False, 'admin', 6),
+('menu-level', '3910b181c2b6541537424984a885180a', '6', '六级菜单', '菜单级别 > 六级菜单', False, False, 'admin', 7),
+('menu-level', '6a585ff1b9247fc7ac701d51bc735dc8', '7', '七级菜单', '菜单级别 > 七级菜单', False, False, 'admin', 8),
+('menu-level', 'f54c2a67f5981f11ea34d7326b5eae87', '8', '八级菜单', '菜单级别 > 八级菜单', False, False, 'admin', 9),
+('menu-level', '72a2e1da9e70462d8f31cc139147a9d9', '9', '九级菜单', '菜单级别 > 九级菜单', False, False, 'admin', 10),
+('menu-level', '896e19f6470e5bfc60ba1d2a6ac8e4f1', '10', '十级菜单', '菜单级别 > 十级菜单', False, False, 'admin', 11),
+('api-type', '6e0902c24a7c2ba5eff38c893288454f', 'SUCCESS', 'POST', 'API接口操作类型 > 新增', False, False, 'admin', 1),
+('api-type', '055360b96a9712758ba22cea8cb4cda0', 'DANGER', 'DELETE', 'API接口操作类型 > 删除', False, False, 'admin', 2),
+('api-type', '42c142615a0f68e436d8f6021d566ec2', 'INFO', 'PUT', 'API接口操作类型 > 修改', False, False, 'admin', 3),
+('api-type', 'cba31eaae518a4695c40d22f87812072', 'PRIMARY', 'GET', 'API接口操作类型 > 查询', False, False, 'admin', 4),
+('api-type', 'de77797d9f646e2055e7d6e08b6421d3', 'ERROR', 'OTHER', 'API接口操作类型 > 其他', False, False, 'admin', 5),
+('task-status', 'f6c92121b95675feb64d8bf785859f2f', 'SUCCESS', '成功', '任务状态 > 成功', False, False, 'admin', 1),
+('task-status', '9b3bd908456381af4ef69f98f9810846', 'FAILURE', '失败', '任务状态 > 失败', False, False, 'admin', 2),
+('task-status', '85a78a1c4bfc5ad70a542c0e32c43026', 'WORKING', '执行中', '任务状态 > 执行中', False, False, 'admin', 3);
+
+
+
+
+
+
+('excel-type', 'ecf0b1978b354bfcf243ef316c252101', '1', '合并', '表格处理方式 > 合并', 1, 'admin', 1),
+('excel-type', '67128fcae7732df36a12e6e760aa39c7', '2', '拆分', '表格处理方式 > 拆分', 1, 'admin', 2),
+('excel-split-store', '37ca191a1f70223c75c002fe80066a79', '1', '多表一Sheet', '表格拆分 > 存储方式 > 多表一Sheet', 1, 'admin', 1),
+('excel-split-store', '1cf44e3c01b8c185e829a912375c3d88', '2', '一表多Sheet', '表格拆分 > 存储方式 > 一表多Sheet', 1, 'admin', 2),
+('excel-num', 'ed6bfec14176d9717f16049ceaef1997', '1', '行', '表格拆分 > 拆分方式 > 行', 1, 'admin', 1),
+('excel-num', '41a761bd675bda3f95fabb16987675e9', '2', '列', '表格拆分 > 拆分方式 > 列', 1, 'admin', 2),
+
+('file-type', '9086ab2a079b27a89e959a7588063e13', '1', 'WORD', '文件类型 > WORD文档', 1, 'admin', 1),
+('file-type', 'f65e091a48c00c5439e6bf536b35c03a', '2', 'EXCEL', '文件类型 > EXCEL表格', 1, 'admin', 2),
+('file-type', 'd9e8eab4ac9e4dba2d7798b64a335e36', '3', 'PPT', '文件类型 > PPT演示文稿', 1, 'admin', 3),
+('file-type', 'b3e251df695d0d1381f356c9a2de6f81', '4', '文本', '文件类型 > 文本文件', 1, 'admin', 4),
+('file-type', 'e88041819de93ea5fe50d02816b6d443', '5', 'PDF', '文件类型 > PDF文件', 1, 'admin', 5),
+('file-type', '8ba23dbd99ce1fd1721848806f396a2d', '99', '其他', '文件类型 > 其他类型文件', 1, 'admin', 6),
+('qywx-type', '882c0c19dbc420c129e696532e75f027', 'text', '文本消息', '企业微信消息类型 > 文本消息', 1, 'admin', 1),
+('qywx-type', '3fc72ebfbc1cccb57c0be9755cd05a6a', 'image', '图片消息', '企业微信消息类型 > 图片消息', 1, 'admin', 2),
+('qywx-type', 'f93a4f42766340e21d84d117f0e8ee2b', 'voice', '语音消息', '企业微信消息类型 > 语音消息', 1, 'admin', 3),
+('qywx-type', '88f8a7b7e659c25e1168830587273a95', 'video', '视频消息', '企业微信消息类型 > 视频消息', 1, 'admin', 4),
+('qywx-type', '6bb6b85b36e06aeb31ecfe7ab1f4d894', 'file', '文件消息', '企业微信消息类型 > 文件消息', 1, 'admin', 5),
+('qywx-type', 'b4fd5e4d7e033fe6c022d9d9237efd17', 'textcard', '文本卡片消息', '企业微信消息类型 > 文本卡片消息', 0, 'admin', 6),
+('qywx-type', '259225b177117c2f44b39de0ae3d3457', 'news', '图文消息', '企业微信消息类型 > 图文消息', 0, 'admin', 7),
+('qywx-type', 'febc81425c4542429956d7cf3477bb46', 'markdown', 'markdown消息', '企业微信消息类型 > markdown消息', 1, 'admin', 9),
+('qywx-type', '88e59bdf04e4843ca649e33f7872bcbb', 'miniprogram_notice', '小程序通知消息', '企业微信消息类型 > 小程序通知消息', 0, 'admin', 10),
+('qywx-type', 'd046e3333d903c8962e927571660452f', 'template_card@text_notice', '模板卡片消息 > 文本通知型', '企业微信消息类型 > 模板卡片消息 > 文本通知型', 0, 'admin', 11),
+
+('qywx-type', '4da311801e0c3b85161223855540be41', 'mpnews', '多图文消息', '企业微信消息类型 > 多图文消息', 0, 'admin', 8),
+('qywx-type', '684fb803a898eeb2497c6b5e6921e0b6', 'template_card@news_notice', '模板卡片消息 > 图文展示型', '企业微信消息类型 > 模板卡片消息 > 图文展示型', 0, 'admin', 12),
+('qywx-type', '1848b73595df91d0c29cdf5127897040', 'template_card@button_interaction', '模板卡片消息 > 按钮交互型', '企业微信消息类型 > 模板卡片消息 > 按钮交互型', 0, 'admin', 13),
+('qywx-type', '16bef9b5ef7a95422d8b355714e92367', 'template_card@vote_interaction', '模板卡片消息 > 投票选择型', '企业微信消息类型 > 模板卡片消息 > 投票选择型', 0, 'admin', 14),
+('qywx-type', 'a805e896e02b83115987743cff27d507', 'template_card@multiple_interaction', '模板卡片消息 > 多项选择型', '企业微信消息类型 > 模板卡片消息 > 多项选择型', 0, 'admin', 15),
+('db-type', '01a9bf972fa7c09be40d08d668419da1', 'DB2', 'DB2', '数据库类型 > 关系型数据库 > DB2', 1, 'admin', 1),
+('db-type', 'c555fd735b52b0f37cba6616f5f584d2', 'Oracle', 'Oracle', '数据库类型 > 关系型数据库 > Oracle', 1, 'admin', 2),
+('db-type', '2f7bde83268fab2083719214e29f620c', 'MySQL', 'MySQL', '数据库类型 > 关系型数据库 > MySQL', 1, 'admin', 3),
+('db-type', '086fa1c6e5790ed66183907e975f8ac1', 'SqlServer', 'SqlServer', '数据库类型 > 关系型数据库 > SqlServer', 1, 'admin', 4),
+('db-type', 'c995768c30121e6171909886effc2bd2', 'SQLite', 'SQLite', '数据库类型 > 关系型数据库 > SQLite', 1, 'admin', 5),
+('db-type', 'ae6725e88e8fab0f5d26dc87f785f0a8', 'PostgreSQL', 'PostgreSQL', '数据库类型 > 关系型数据库 > PostgreSQL', 1, 'admin', 6),
+('db-type', '4e0d61664feab705c27a1a07eb304ac5', 'Redis', 'Redis', '数据库类型 > 非关系型数据库 > Redis', 1, 'admin', 7),
+('db-type', '358841380e96a757c6293278a1e76528', 'Memcache', 'Memcache', '数据库类型 > 非关系型数据库 > Memcache', 1, 'admin', 8),
+('db-type', 'ae5816aea7485d94c4bf782e8f9fa2c7', 'MongoDb', 'MongoDb', '数据库类型 > 非关系型数据库 > MongoDb', 1, 'admin', 9),
+('db-type', 'c9c0821ca988ca2fd7c8c10d9198058f', 'HBase', 'HBase', '数据库类型 > 非关系型数据库 > HBase', 1, 'admin', 10),
+
+
+-- ----------------------------------------------------------------------------------------------
+
 -- = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
 -- = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
 -- = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
