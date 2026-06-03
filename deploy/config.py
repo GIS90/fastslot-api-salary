@@ -68,6 +68,8 @@ server_name: str = data["server"].get("name") or "Fastslot-API"
 server_version: str = data["server"].get("version")
 server_user: str = data["server"].get("user")
 server_role: str = data["server"].get("role")
+server_password: str = data["server"].get("password")
+server_avatar: str = data["server"].get("avatar")
 
 # app
 # ---------- middleware ------------

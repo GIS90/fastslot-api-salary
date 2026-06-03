@@ -43,13 +43,16 @@ from deploy.utils.status_value import (StatusCode as status_code,
 from deploy.utils.converter import model_converter_dict
 from deploy.schema.dto.xtb_user import xtb_user_list_fields, xtb_user_detail_fields, xtb_user_login_fields
 from deploy.utils.utils import get_now, random_string, md5 as generator_md5
-from deploy.config import server_user as SERVER_USER_ADMIN
+from deploy.config import server_user, server_password, server_avatar
 from deploy.utils.enumeration import XtbXtcsKEY
 
 
-class SystemMainUserService:
+_SERVER_USER_ADMIN: str = server_user
+_SERVER_USER_DEFAULT_PASSWORD: str = server_password
+_SERVER_USER_DEFAULT_AVATAR: str = server_avatar
 
-    DEFAULT_AVATAR: str = "http://2lstore.pygo.space/avatars/default.png"
+
+class SystemMainUserService:
 
     def __init__(self, db_connection: AsyncSession):
         """
@@ -85,7 +88,7 @@ class SystemMainUserService:
             return False, FailureStatus(code=status_code.CODE_501_DATA_NOT_EXIST)
         if status_check and getattr(model, "status", None):
             return False, FailureStatus(code=status_code.CODE_503_DATA_DELETE_NOT_EDIT)
-        if admin_check and getattr(model, "rtx_id") ==  SERVER_USER_ADMIN:
+        if admin_check and getattr(model, "rtx_id") ==  _SERVER_USER_ADMIN:
             return False, FailureStatus(code=status_code.CODE_500_DATA_ADMIN_NOT)
 
         return (True, model if response_type == "model"
@@ -153,7 +156,7 @@ class SystemMainUserService:
         await self.xtb_user_curd.update(db=self.db, model=data)
         return SuccessStatus()
 
-    async def __generator_default_password(self, password: str="abcd1234") -> str:
+    async def __generator_default_password(self, password: str=_SERVER_USER_DEFAULT_PASSWORD) -> str:
         """生成用户密码"""
         default_password: XtbXtcsModel = await self.xtb_xtcs_curd.get_by_key(
             db=self.db,
@@ -176,7 +179,7 @@ class SystemMainUserService:
         await self.xtb_user_curd.update(db=self.db, model=data)
         return SuccessStatus()
 
-    async def __default_avatar(self, avatar: str="http://2lstore.pygo.space/avatars/default.png") -> str:
+    async def __default_avatar(self, avatar: str=_SERVER_USER_DEFAULT_AVATAR) -> str:
         """用户默认头像"""
         default_avatar: XtbXtcsModel = await self.xtb_xtcs_curd.get_by_key(
             db=self.db,
@@ -248,7 +251,7 @@ class SystemMainUserService:
 
     async def __verify_contain_admin_user(self, md5_list: List) -> Tuple[bool, Any]:
         db_model: List = await self.xtb_user_curd.get_rtx_by_md5_list(db=self.db, md5_list=md5_list)
-        if db_model and SERVER_USER_ADMIN in db_model:
+        if db_model and _SERVER_USER_ADMIN in db_model:
             return True, FailureStatus(code=status_code.CODE_500_DATA_ADMIN_NOT, message="管理员用户不允许删除")
         else:
             return False, db_model

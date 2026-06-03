@@ -4,6 +4,8 @@ name = "Fastslot-API-Salary"
 version = "v1.0.1"
 user = "admin"
 role = "ADMIN"
+password = "abcd@1234"
+avatar = "http://2lstore.pygo.space/avatars/default.png"
 
 # Flask APP[默认配置，不建议更改]
 [app]
