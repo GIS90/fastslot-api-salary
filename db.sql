@@ -220,26 +220,30 @@ VALUES
 (36, '系统维护', 'SystemOps', '/system/ops', 35, 2, '4059b0251f66a18cb56f544728796875', '/system/ops', FALSE, '', 'Operation', TRUE, FALSE, FALSE, 'MENU', TRUE, 10100, 'admin', FALSE, FALSE, ''),
 --   >> [三级级菜单]
 (37, '部门架构', 'SystemOpsDepart', '/system/ops/depart', 36, 3, '1d17cb9923b99f823da9f5a16dc460e5', '/system/ops/depart/index', FALSE, '', '', TRUE, FALSE, FALSE, 'MENU', TRUE, 10101, 'admin', FALSE, TRUE, ''),
-(38, '数据字典', 'SystemOpsDict', '/system/ops/dict', 36, 3, '91516e7a50ce0a67a8eb1f9229c293d1', '/system/ops/dict/index', FALSE, '', '', TRUE, FALSE, FALSE, 'MENU', TRUE, 10102, 'admin', FALSE, TRUE, ''),
-缺少系统表-系统参数 数据字典KEY 数据字典VALUE
-(39, '后台API', 'SystemOpsApi', '/system/ops/api', 36, 3, '4ae6c8f4429f7bacb050c9c980cf51d3', '/system/ops/api/index', FALSE, '', '', TRUE, FALSE, FALSE, 'MENU', TRUE, 10103, 'admin', FALSE, TRUE, ''),
-(40, '头像管理', 'SystemOpsAvatar', '/system/ops/avatar', 36, 3, 'eafdc02f3b847285bf1815f55f1f4e46', '/system/ops/avatar/index', FALSE, '', '', TRUE, FALSE, FALSE, 'MENU', TRUE, 10104, 'admin', FALSE, TRUE, ''),
-(41, '系统日志', 'SystemOpsLog', '/system/ops/log', 36, 3, 'fa83d9352d3c8fab04893bbf60be7e06', '/system/ops/log/index', FALSE, '', '', TRUE, FALSE, FALSE, 'MENU', TRUE, 10105, 'admin', FALSE, TRUE, ''),
-(42, '任务中心', 'SystemOpsTask', '/system/ops/task', 36, 3, '0d5939c51f761fe1d7fe3c9409577a6f', '/system/ops/task/index', FALSE, '', '', TRUE, FALSE, FALSE, 'MENU', TRUE, 10106, 'admin', FALSE, TRUE, ''),
+(38, '头像管理', 'SystemOpsAvatar', '/system/ops/avatar', 36, 3, 'eafdc02f3b847285bf1815f55f1f4e46', '/system/ops/avatar/index', FALSE, '', '', TRUE, FALSE, FALSE, 'MENU', TRUE, 10102, 'admin', FALSE, TRUE, ''),
+(39, '系统日志', 'SystemOpsLog', '/system/ops/log', 36, 3, 'fa83d9352d3c8fab04893bbf60be7e06', '/system/ops/log/index', FALSE, '', '', TRUE, FALSE, FALSE, 'MENU', TRUE, 10103, 'admin', FALSE, TRUE, ''),
+(40, '任务中心', 'SystemOpsTask', '/system/ops/task', 36, 3, '0d5939c51f761fe1d7fe3c9409577a6f', '/system/ops/task/index', FALSE, '', '', TRUE, FALSE, FALSE, 'MENU', TRUE, 10104, 'admin', FALSE, TRUE, ''),
 -- * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
 --   > 系统维护[二级菜单]
-(43, '权限管理', 'SystemMain', '/system/main', 35, 2, '34e34c43ec6b943c10a3cc1a1a16fb11', '/system/main', FALSE, '', 'Lock', TRUE, FALSE, FALSE, 'MENU', TRUE, 10200, 'admin', FALSE, FALSE, ''),
+(41, '系统配置', 'SystemConfig', '/system/config', 35, 2, 'a59948b9e45358eaaaa1b13d9cedc248', '/system/config', FALSE, '', 'SetUp', TRUE, FALSE, FALSE, 'MENU', TRUE, 10200, 'admin', FALSE, FALSE, ''),
+(42, '参数配置', 'SystemConfigXtcs', '/system/config/xtcs', 41, 3, '01a048451007391f41a139858d9a9ac9', '/system/config/xtcs/index', FALSE, '', '', TRUE, FALSE, FALSE, 'MENU', TRUE, 10201, 'admin', FALSE, TRUE, ''),
+(43, '数据字典K', 'SystemConfigEK', '/system/config/ek', 41, 3, 'ae4f23009c2738728e4ecd415cbd6167', '/system/config/ek/index', FALSE, '', '', TRUE, FALSE, FALSE, 'MENU', TRUE, 10202, 'admin', FALSE, TRUE, ''),
+(44, '数据字典V', 'SystemConfigEV', '/system/config/ev', 41, 3, 'd8692fd595339b6cd2336589b96f79e0', '/system/config/ev/index', FALSE, '', '', TRUE, FALSE, FALSE, 'MENU', TRUE, 10203, 'admin', FALSE, TRUE, ''),
+(45, '后台API', 'SystemConfigApi', '/system/config/api', 41, 3, '4ae6c8f4429f7bacb050c9c980cf51d3', '/system/config/api/index', FALSE, '', '', TRUE, FALSE, FALSE, 'MENU', TRUE, 10204, 'admin', FALSE, TRUE, ''),
+-- * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+--   > 系统维护[二级菜单]
+(46, '权限管理', 'SystemMain', '/system/main', 35, 2, '34e34c43ec6b943c10a3cc1a1a16fb11', '/system/main', FALSE, '', 'Lock', TRUE, FALSE, FALSE, 'MENU', TRUE, 10300, 'admin', FALSE, FALSE, ''),
 --   >> [三级级菜单]
-(44, '用户管理', 'SystemMainUser', '/system/main/user', 43, 3, '8f9bfe9d1345237cb3b2b205864da075', '/system/main/user/index', FALSE, '', '', TRUE, FALSE, FALSE, 'MENU', TRUE, 10201, 'admin', FALSE, TRUE, ''),
-(45, '角色管理', 'SystemMainRole', '/system/main/role', 43, 3, 'bbbabdbe1b262f75d99d62880b953be1', '/system/main/role/index', FALSE, '', '', TRUE, FALSE, FALSE, 'MENU', TRUE, 10202, 'admin', FALSE, TRUE, ''),
-(46, '菜单管理', 'SystemMainMenu', '/system/main/menu', 43, 3, 'b61541208db7fa7dba42c85224405911', '/system/main/menu/index', FALSE, '', '', TRUE, FALSE, FALSE, 'MENU', TRUE, 10203, 'admin', FALSE, TRUE, ''),
+(47, '用户管理', 'SystemMainUser', '/system/main/user', 46, 3, '8f9bfe9d1345237cb3b2b205864da075', '/system/main/user/index', FALSE, '', '', TRUE, FALSE, FALSE, 'MENU', TRUE, 10301, 'admin', FALSE, TRUE, ''),
+(48, '角色管理', 'SystemMainRole', '/system/main/role', 46, 3, 'bbbabdbe1b262f75d99d62880b953be1', '/system/main/role/index', FALSE, '', '', TRUE, FALSE, FALSE, 'MENU', TRUE, 10302, 'admin', FALSE, TRUE, ''),
+(49, '菜单管理', 'SystemMainMenu', '/system/main/menu', 46, 3, 'b61541208db7fa7dba42c85224405911', '/system/main/menu/index', FALSE, '', '', TRUE, FALSE, FALSE, 'MENU', TRUE, 10303, 'admin', FALSE, TRUE, ''),
 
 
 -- 个人中心[一级菜单]
-(47, '设置', 'Setter', '/setter', 1, 1, '130bdeec588552954b9e3bea0ef364b2', '/setter', FALSE, '', 'Setting', TRUE, FALSE, FALSE, 'MENU', TRUE, 11000, 'admin', FALSE, FALSE, ''),
+(50, '设置', 'Setter', '/setter', 1, 1, '130bdeec588552954b9e3bea0ef364b2', '/setter', FALSE, '', 'Setting', TRUE, FALSE, FALSE, 'MENU', TRUE, 11000, 'admin', FALSE, FALSE, ''),
 --   > [二级菜单]
-(48, '个人中心', 'SetterProfile', '/setter/profile', 47, 2, 'cce99c598cfdb9773ab041d54c3d973a', '/setter/profile/index', FALSE, '', 'User', TRUE, FALSE, FALSE, 'MENU', TRUE, 11001, 'admin', FALSE, TRUE, ''),
-(49, '系统向导', 'SetterGuide', '/setter/guide', 47, 2, '6602bbeb2956c035fb4cb5e844a4861b', '/setter/guide/index', FALSE, '', 'Guide', TRUE, FALSE, FALSE, 'MENU', TRUE, 11002, 'admin', FALSE, TRUE, '');
+(51, '个人中心', 'SetterProfile', '/setter/profile', 50, 2, 'cce99c598cfdb9773ab041d54c3d973a', '/setter/profile/index', FALSE, '', 'User', TRUE, FALSE, FALSE, 'MENU', TRUE, 11001, 'admin', FALSE, TRUE, ''),
+(52, '系统向导', 'SetterGuide', '/setter/guide', 50, 2, '6602bbeb2956c035fb4cb5e844a4861b', '/setter/guide/index', FALSE, '', 'Guide', TRUE, FALSE, FALSE, 'MENU', TRUE, 11002, 'admin', FALSE, TRUE, '');
 -- = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
 -- 系统表-系统参数
 -- create table && index
@@ -272,7 +276,11 @@ insert into xtb_xtcs(`key`, `md5`, `remark`, `value`, `create_rtx`, `lock`, `sta
 ('SYSTEM-TITLE', '1700a58b93fe99d9edf8eec318737f1e', '系统登录页信息展示：系统标题', '智行工具平台', 'admin', False, False, 3),
 ('SYSTEM-VERSION', '7bf8a92528d9e53f020bb24d80bfb967', '系统登录页信息展示：系统版本', '1.1.2', 'admin', False, False, 4),
 ('SYSTEM-FEATURE', 'c827459d2ee5da92adfd826355588039', '系统登录页信息展示：系统特色', '定制化 / 高性能 / 精优雅', 'admin', False, False, 5),
-('SYSTEM-SUMMARY', 'b48ef16d13363753454a38b1ccf255a4', '系统登录页信息展示：系统简述', '践行践远，智慧前行，总有一款工具让工作变得更加轻松，助你提质增效。', 'admin', False, False, 6);
+('SYSTEM-SUMMARY', 'b48ef16d13363753454a38b1ccf255a4', '系统登录页信息展示：系统简述', '践行践远，智慧前行，总有一款工具让工作变得更加轻松，助你提质增效。', 'admin', False, False, 6),
+('HOME-TIP-MORNING', '16d037c51df631d8c4260f04bdbee199', '系统登录温馨提示：凌晨6点～中午12点', '希望您有一个元气满满的早晨，充满动力地开始新的一天，加油哦！', 'admin', False, False, 7),
+('HOME-TIP-NOON', 'a6856a3069a3fcb0201dd43a8cc382f0', '系统登录温馨提示：中午12点～下午14点', '忙碌了一上午，确实应该适当休息一下，记得按时吃午饭，补充能量才能更好地完成下午的工作！', 'admin', False, False, 8),
+('HOME-TIP-AFTERNOON', 'a262837654996d535aa3f3790a6eba4f', '系统登录温馨提示：下午14点～下午18点', '下午是继续推进各项任务的好时间，保持专注和效率，希望您能够保持良好的状态，顺利完成每一天的目标！', 'admin', False, False, 9),
+('HOME-TIP-NIGHT', '2cb3bb4adb5d010267204a7effd2c8da', '系统登录温馨提示：下午18点～凌晨6点', '一天的努力即将结束，回顾今天的成就，为明天做好准备。别忘了放松一下自己，享受美好的夜晚时光，睡觉要有好梦。', 'admin', False, False, 10);
 -- = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
 -- CSB_ENUM_EKY 枚举Key表
 -- create table && index

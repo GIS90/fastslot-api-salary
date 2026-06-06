@@ -182,7 +182,31 @@ class FieldTypeEnum(StrEnum):
 @unique
 class XtbXtcsKEY(StrEnum):
     """
-    系统表-系统参数（xtb-xtcs）KEY值枚举
+    系统表-系统参数（xtb-xtcs）
     """
     USER_DEFAULT_PASSWORD = "USER-DEFAULT-PASSWORD"
     USER_DEFAULT_AVATAR = "USER-DEFAULT-AVATAR"
+    SYSTEM_TITLE = "SYSTEM-TITLE"
+    SYSTEM_VERSION = "SYSTEM-VERSION"
+    SYSTEM_FEATURE = "SYSTEM-FEATURE"
+    SYSTEM_SUMMARY = "SYSTEM-SUMMARY"
+    HOME_TIP_MORNING = "HOME-TIP-MORNING"
+    HOME_TIP_NOON = "HOME-TIP-NOON"
+    HOME_TIP_AFTERNOON = "HOME-TIP-AFTERNOON"
+    HOME_TIP_NIGHT = "HOME-TIP-NIGHT"
+
+
+@unique
+class CSB_ENUM_KEY(StrEnum):
+    """
+    参数表-枚举Key表（csb_enum_key）
+    """
+    BOOL_TYPE = "bool-type"
+    SEX_TYPE = "sex-type"
+    DOWNLOAD_SELECT = "download-select"
+    DOWNLOAD_FORMAT = "download-format"
+    MENU_TYPE = "menu-type"
+    MENU_LEVEL = "menu-level"
+    API_TYPE = "api-type"
+    TASK_STATUS = "task-status"
+
