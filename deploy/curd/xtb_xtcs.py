@@ -73,21 +73,24 @@ class XtbXtcsCurd(BaseCurd):
             raise SQLDBHandleException(f"[{self.__class__.__name__}*查询One]{e}")
 
     async def get_by_id(
-            self, db: AsyncSession,
+            self,
+            db: AsyncSession,
             _id: int,
             filter_lock: bool = False
     ) -> Optional[XtbXtcsModel]:
         return await self._get_model_by_field(db, XtbXtcsModel.id, _id, filter_lock)
 
     async def get_by_key(
-            self, db: AsyncSession,
+            self,
+            db: AsyncSession,
             key: str,
             filter_lock: bool = False
     ) -> Optional[XtbXtcsModel]:
         return await self._get_model_by_field(db, XtbXtcsModel.key, key, filter_lock)
 
     async def get_by_md5(
-            self, db: AsyncSession,
+            self,
+            db: AsyncSession,
             md5: str,
             filter_lock: bool = False
     ) -> Optional[XtbXtcsModel]:

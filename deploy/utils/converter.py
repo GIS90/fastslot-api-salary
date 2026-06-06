@@ -34,7 +34,10 @@ import datetime
 from typing import Any, List, Dict, Optional
 
 
-__all__ = ["model_converter_dict", "many_model_converter_dict"]
+__all__ = [
+    "model_converter_dict",
+    "many_model_converter_dict"
+]
 
 
 async def model_converter_dict(
@@ -169,3 +172,36 @@ async def many_model_converter_dict(
         else:
             return _model_list
 
+
+async def option_converter_dict(
+        models: Any,
+        key_trans_int: bool = False,
+        lock_view: bool = False,
+        *args,
+        **kwargs
+) -> Optional[List[Dict]]:
+    """
+    csb_enum_value数据模型对象转换为Select-Option格式
+    [
+        {"label": x, "value": y, "disabled": z},
+    ]
+    :param models: model list
+    :param key_trans_int: 是否key为整型，默认False
+    :param lock_view: 是否key为整型，默认False
+    :return: list
+    """
+    if not models: return None
+
+    _res: List = []
+    for item in models:
+        if not item: continue
+        if not lock_view and getattr(item, "lock", None) : continue  # 锁定不显示
+
+        key = int(getattr(item, "key")) if key_trans_int else getattr(item, "key")
+        _res.append({
+            "label": getattr(item, "value"),
+            "value": key,
+            "disabled": getattr(item, "lock")
+        })
+    else:
+        return _res

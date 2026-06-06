@@ -4,6 +4,7 @@
 ------------------------------------------------
 
 describe: 
+    setter>profile view
 
 base_info:
     __author__ = PyGo

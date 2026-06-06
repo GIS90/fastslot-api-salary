@@ -321,9 +321,9 @@ insert into csb_enum_key(`key`, `md5`, `remark`, `lock`, `status`, `create_rtx`,
 DROP TABLES IF EXISTS `csb_enum_value`;
 CREATE TABLE `csb_enum_value`  (
     `id` int NOT NULL AUTO_INCREMENT COMMENT '主键，自增ID',
-    `name` varchar(35) NOT NULL COMMENT '枚举VALUE值RTX-ID',
+    `name` varchar(35) NOT NULL COMMENT '枚举子集对应的key（csb_enum_key）',
     `md5` varchar(64) NOT NULL UNIQUE COMMENT '数据唯一标识：MD5-ID',
-    `key` varchar(35) NOT NULL COMMENT '枚举子集对应的key（csb_enum_key）',
+    `key` varchar(35) NOT NULL COMMENT '枚举VALUE值RTX-ID',
     `value` varchar(35) COMMENT '枚举子集对应的value',
     `remark` text COMMENT '枚举子集对应的value说明',
     `create_rtx` varchar(35) COMMENT '创建用户RTX-ID',
@@ -342,7 +342,7 @@ CREATE TABLE `csb_enum_value`  (
 
 delete from csb_enum_value;
 
-insert into csb_enum_value(`name`, `md5_id`, `key`, `value`, `description`, `lock`, `status`, `create_rtx`, `order_id`) VALUES
+insert into csb_enum_value(`name`, `md5`, `key`, `value`, `remark`, `lock`, `status`, `create_rtx`, `order_id`) VALUES
 ('bool-type', '9a5f13cb385c7fa20c2242a657896aca', 'Y', '是', '布尔枚举值：YES', False, False, 'admin', 1),
 ('bool-type', '771e7a50ad44f434ef93958fb9a1a8aa', 'N', '否', '布尔枚举值：NO', False, False, 'admin', 2),
 ('sex-type', '228708a5966408d2dbd19f1976270223', 'NO', '保密', '性别枚举值：NO', False, False, 'admin', 1),

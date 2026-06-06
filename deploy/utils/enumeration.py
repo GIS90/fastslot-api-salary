@@ -197,7 +197,7 @@ class XtbXtcsKEY(StrEnum):
 
 
 @unique
-class CSB_ENUM_KEY(StrEnum):
+class CsbEnumKEY(StrEnum):
     """
     参数表-枚举Key表（csb_enum_key）
     """

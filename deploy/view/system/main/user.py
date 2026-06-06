@@ -4,7 +4,7 @@
 ------------------------------------------------
 
 describe: 
-    system xtb_user view
+    system>main>user view
 
 base_info:
     __author__ = PyGo
@@ -13,7 +13,7 @@ base_info:
     __mail__ = gaoming971366@163.com
     __blog__ = www.pygo.space
     __project__ = fastslot-api-salary
-    __file_name__ = xtb_user.py
+    __file_name__ = user.py
 
 usage:
     

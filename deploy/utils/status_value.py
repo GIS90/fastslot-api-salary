@@ -108,6 +108,7 @@ StatusMsg = {
     508: "部分数据删除成功",
     509: "部分数据更新成功",
     510: "数据含有子数据，不允许删除",
+    511: "数据已锁定，请先解锁再进行操作",
 
     # ** db **
     600: "数据库异常",
@@ -200,6 +201,7 @@ class StatusCode(IntEnum):
     CODE_508_DATA_PART_DELETE = 508
     CODE_509_DATA_PART_UPDATE = 509
     CODE_510_DATA_CONTAIN_SUB_DATA_NOT_DELETE = 510
+    CODE_511_DATA_LOCKED_NOT_EDIT = 511
 
     # ** db **
     CODE_600_DB_EXCEPTION = 600

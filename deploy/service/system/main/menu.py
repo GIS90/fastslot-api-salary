@@ -4,7 +4,7 @@
 ------------------------------------------------
 
 describe: 
-    xtb_menu service
+    system>main>menu service
     
 base_info:
     __author__ = PyGo
@@ -13,7 +13,7 @@ base_info:
     __mail__ = gaoming971366@163.com
     __blog__ = www.pygo2.top
     __project__ = fastslot-api-salary
-    __file_name__ = xtb_menu.py
+    __file_name__ = menu.py
 
 usage:
     

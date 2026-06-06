@@ -34,6 +34,7 @@ from typing import Dict, List, Tuple, Literal, Any
 from sqlalchemy.ext.asyncio import AsyncSession
 from deploy.curd.xtb_user import XtbUserCurd
 from deploy.curd.xtb_request import XtbRequestCurd
+from deploy.curd.csb_enum_value import CsbEnumValueCurd
 from deploy.schema.dao.xtb_user import XtbUserModel
 from deploy.utils.status import Status, SuccessStatus, FailureStatus
 from deploy.utils.status_value import (StatusCode as status_code,
@@ -46,6 +47,8 @@ from deploy.config import server_user as SERVER_USER_ADMIN
 from deploy.delib.image_lib import ImageLib
 from deploy.delib.store_lib import QiNiuStoreLib
 from deploy.config import store_yun_base, store_yun_space
+from deploy.utils.enumeration import CsbEnumKEY
+from deploy.utils.converter import option_converter_dict
 
 
 class SetterProfileService:
@@ -57,6 +60,7 @@ class SetterProfileService:
         self.db: AsyncSession = db_connection
         self.xtb_user_curd: XtbUserCurd = XtbUserCurd()
         self.xtb_request_curd: XtbRequestCurd = XtbRequestCurd()
+        self.csb_enum_v_curd: CsbEnumValueCurd = CsbEnumValueCurd()
         self.image_lib: ImageLib = ImageLib()
         self.qiniu_store_lib: QiNiuStoreLib = QiNiuStoreLib(
             space_url=store_yun_base,
@@ -93,6 +97,10 @@ class SetterProfileService:
         return (True, model if response_type == "model"
                         else await model_converter_dict(model=model, fields=fields, default_value="****"))
 
+    async def __get_enum_sex_type(self):
+        sex_enum_model = await self.csb_enum_v_curd.get_list_by_name(db=self.db, name=CsbEnumKEY.SEX_TYPE.value)
+        return [] if not sex_enum_model else await option_converter_dict(sex_enum_model, lock_view=True)
+
     async def profile_detail(self, rtx_id: str) -> Status:
         __flag, data = await self.__valid_model_by_rtx(
             rtx_id=rtx_id, status_check=False, response_type="model", admin_check=False
@@ -107,20 +115,11 @@ class SetterProfileService:
             "phone": getattr(data, "phone"),
             "introduction": getattr(data, "introduction"),
         }
-        # sex_enum_model = self.csb_enum_value_bo.get_model_by_name(name=CsbEnum.SEX_TYPE.value)
-        # data = {
-        #     "user": user,
-        #     "sexEnum": csb_enum_value_to_option(sex_enum_model) if sex_enum_model else []
-        # }
-        _d = {
+        data = {
             "user": user,
-            "sexEnum": [
-                {"label": "男", "value": "M", "disabled": False},
-                {"label": "女", "value": "F", "disabled": False},
-                {"label": "未知", "value": "NO", "disabled": True},
-            ]
+            "sexEnum": await self.__get_enum_sex_type()
         }
-        return SuccessStatus(data=_d)
+        return SuccessStatus(data=data)
 
     async def profile_update(self, rtx_id: str, model: Dict) -> Status:
         __flag, data = await self.__valid_model_by_rtx(

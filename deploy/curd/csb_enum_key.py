@@ -41,7 +41,7 @@ from deploy.schema.dao.csb_enum_key import CsbEnumKeyModel
 from deploy.utils.exception import SQLDBHandleException
 
 
-class XtbXtcsCurd(BaseCurd):
+class CsbEnumKeyCurd(BaseCurd):
 
     @staticmethod
     async def new_model():
@@ -51,7 +51,8 @@ class XtbXtcsCurd(BaseCurd):
         self,
         db: AsyncSession,
         field: str | InstrumentedAttribute,
-        value: Any
+        value: Any,
+        filter_lock: bool = False
     ) -> Optional[CsbEnumKeyModel]:
         try:
             if isinstance(field, str):
@@ -61,19 +62,31 @@ class XtbXtcsCurd(BaseCurd):
             else:
                 _field = field
 
-            result = await db.execute(select(CsbEnumKeyModel).where( _field == value))
+            stmt = select(CsbEnumKeyModel).where(
+                _field == value,
+                CsbEnumKeyModel.status != 1)
+            if filter_lock:
+                stmt = stmt.where(CsbEnumKeyModel.lock != True)
+            result = await db.execute(stmt)
             return result.scalar_one_or_none()
         except Exception as e:
             raise SQLDBHandleException(f"[{self.__class__.__name__}*查询One]{e}")
 
-    async def get_by_id(self, db: AsyncSession, _id: int):
-        return await self._get_model_by_field(db, CsbEnumKeyModel.id, _id)
+    async def get_by_id(
+            self,
+            db: AsyncSession,
+            _id: int,
+            filter_lock: bool = False
+    ) -> Optional[CsbEnumKeyModel]:
+        return await self._get_model_by_field(db, CsbEnumKeyModel.id, _id, filter_lock)
 
-    async def get_by_key(self, db: AsyncSession, key: str):
-        return await self._get_model_by_field(db, CsbEnumKeyModel.key, key)
-
-    async def get_by_md5(self, db: AsyncSession, md5: str):
-        return await self._get_model_by_field(db, CsbEnumKeyModel.md5, md5)
+    async def get_by_md5(
+            self,
+            db: AsyncSession,
+            md5: str,
+            filter_lock: bool = False
+    ) -> Optional[CsbEnumKeyModel]:
+        return await self._get_model_by_field(db, CsbEnumKeyModel.md5, md5, filter_lock)
 
     @classmethod
     async def get_count(cls, db: AsyncSession) -> int:

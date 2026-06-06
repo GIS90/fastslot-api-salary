@@ -30,7 +30,7 @@ Life is short, I use python.
 
 ------------------------------------------------
 """
-from typing import Optional, List, Any
+from typing import Optional, List, Any, Union
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select, update, delete, insert, asc, desc
 from sqlalchemy.orm.attributes import InstrumentedAttribute
@@ -41,7 +41,7 @@ from deploy.schema.dao.csb_enum_value import CsbEnumValueModel
 from deploy.utils.exception import SQLDBHandleException
 
 
-class XtbXtcsCurd(BaseCurd):
+class CsbEnumValueCurd(BaseCurd):
 
     @staticmethod
     async def new_model():
@@ -51,7 +51,8 @@ class XtbXtcsCurd(BaseCurd):
         self,
         db: AsyncSession,
         field: str | InstrumentedAttribute,
-        value: Any
+        value: Any,
+        filter_lock: bool = False
     ) -> Optional[CsbEnumValueModel]:
         try:
             if isinstance(field, str):
@@ -61,19 +62,50 @@ class XtbXtcsCurd(BaseCurd):
             else:
                 _field = field
 
-            result = await db.execute(select(CsbEnumValueModel).where(_field == value))
+            stmt = select(CsbEnumValueModel).where(
+                _field == value,
+                CsbEnumValueModel.status != 1)
+            if filter_lock:
+                stmt = stmt.where(CsbEnumValueModel.lock != True)
+            result = await db.execute(stmt)
             return result.scalar_one_or_none()
         except Exception as e:
             raise SQLDBHandleException(f"[{self.__class__.__name__}*查询One]{e}")
 
-    async def get_by_id(self, db: AsyncSession, _id: int):
-        return await self._get_model_by_field(db, CsbEnumValueModel.id, _id)
+    async def get_by_id(
+            self,
+            db: AsyncSession,
+            _id: int,
+            filter_lock: bool = False
+    ) -> Optional[CsbEnumValueModel]:
+        return await self._get_model_by_field(db, CsbEnumValueModel.id, _id, filter_lock)
 
-    async def get_by_key(self, db: AsyncSession, key: str):
-        return await self._get_model_by_field(db, CsbEnumValueModel.key, key)
+    async def get_by_md5(
+            self,
+            db: AsyncSession,
+            md5: str,
+            filter_lock: bool = False
+    ) -> Optional[CsbEnumValueModel]:
+        return await self._get_model_by_field(db, CsbEnumValueModel.md5, md5, filter_lock)
 
-    async def get_by_md5(self, db: AsyncSession, md5: str):
-        return await self._get_model_by_field(db, CsbEnumValueModel.md5, md5)
+    @classmethod
+    async def get_list_by_name(
+            cls,
+            db: AsyncSession,
+            name: str,
+            filter_lock: bool = False
+    ) -> Union[List, None]:
+        try:
+            stmt = select(CsbEnumValueModel).where(
+                CsbEnumValueModel.name == name,
+                CsbEnumValueModel.status != 1)
+            if filter_lock:
+                stmt = stmt.where(CsbEnumValueModel.lock != True)
+            result = await db.execute(stmt)
+
+            return result.scalars().all()
+        except Exception as e:
+            raise SQLDBHandleException(f"[{cls.__name__}*查询Many]{e}")
 
     @classmethod
     async def get_count(cls, db: AsyncSession) -> int:

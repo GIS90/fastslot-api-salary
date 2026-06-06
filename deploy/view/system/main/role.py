@@ -4,7 +4,7 @@
 ------------------------------------------------
 
 describe: 
-    system xtb_role view
+    system>main>role view
 
 base_info:
     __author__ = PyGo
@@ -13,7 +13,7 @@ base_info:
     __mail__ = gaoming971366@163.com
     __blog__ = www.pygo2.top
     __project__ = fastslot-api-salary
-    __file_name__ = xtb_role.py
+    __file_name__ = role.py
 
 usage:
     

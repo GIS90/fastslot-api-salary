@@ -4,7 +4,7 @@
 ------------------------------------------------
 
 describe: 
-    xtb_user service
+    system>main>user service
 
 base_info:
     __author__ = PyGo
@@ -13,7 +13,7 @@ base_info:
     __mail__ = gaoming971366@163.com
     __blog__ = www.pygo.space
     __project__ = fastslot-api-salary
-    __file_name__ = xtb_user.py
+    __file_name__ = user.py
 
 usage:
 
@@ -163,7 +163,7 @@ class SystemMainUserService:
             key=XtbXtcsKEY.USER_DEFAULT_PASSWORD.value,
             filter_lock=True
         )
-        __value: str = password if not default_password else getattr(default_password, "value")
+        __value: str = getattr(default_password, "value") if default_password else password
         return __value if __value else password
 
     async def default_pwd(self, rtx_id: str) -> Status:
@@ -186,7 +186,7 @@ class SystemMainUserService:
             key=XtbXtcsKEY.USER_DEFAULT_AVATAR.value,
             filter_lock=True
         )
-        __value: str = avatar if not default_avatar else getattr(default_avatar, "value")
+        __value: str = getattr(default_avatar, "value") if default_avatar else avatar
         return __value
 
     async def add(self, rtx_id: str, model: Dict) -> Status:
