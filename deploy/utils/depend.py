@@ -30,17 +30,20 @@ Life is short, I use python.
 
 ------------------------------------------------
 """
+from os.path import splitext as os_path_splitext
 from fastapi import Header, Query
 from typing import Optional, Dict, List
 
 from deploy.utils.token import decode_access_token_rtx
 from deploy.utils.exception import JwtCredentialsException, UserInvalidException
+from deploy.utils.utils import get_now
 from deploy.delib.redis_lib import RedisClientLib
 from deploy.config import redis_host, redis_port, redis_db, redis_password
 from deploy.schema.po.x import PageListModel, DownloadFileModel
 from deploy.schema.po.system_main_menu import MenuBaseModel, MenuEditModel
 from deploy.curd.database import get_session_context
 from deploy.service.system.main.user import SystemMainUserService
+from deploy.utils.enumeration import DownloadExcelFormat as DEF
 
 
 # redis-cli
@@ -172,12 +175,18 @@ async def pageable_model_params(
 X->Download依赖
 > download_params：下载数据请求参数
 """
-
-
 async def download_params(params: DownloadFileModel) -> Dict:
-    # TODO 自定义处理
     file_name = params.name
-    ...
+    # 直接是.xlsx、.xls格式，名称则自动加上时间戳
+    if file_name in [DEF.XLSX.value, DEF.XLS.value]:
+        file_name = "%s%s" % (get_now(format="%Y-%m-%d-%H-%M-%S"), file_name)
+    # 文件名称不包含扩展名，则自动加上扩展名
+    file_names = os_path_splitext(file_name)
+    if not file_names[1]:
+        file_name = "%s%s" % (file_name, DEF.XLSX.value)
+    # 扩展名不是.xlsx、.xls，则自动加上扩展名
+    if file_names[1] not in [DEF.XLSX.value, DEF.XLS.value]:
+        file_name = "%s%s" % (file_name, DEF.XLSX.value)
     return {"api": params.api, "name": file_name, "md5": params.md5, "type": params.type}
 
 

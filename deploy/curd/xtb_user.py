@@ -30,7 +30,7 @@ Life is short, I use python.
 
 ------------------------------------------------
 """
-from typing import Optional, List, Any
+from typing import Optional, List, Any, Dict
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select, update, delete, insert, asc, or_
 from sqlalchemy.orm.attributes import InstrumentedAttribute
@@ -110,11 +110,25 @@ class XtbUserCurd(BaseCurd):
                         XtbUserModel.introduction.like(content)
                     )
                 )
-            stmt = stmt.order_by(asc(XtbUserModel.id)).offset(offset).limit(limit)
+            stmt = stmt.order_by(asc(XtbUserModel.create_time)).offset(offset).limit(limit)
             result = await db.execute(stmt)
             return result.scalars().all()
         except Exception as e:
             raise SQLDBHandleException(f"[{cls.__name__}*查询All]{e}")
+
+    @classmethod
+    async def download(
+        cls, db: AsyncSession, params: Dict, *args, **kwargs
+    ) -> Optional[List]:
+        try:
+            stmt = select(XtbUserModel)
+            if params.get("md5"):
+                stmt = stmt.where(XtbUserModel.md5.in_(params.get("md5")))
+            stmt = stmt.order_by(asc(XtbUserModel.create_time))
+            result = await db.execute(stmt)
+            return result.scalars().all()
+        except Exception as e:
+            raise SQLDBHandleException(f"[{cls.__name__}*下载]{e}")
 
     @classmethod
     async def get_rtx_by_md5_list(

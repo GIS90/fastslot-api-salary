@@ -81,3 +81,12 @@ xtb_user_login_fields = [
     {"key": "role", "type": ft.SPLITLIST, "name": "role", "null": True},
     {"key": "status", "type": ft.BOOLTEXT, "name": "status"},
 ]
+
+
+xtb_user_download_fields = {
+    "rtx_id": "账号",
+    "name": "昵称",
+    "phone": "电话",
+    "email": "邮箱",
+    "introduction": "自我介绍"
+}

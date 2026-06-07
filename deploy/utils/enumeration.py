@@ -44,6 +44,9 @@ __all__ = [
     'FieldTypeEnum',
     'XtbXtcsKEY',
     'CsbEnumKEY',
+    'DownloadExcelFormat',
+    'DownloadExcelType',
+    'TaskStatus',
 ]
 
 
@@ -211,3 +214,27 @@ class CsbEnumKEY(StrEnum):
     API_TYPE = "api-type"
     TASK_STATUS = "task-status"
 
+
+@unique
+class DownloadExcelFormat(StrEnum):
+    """
+    文件下载Excel文件格式
+    """
+    XLS = ".xls"
+    XLSX = ".xlsx"
+
+
+@unique
+class DownloadExcelType(Enum):
+    """
+    文件下载s数据方式
+    """
+    ALL = "ALL"
+    SELECT = "SELECT"
+
+
+@unique
+class TaskStatus(Enum):
+    SUCCESS = "SUCCESS"
+    FAILURE = "FAILURE"
+    WORKING = "WORKING"

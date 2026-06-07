@@ -42,8 +42,9 @@ from deploy.service.system.main.role import SystemMainRoleService
 from deploy.utils.status import Status, SuccessStatus, FailureStatus
 from deploy.utils.status_value import (StatusCode as status_code,
                                        StatusMsg as status_msg)
-from deploy.utils.converter import model_converter_dict, option_converter_dict
-from deploy.schema.dto.xtb_user import xtb_user_list_fields, xtb_user_detail_fields, xtb_user_login_fields
+from deploy.utils.converter import model_converter_dict
+from deploy.schema.dto.xtb_user import (xtb_user_list_fields, xtb_user_detail_fields,
+                                        xtb_user_login_fields, xtb_user_download_fields)
 from deploy.utils.utils import get_now, random_string, md5 as generator_md5
 from deploy.config import server_user, server_password, server_avatar
 from deploy.utils.enumeration import XtbXtcsKEY, CsbEnumKEY
@@ -300,3 +301,37 @@ class SystemMainUserService:
         return SuccessStatus() if query_count == request_count \
             else FailureStatus(code=status_code.CODE_508_DATA_PART_DELETE,
                                message=f"总数{request_count}，成功删除{query_count}，查询失败{request_count - query_count}")
+
+    async def download(self, params: dict) -> List:
+        models = await self.xtb_user_curd.download(db=self.db, params=params)
+        __res = []
+        for model in models:
+            if not model: continue
+            __res_dict = {}
+            for field_k, field_v in xtb_user_download_fields.items():
+                __res_dict[field_v] = getattr(model, field_k)
+            __res.append(__res_dict)
+        else:
+            return __res
+
+        # data, total = self.xtb_sysuser_bo.get_all(params=params, is_admin=True, is_del=False)
+        # _res = []
+        # n = 1
+        # for _d in data:
+        #     if not _d: continue
+        #     _res_dict = xtb_sysuser_model_to_dict(model=_d, _type='all')
+        #     if _res_dict:
+        #         _new_res_dict = dict()
+        #         _new_res_dict['序号'] = n
+        #         _new_res_dict['账号'] = _res_dict.get('rtx_id')
+        #         _new_res_dict['姓名'] = _res_dict.get('name')
+        #         _new_res_dict['性别'] = _res_dict.get('sex_value')
+        #         _new_res_dict['电话'] = _res_dict.get('phone')
+        #         _new_res_dict['邮箱'] = _res_dict.get('email')
+        #         _new_res_dict['部门'] = _res_dict.get('department')
+        #         _new_res_dict['描述'] = _res_dict.get('introduction')
+        #         _new_res_dict['状态'] = "注销" if _res_dict.get('is_del') else "启用"
+        #         _new_res_dict['创建者RTX'] = _res_dict.get('create_rtx')
+        #         _new_res_dict['创建时间'] = _res_dict.get('create_time')
+        #         new_res.append(_new_res_dict)
+        #         n += 1

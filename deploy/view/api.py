@@ -36,9 +36,11 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from deploy.curd.database import get_session
 from deploy.service.api.api import ApiOpenService
 from deploy.service.api.user import ApiUserService
+from deploy.service.api.download import ApiDownloadService
 from deploy.utils.status import Status
 from deploy.utils.depend import depend_token_rtx
 from deploy.utils.decorator import watch_except
+from deploy.utils.depend import download_params
 
 
 # router
@@ -47,10 +49,11 @@ router: APIRouter = APIRouter(prefix="/api", tags=["系统正常运行相关APIs
 api_service: ApiOpenService = ApiOpenService()
 def get_user_service(db: AsyncSession = Depends(get_session)) -> ApiUserService:
     return ApiUserService(db_connection=db)
-
+def get_download_service(db: AsyncSession = Depends(get_session)) -> ApiDownloadService:
+    return ApiDownloadService(db_connection=db)
 
 # - - - - - - - - - - - - - - - - - - - - Open Api - - - - - - - - - - - - - - - - - - - -
-@router.get('/open/m1/case',
+@router.get('/open/m1.case',
             summary="[M1模块]CASE",
             description="[M1模块]测试用例")
 @watch_except
@@ -60,6 +63,23 @@ async def m1_case() -> dict:
     :return: json
     """
     return await api_service.m1_case()
+# - - - - - - - - - - - - - - - - - - - - 文件下载 - - - - - - - - - - - - - - - - - - - -
+@router.get('/download.enum', summary="[下载]枚举")
+async def download_enum(
+    token_rtx_id: str = Depends(depend_token_rtx),
+    download_service: ApiDownloadService = Depends(get_download_service)
+) -> Status:
+    return await download_service.download_enum(token_rtx_id)
+
+
+@router.post('/download', summary="[下载]下载")
+async def download(
+    params: dict = Depends(download_params),
+    token_rtx_id: str = Depends(depend_token_rtx),
+    download_service: ApiDownloadService = Depends(get_download_service)
+) -> Status:
+    return await download_service.download(rtx_id=token_rtx_id, params=params)
+
 
 
 # - - - - - - - - - - - - - - - - - - - - 用户权限 - - - - - - - - - - - - - - - - - - - -

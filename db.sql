@@ -373,7 +373,7 @@ insert into csb_enum_value(`name`, `md5`, `key`, `value`, `remark`, `lock`, `sta
 ('api-type', 'de77797d9f646e2055e7d6e08b6421d3', 'OTHER', 'error', 'API接口操作类型 > 其他', False, False, 'admin', 5),
 ('task-status', 'f6c92121b95675feb64d8bf785859f2f', 'SUCCESS', '成功', '任务状态 > 成功', False, False, 'admin', 1),
 ('task-status', '9b3bd908456381af4ef69f98f9810846', 'FAILURE', '失败', '任务状态 > 失败', False, False, 'admin', 2),
-('task-status', '85a78a1c4bfc5ad70a542c0e32c43026', 'WORKING', '执行中', '任务状态 > 执行中', False, False, 'admin', 3);
+('task-status', '85a78a1c4bfc5ad70a542c0e32c43026', 'WORKING', '执行中', '任务状态 > 执行中', False, True, 'admin', 3);
 
 
 
@@ -422,6 +422,31 @@ insert into csb_enum_value(`name`, `md5`, `key`, `value`, `remark`, `lock`, `sta
 
 
 -- ----------------------------------------------------------------------------------------------
+
+-- = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
+-- xtb_task 系统表-用户任务表
+-- create table && index
+DROP TABLES IF EXISTS `xtb_user_task`;
+CREATE TABLE `xtb_user_task`  (
+    `id` int NOT NULL AUTO_INCREMENT COMMENT '主键，自增ID',
+    `rtx_id` varchar(35) COMMENT '创建用户',
+    `api` varchar(55) NOT NULL COMMENT 'API接口名称',
+    `name` varchar(55) NOT NULL COMMENT '文件名称',
+    `data` varchar(35) NOT NULL COMMENT '数据下载类型',
+    `md5` varchar(64) NOT NULL COMMENT '唯一标识：MD5-ID',
+    `task` varchar(35) NOT NULL COMMENT '任务状态：success failure working',
+    `cost` decimal(10, 4) COMMENT '任务数据运行时间',
+    `create_time` datetime default CURRENT_TIMESTAMP COMMENT '创建时间',
+    `update_time` datetime COMMENT '更新时间',
+    `delete_rtx` varchar(35) COMMENT '删除用户RTX-ID',
+    `delete_time` datetime COMMENT '删除时间',
+    `status` bool default False COMMENT '数据状态：1删除；0正常（默认）',
+
+    PRIMARY KEY (`id`),
+    UNIQUE INDEX `xtb_user_task_md5_index`(`md5`) USING HASH COMMENT 'md5唯一索引'
+) COMMENT='系统表-用户任务表';
+-- ----------------------------------------------------------------------------------------------
+
 
 -- = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
 -- = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =

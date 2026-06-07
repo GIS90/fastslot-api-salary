@@ -62,7 +62,7 @@ class UploadService:
         return "UploadService class."
 
     def __repr__(self):
-        self.__str__()
+        return self.__str__()
 
     def file_api(self, file: File) -> Status:
         """

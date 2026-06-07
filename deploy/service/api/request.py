@@ -51,7 +51,7 @@ class ApiRequestService:
         return "ApiRequestService class."
 
     def __repr__(self):
-        self.__str__()
+        return self.__str__()
 
     async def add(self, rtx_id: str, request_body: Request, *args, **kwargs) -> None:
         """

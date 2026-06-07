@@ -52,7 +52,7 @@ class ApiOpenService:
         return "ApiOpenService class."
 
     def __repr__(self):
-        self.__str__()
+        return self.__str__()
 
     async def m1_case(self) -> dict:
         return {
