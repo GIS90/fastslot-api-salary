@@ -62,6 +62,6 @@ xtb_xtcs_detail_fields = [
     {"key": "create_time", "type": ft.DATETIME, "name": "createTime", "null": True},
     {"key": "update_rtx", "type": ft.STR, "name": "updateRtx", "null": True},
     {"key": "update_time", "type": ft.DATETIME, "name": "updateTime", "null": True},
-    {"key": "status", "type": ft.BOOLTEXT, "name": "status"},
+    {"key": "status", "type": ft.BOOL_TEXT, "name": "status"},
 ]
 

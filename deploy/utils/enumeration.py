@@ -173,7 +173,7 @@ class FieldTypeEnum(StrEnum):
     INT = "int"
     FLOAT = "float"
     BOOL = "bool"
-    BOOLTEXT = "bool_text"
+    BOOL_TEXT = "bool_text"
     DATETIME = "datetime"
     DATE = "date"
     TIME = "time"
@@ -181,6 +181,8 @@ class FieldTypeEnum(StrEnum):
     LIST = "list"
     DICT = "dict"
     SPLITLIST = "split_list"
+    USER_STATUS_TEXT = "user_status_text"
+    LOCK_TEXT = "lock_text"
 
 
 @unique

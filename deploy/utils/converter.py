@@ -103,9 +103,11 @@ async def model_converter_dict(
                 case "bool":
                     model_dict[field_name] = bool(field_value)
                 case "bool_text":
-                    # field_name保留原有字段信息，新增field_name+TEXT存储对应的布尔中文值
-                    model_dict[field_name] = bool(field_value)
-                    model_dict[f"{field_name}Text"] = "是" if bool(field_value) else "否"
+                    model_dict[field_name] = "是" if bool(field_value) else "否"
+                case "user_status_text":
+                    model_dict[field_name] = "注销" if bool(field_value) else "启用"
+                case "lock_text":
+                    model_dict[field_name] = "锁定" if bool(field_value) else "正常"
                 case "datetime" | "date" | "time" if isinstance(field_value, (datetime.datetime, datetime.date)):
                     fmt_map = {
                         "datetime": "%Y-%m-%d %H:%M:%S",

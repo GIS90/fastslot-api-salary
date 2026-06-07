@@ -65,7 +65,7 @@ xtb_user_detail_fields = [
     {"key": "create_time", "type": ft.DATETIME, "name": "createTime", "null": True},
     {"key": "update_rtx", "type": ft.STR, "name": "updateRtx", "null": True},
     {"key": "update_time", "type": ft.DATETIME, "name": "updateTime", "null": True},
-    {"key": "status", "type": ft.BOOLTEXT, "name": "status"},
+    {"key": "status", "type": ft.BOOL_TEXT, "name": "status"},
 ]
 
 
@@ -78,22 +78,23 @@ xtb_user_login_fields = [
     {"key": "phone"},
     {"key": "avatar"},
     {"key": "introduction"},
-    {"key": "role", "type": ft.SPLITLIST, "name": "role", "null": True},
-    {"key": "status", "type": ft.BOOLTEXT, "name": "status"},
+    {"key": "role", "type": ft.SPLITLIST, "null": True},
+    {"key": "status", "type": ft.BOOL},
 ]
 
 
-xtb_user_download_fields = {
-    "id": "序号",
-    "rtx_id": "账号",
-    "name": "昵称",
-    "phone": "电话",
-    "email": "邮箱",
-    "sex": "性别",
-    "avatar": "头像URL地址",
-    "department": "部门",
-    "introduction": "自我介绍",
-    "create_rtx": "创建人",
-    # "create_time": "创建时间",
-    # "status": "状态",
-}
+xtb_user_download_fields = [
+    {"key": "id", "type": ft.INT, "name": "序号", "null": True},
+    {"key": "rtx_id", "type": ft.STR, "name": "账号", "null": True},
+    {"key": "name", "type": ft.STR, "name": "用户昵称", "null": True},
+    {"key": "phone", "type": ft.STR, "name": "电话", "null": True},
+    {"key": "email", "type": ft.STR, "name": "邮箱", "null": True},
+    {"key": "sex", "type": ft.STR, "name": "性别", "null": True},
+    {"key": "avatar", "type": ft.STR, "name": "头像URL地址", "null": True},
+    # {"key": "department", "type": ft.STR, "name": "部门名称", "null": True},
+    {"key": "introduction", "type": ft.STR, "name": "个性签名", "null": True},
+    {"key": "create_rtx", "type": ft.STR, "name": "创建人", "null": True},
+    {"key": "create_time", "type": ft.DATETIME, "name": "创建时间", "null": True},
+    {"key": "status", "type": ft.USER_STATUS_TEXT, "name": "状态", "null": True},
+]
+

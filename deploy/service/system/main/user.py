@@ -296,14 +296,11 @@ class SystemMainUserService:
 
     async def download(self, params: dict) -> List:
         models = await self.xtb_user_curd.download(db=self.db, params=params)
-        __res = []
-        for model in models:
-            if not model: continue
-            __res_dict = {}
-            for field_k, field_v in xtb_user_download_fields.items():
-                __res_dict[field_v] = getattr(model, field_k)
-            # 个性化字段
-            __res_dict['状态'] = "注销" if getattr(model, "status") else "启用"
-            __res_dict['创建时间'] = d2s(getattr(model, "create_time")) if getattr(model, "create_time") else ""
-            __res.append(__res_dict)
-        return __res
+        data: List = list()
+        data.extend(
+            filter(
+                lambda x: x is not None and x is not {},
+                [await model_converter_dict(model=u, fields=xtb_user_download_fields) for u in models if u]
+            )
+        )
+        return data
