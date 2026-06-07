@@ -32,7 +32,7 @@ Life is short, I use python.
 """
 from typing import Optional, List, Any
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy import select, update, delete, insert, asc
+from sqlalchemy import select, update, delete, insert, asc, or_
 from sqlalchemy.orm.attributes import InstrumentedAttribute
 from sqlalchemy import func
 
@@ -96,14 +96,21 @@ class XtbUserCurd(BaseCurd):
 
     @classmethod
     async def get_pagination(
-        cls, db: AsyncSession, offset: int = 0, limit: int = 15
+        cls, db: AsyncSession, offset: int = 0, limit: int = 15, content: str = None
     ) -> Optional[List]:
         try:
-            stmt = (select(XtbUserModel)
-                    # .where(XtbUserModel.status != 1)
-                    .order_by(asc(XtbUserModel.id))
-                    .offset(offset)
-                    .limit(limit))
+            stmt = select(XtbUserModel)
+            if content:
+                stmt = stmt.where(
+                    or_(
+                        XtbUserModel.rtx_id.like(content),
+                        XtbUserModel.name.like(content),
+                        XtbUserModel.phone.like(content),
+                        XtbUserModel.email.like(content),
+                        XtbUserModel.introduction.like(content)
+                    )
+                )
+            stmt = stmt.order_by(asc(XtbUserModel.id)).offset(offset).limit(limit)
             result = await db.execute(stmt)
             return result.scalars().all()
         except Exception as e:

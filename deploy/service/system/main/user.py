@@ -103,7 +103,8 @@ class SystemMainUserService:
         models: List = await self.xtb_user_curd.get_pagination(
             db=self.db,
             offset=params.get("offset"),
-            limit=params.get("limit")
+            limit=params.get("limit"),
+            content=params.get("content")
         )
         if not models:
             return FailureStatus(code=status_code.CODE_101_SUCCESS_NO_DATA)
@@ -190,7 +191,14 @@ class SystemMainUserService:
         setattr(data, "password", await self.__generator_default_password())
         await self.xtb_user_curd.update(db=self.db, model=data)
         return SuccessStatus()
-
+    
+    async def add_enum(self, rtx_id: str) -> Status:
+        _d = {
+            "sexEnum": await self.csb_enum_v_service.get_select_option_data(name=CsbEnumKEY.SEX_TYPE.value, lock_view=False),
+            "roleList": await self.role_service.role_select_option()
+        }
+        return SuccessStatus(data=_d)
+    
     async def __default_avatar(self, avatar: str=_SERVER_USER_DEFAULT_AVATAR) -> str:
         """用户默认头像"""
         default_avatar: XtbXtcsModel = await self.xtb_xtcs_curd.get_by_key(
@@ -200,12 +208,14 @@ class SystemMainUserService:
         )
         __value: str = getattr(default_avatar, "value") if default_avatar else avatar
         return __value
-
+    
     async def add(self, rtx_id: str, model: Dict) -> Status:
+        print("*" * 100)
+        print(model)
         db_model: XtbUserModel = await self.xtb_user_curd.get_by_rtx_id(db=self.db, rtx_id=model.get("rtx_id"))
         if db_model:
             return FailureStatus(code=status_code.CODE_502_DATA_EXIST_NOT_ADD,
-                                 message="用户rtxId已存在，请更换")
+                                 message="用户账号已存在，请更换")
 
         new_model: XtbUserModel = await self.xtb_user_curd.new_model()
         __password: str = await self.__generator_default_password()
@@ -217,6 +227,8 @@ class SystemMainUserService:
         new_model.create_time = datetime.now()
         new_model.create_rtx = rtx_id
         new_model.password = generator_md5(v=__password)
+
+        model["role"] = ','.join(model.get("role")) if model.get("role") else ""
         for k, v in model.items():
             setattr(new_model, k, v)
         await self.xtb_user_curd.add(db=self.db, model=new_model)

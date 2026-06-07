@@ -77,7 +77,7 @@ class XtbRoleAddModel(__XtbRoleBaseModel):
     """
     @field_validator("engname")
     def field_is_alnum(cls, value: str) -> str:
-        return alphanumeric_only(value=value, field="engname")
+        return alphanumeric_only(value=value, field="角色ID")
     # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 

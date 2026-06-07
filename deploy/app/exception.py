@@ -67,10 +67,11 @@ def register_app_exception(app: FastAPI, app_headers: Dict):
         LOG.error(f"请求地址{request.url.__str__()}，[request_validation_handle]: {exec.errors()}")
 
         # rewrite response >>> 加入请求体body
+        _error_message = exec.errors() or "请求参数错误"
         content = FailureStatus(
             code=status_code.CODE_404_REQUEST_PARAMETER_VALUE_ERROR.value,
-            message="请求参数错误" or status_msg.get(404),
-            data=jsonable_encoder(exec.errors())  # jsonable_encoder({"error": exec.errors(), "body": exec.body})   # 返回请求体参数 + errors
+            message=_error_message,
+            data=jsonable_encoder(_error_message)  # jsonable_encoder({"error": exec.errors(), "body": exec.body})   # 返回请求体参数 + errors
         ).status_body
         headers = {"app-cm-exception-webhook": "RequestValidationError"}
         headers.update(app_headers)

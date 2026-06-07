@@ -66,7 +66,7 @@ class ProfileUserBaseModel(baseModel):
     """
     @field_validator("userId")
     def field_is_alnum(cls, value: str) -> str:
-        return alphanumeric_only(value=value, field="rtx_id")
+        return alphanumeric_only(value=value, field="用户账户")
     # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 

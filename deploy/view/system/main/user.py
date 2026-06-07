@@ -37,7 +37,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from deploy.curd.database import get_session
 from deploy.service.system.main.user import SystemMainUserService
 from deploy.utils.status import Status
-from deploy.utils.depend import pageable_params, depend_token_rtx, md5_params, md5_list_params
+from deploy.utils.depend import pageable_like_params, depend_token_rtx, md5_params, md5_list_params
 from deploy.schema.po.system_main_user import XtbUserAddModel, XtbUserUpdateModel
 
 
@@ -50,7 +50,7 @@ def get_user_service(db: AsyncSession = Depends(get_session)) -> SystemMainUserS
 
 @router.get("/user.list", summary="数据列表")
 async def pagination(
-    params: Dict = Depends(pageable_params),
+    params: Dict = Depends(pageable_like_params),
     token_rtx_id: str = Depends(depend_token_rtx),
     user_service: SystemMainUserService = Depends(get_user_service)
 ) -> Status:
@@ -91,6 +91,14 @@ async def one_by_md5(
     user_service: SystemMainUserService = Depends(get_user_service)
 ) -> Status:
     return await user_service.one_by_md5(rtx_id=token_rtx_id, md5=md5)
+
+
+@router.get("/user.addEnum", summary="新增枚举值")
+async def one_by_md5(
+    token_rtx_id: str = Depends(depend_token_rtx),
+    user_service: SystemMainUserService = Depends(get_user_service)
+) -> Status:
+    return await user_service.add_enum(rtx_id=token_rtx_id)
 
 
 @router.post("/user", summary="新增")
