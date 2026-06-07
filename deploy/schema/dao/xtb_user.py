@@ -61,7 +61,7 @@ class XtbUserModel(baseModel, IDField, RtxIdField, Md5Field, CUDField, StatusFie
     avatar: Mapped[str] = mapped_column(name="avatar", type_=String(120), comment="头像地址")
     introduction: Mapped[Optional[str]] = mapped_column(name="introduction", type_=Text, comment="描述")
     role: Mapped[Optional[str]] = mapped_column(name="role", type_=String(255), comment="角色RTX-ID值（大写），关联role表，多角色用;分割")
-    department: Mapped[Optional[str]] = mapped_column(name="department", type_=String(55), comment="部门MD5-ID值，关联department表")
+    department: Mapped[Optional[str]] = mapped_column(name="department", type_=String(64), comment="部门MD5-ID值，关联department表")
 
     def __str__(self):
         return f"XtbUserModel Class[DB table: {self.__tablename__}], id: {self.id}, rtx_id: {self.rtx_id}, name: {self.name}."

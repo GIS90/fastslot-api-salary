@@ -19,7 +19,7 @@ CREATE TABLE `xtb_user` (
     `avatar` varchar(120) COMMENT '头像地址',
     `introduction` text COMMENT '描述',
     `role` varchar(255) COMMENT '角色RTX-ID值（大写），关联role表，多角色用;分割',
-    `department` varchar(55) COMMENT '部门MD5-ID值，关联department表',
+    `department` varchar(64) COMMENT '部门MD5-ID值，关联department表',
     `create_rtx` varchar(35) COMMENT '创建用户RTX-ID',
     `create_time` datetime default CURRENT_TIMESTAMP COMMENT '创建时间',
     `update_rtx` varchar(35) COMMENT '更新用户RTX-ID',

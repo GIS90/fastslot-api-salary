@@ -64,7 +64,7 @@ class XtbUserAddModel(__XtbUserBaseModel):
                         min_length=1,
                         max_length=35,
                         description="用户RTX-ID（唯一标识）",
-                        alias="rtx_id",
+                        alias="rtxId",
                         validate_default=True)
 
     model_config = {
@@ -92,6 +92,8 @@ class XtbUserAddModel(__XtbUserBaseModel):
 
 class XtbUserUpdateModel(__XtbUserBaseModel):
     md5: str = Field(..., min_length=1, max_length=64, description="数据Md5-Id", alias="md5")
+    # department: Optional[str] = Field(..., max_length=64, description="用户部门")
+    role: Optional[list] = Field(..., description="用户权限")
 
     model_config = {
         "json_schema_extra": {
@@ -101,7 +103,9 @@ class XtbUserUpdateModel(__XtbUserBaseModel):
                 "sex": "M",
                 "email": "gaoming971366@163.com",
                 "phone": "13051355646",
-                "introduction": "哈哈哈哈哈"
+                "introduction": "哈哈哈哈哈",
+                "department": "研发部",
+                "role": ["admin", "hr"]
             }
         }
     }

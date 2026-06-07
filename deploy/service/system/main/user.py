@@ -91,7 +91,8 @@ class SystemMainUserService:
         if not model:
             return False, FailureStatus(code=status_code.CODE_501_DATA_NOT_EXIST)
         if status_check and getattr(model, "status", None):
-            return False, FailureStatus(code=status_code.CODE_503_DATA_DELETE_NOT_EDIT)
+            return False, FailureStatus(code=status_code.CODE_503_DATA_DELETE_NOT_EDIT,
+                                        message="用户已注销，不允许操作")
         if admin_check and getattr(model, "rtx_id") ==  _SERVER_USER_ADMIN:
             return False, FailureStatus(code=status_code.CODE_500_DATA_ADMIN_NOT)
 
@@ -204,7 +205,7 @@ class SystemMainUserService:
         db_model: XtbUserModel = await self.xtb_user_curd.get_by_rtx_id(db=self.db, rtx_id=model.get("rtx_id"))
         if db_model:
             return FailureStatus(code=status_code.CODE_502_DATA_EXIST_NOT_ADD,
-                                 message="用户rtx_id已存在，请更换")
+                                 message="用户rtxId已存在，请更换")
 
         new_model: XtbUserModel = await self.xtb_user_curd.new_model()
         __password: str = await self.__generator_default_password()
@@ -223,6 +224,7 @@ class SystemMainUserService:
 
     async def update(self, rtx_id: str, model: Dict) -> Status:
         _md5: str = model.get("md5")
+        del model["md5"]
         __flag, data = await self.__valid_model_by_md5_or_rtx(
             query_id=_md5, status_check=True, response_type="model", admin_check=True
         )
@@ -230,7 +232,7 @@ class SystemMainUserService:
 
         if model.get("rtx_id"):
             del model["rtx_id"]
-        del model["md5"]
+        model["role"] = ','.join(model.get("role")) if model.get("role") else ""
         model["update_rtx"] = rtx_id
         model["update_time"] = get_now()
         for k, v in model.items():
