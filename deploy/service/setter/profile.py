@@ -36,10 +36,11 @@ from deploy.curd.xtb_user import XtbUserCurd
 from deploy.curd.xtb_request import XtbRequestCurd
 from deploy.curd.csb_enum_value import CsbEnumValueCurd
 from deploy.schema.dao.xtb_user import XtbUserModel
+from deploy.service.system.config.enum_value import SystemConfigEnumVService
 from deploy.utils.status import Status, SuccessStatus, FailureStatus
 from deploy.utils.status_value import (StatusCode as status_code,
                                        StatusMsg as status_msg)
-from deploy.utils.converter import model_converter_dict, many_model_converter_dict
+from deploy.utils.converter import model_converter_dict
 from deploy.schema.dto.xtb_user import xtb_user_detail_fields
 from deploy.schema.dto.xtb_request import profile_request_list_fields
 from deploy.utils.utils import get_now, md5 as generator_md5
@@ -48,7 +49,6 @@ from deploy.delib.image_lib import ImageLib
 from deploy.delib.store_lib import QiNiuStoreLib
 from deploy.config import store_yun_base, store_yun_space
 from deploy.utils.enumeration import CsbEnumKEY
-from deploy.utils.converter import option_converter_dict
 
 
 class SetterProfileService:
@@ -61,6 +61,7 @@ class SetterProfileService:
         self.xtb_user_curd: XtbUserCurd = XtbUserCurd()
         self.xtb_request_curd: XtbRequestCurd = XtbRequestCurd()
         self.csb_enum_v_curd: CsbEnumValueCurd = CsbEnumValueCurd()
+        self.csb_enum_v_service: SystemConfigEnumVService = SystemConfigEnumVService(db_connection=db_connection)
         self.image_lib: ImageLib = ImageLib()
         self.qiniu_store_lib: QiNiuStoreLib = QiNiuStoreLib(
             space_url=store_yun_base,
@@ -97,10 +98,6 @@ class SetterProfileService:
         return (True, model if response_type == "model"
                         else await model_converter_dict(model=model, fields=fields, default_value="****"))
 
-    async def __get_enum_sex_type(self):
-        sex_enum_model = await self.csb_enum_v_curd.get_list_by_name(db=self.db, name=CsbEnumKEY.SEX_TYPE.value)
-        return [] if not sex_enum_model else await option_converter_dict(sex_enum_model, lock_view=True)
-
     async def profile_detail(self, rtx_id: str) -> Status:
         __flag, data = await self.__valid_model_by_rtx(
             rtx_id=rtx_id, status_check=False, response_type="model", admin_check=False
@@ -117,7 +114,8 @@ class SetterProfileService:
         }
         data = {
             "user": user,
-            "sexEnum": await self.__get_enum_sex_type()
+            "sexEnum": await self.csb_enum_v_service.get_select_option_data(
+                name=CsbEnumKEY.SEX_TYPE.value, lock_view=False)
         }
         return SuccessStatus(data=data)
 
@@ -160,6 +158,25 @@ class SetterProfileService:
         setattr(data, "password", generator_md5(v=newPassword))
         await self.xtb_user_curd.update(db=self.db, model=data)
         return SuccessStatus()
+    async def __get_tag(self) -> Dict[str, str]:
+        enum_v_model = await self.csb_enum_v_curd.get_list_by_name(
+            db=self.db,
+            name=CsbEnumKEY.API_TYPE,
+            filter_lock=True)
+        if not enum_v_model:
+            return  {
+            "GET": "primary",
+            "POST": "success",
+            "PUT": "warning",
+            "DELETE": "danger",
+        }
+        __tag = {}
+        for model in enum_v_model:
+            if not model: continue
+            if not getattr(model, "key"): continue
+            __tag[model.key] = str(model.value).lower() if getattr(model, "value") else "info"
+        else:
+            return __tag
 
     async def profile_log(self, rtx_id: str, params: dict) -> Status:
         models: List = await self.xtb_request_curd.get_pagination(
@@ -173,19 +190,13 @@ class SetterProfileService:
 
         data: List = list()
         id_value: int = params.get("offset") + 1
-        __tag = {
-            "GET": "primary",
-            "POST": "success",
-            "PUT": "warning",
-            "DELETE": "danger",
-        }
+        tag: Dict[str, str] = await self.__get_tag()
         for model in models:
             _d = await model_converter_dict(model=model, fields=profile_request_list_fields)
             if not _d: continue
             _d["id"] = id_value
             id_value += 1
-            # TODO tag去系统表维护的数据，目前暂时写死
-            _d["tag"] = __tag.get(_d.get("method")) if _d.get("method") else "info"
+            _d["tag"] = tag.get(_d.get("method")) if _d.get("method") else "info"
             data.append(_d)
         result: Dict = {
             "list": data,

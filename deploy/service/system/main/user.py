@@ -37,14 +37,16 @@ from deploy.curd.xtb_user import XtbUserCurd
 from deploy.curd.xtb_xtcs import XtbXtcsCurd
 from deploy.schema.dao.xtb_user import XtbUserModel
 from deploy.schema.dao.xtb_xtcs import XtbXtcsModel
+from deploy.service.system.config.enum_value import SystemConfigEnumVService
+from deploy.service.system.main.role import SystemMainRoleService
 from deploy.utils.status import Status, SuccessStatus, FailureStatus
 from deploy.utils.status_value import (StatusCode as status_code,
                                        StatusMsg as status_msg)
-from deploy.utils.converter import model_converter_dict
+from deploy.utils.converter import model_converter_dict, option_converter_dict
 from deploy.schema.dto.xtb_user import xtb_user_list_fields, xtb_user_detail_fields, xtb_user_login_fields
 from deploy.utils.utils import get_now, random_string, md5 as generator_md5
 from deploy.config import server_user, server_password, server_avatar
-from deploy.utils.enumeration import XtbXtcsKEY
+from deploy.utils.enumeration import XtbXtcsKEY, CsbEnumKEY
 
 
 _SERVER_USER_ADMIN: str = server_user
@@ -61,6 +63,8 @@ class SystemMainUserService:
         self.db: AsyncSession = db_connection
         self.xtb_user_curd: XtbUserCurd = XtbUserCurd()
         self.xtb_xtcs_curd: XtbXtcsCurd = XtbXtcsCurd()
+        self.csb_enum_v_service: SystemConfigEnumVService = SystemConfigEnumVService(db_connection=db_connection)
+        self.role_service: SystemMainRoleService = SystemMainRoleService(db_connection=db_connection)
 
     def __str__(self):
         return "SystemMainUserService class."
@@ -136,7 +140,14 @@ class SystemMainUserService:
         __flag, data = await self.__valid_model_by_md5_or_rtx(
             query_id=md5, status_check=False, response_type="dict", query_type="md5", admin_check=False
         )
-        return SuccessStatus(data=data) if __flag else data
+        if not __flag: return data
+
+        _d = {
+            "user": data,
+            "sexEnum": await self.csb_enum_v_service.get_select_option_data(name=CsbEnumKEY.SEX_TYPE.value, lock_view=False),
+            "roleList": await self.role_service.role_select_option()
+        }
+        return SuccessStatus(data=_d)
 
     async def depend_by_rtx_id(self, rtx_id: str) -> Dict:
         __flag, data = await self.__valid_model_by_md5_or_rtx(

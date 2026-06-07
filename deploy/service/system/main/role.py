@@ -115,6 +115,30 @@ class SystemMainRoleService:
         )
         return SuccessStatus(data=data) if __flag else data
 
+    @staticmethod
+    async def __converter_select_option(models: List) -> List:
+        if not models: return []
+
+        _res: List = []
+        for item in models:
+            if not item: continue
+            if not getattr(item, "engname", None) or not getattr(item, "md5", None): continue
+            _res.append({
+                "label": item.chnname,
+                "value": item.engname,
+                "md5": item.md5,
+                "desc": item.introduction})
+        else:
+            return _res
+
+
+    async def role_select_option(self) -> List:
+        models: List[XtbRoleModel] = await self.xtb_role_curd.get_all(
+            db=self.db,
+            filter_status=True
+        )
+        return await self.__converter_select_option(models) if models else []
+
     async def add(self, rtx_id: str, model: Dict) -> Status:
         # 验证角色名称是否已存在
         db_model: XtbRoleModel = await self.xtb_role_curd.get_by_engname(

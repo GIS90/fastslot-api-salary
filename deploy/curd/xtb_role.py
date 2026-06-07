@@ -32,7 +32,7 @@ Life is short, I use python.
 """
 from typing import Optional, List, Any
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy import select, update, delete, insert, desc
+from sqlalchemy import select, update, delete, insert, desc, asc
 from sqlalchemy.orm.attributes import InstrumentedAttribute
 from sqlalchemy import func
 
@@ -96,9 +96,25 @@ class XtbRoleCurd(BaseCurd):
         try:
             stmt = (select(XtbRoleModel)
                     .where(XtbRoleModel.status != 1)
-                    .order_by(desc(XtbRoleModel.id))
+                    .order_by(desc(XtbRoleModel.create_time), asc(XtbRoleModel.id))
                     .offset(offset)
                     .limit(limit))
+            result = await db.execute(stmt)
+            return result.scalars().all()
+        except Exception as e:
+            raise SQLDBHandleException(f"[{cls.__name__}*查询All]{e}")
+
+    @classmethod
+    async def get_all(
+        cls,
+        db: AsyncSession,
+        filter_status: bool = False
+    ) -> Optional[List]:
+        try:
+            stmt = select(XtbRoleModel)
+            if filter_status:
+                stmt = stmt.where(XtbRoleModel.status != 1)
+            stmt = stmt.order_by(desc(XtbRoleModel.create_time), asc(XtbRoleModel.id))
             result = await db.execute(stmt)
             return result.scalars().all()
         except Exception as e:

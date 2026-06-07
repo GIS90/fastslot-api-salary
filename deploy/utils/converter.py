@@ -36,7 +36,8 @@ from typing import Any, List, Dict, Optional
 
 __all__ = [
     "model_converter_dict",
-    "many_model_converter_dict"
+    "many_model_converter_dict",
+    "option_converter_dict"
 ]
 
 

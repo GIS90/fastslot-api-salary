@@ -37,7 +37,7 @@ from deploy.schema.dao.csb_enum_value import CsbEnumValueModel
 from deploy.utils.status import Status, SuccessStatus, FailureStatus
 from deploy.utils.status_value import (StatusCode as status_code,
                                        StatusMsg as status_msg)
-from deploy.utils.converter import model_converter_dict
+from deploy.utils.converter import model_converter_dict, option_converter_dict
 from deploy.schema.dto.xtb_xtcs import xtb_xtcs_list_fields, xtb_xtcs_detail_fields
 from deploy.config import server_user, server_password, server_avatar
 
@@ -85,3 +85,9 @@ class SystemConfigEnumVService:
 
         return (True, model if response_type == "model"
                         else await model_converter_dict(model=model, fields=fields, default_value="****"))
+
+    async def get_select_option_data(self, name: str, lock_view: bool = False) -> List:
+        if not name: return []
+
+        enum_v_model = await self.csb_enum_v_curd.get_list_by_name(db=self.db, name=name)
+        return [] if not enum_v_model else await option_converter_dict(enum_v_model, lock_view=lock_view)

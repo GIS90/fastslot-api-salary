@@ -43,6 +43,7 @@ __all__ = [
     'FileTypeEnum',
     'FieldTypeEnum',
     'XtbXtcsKEY',
+    'CsbEnumKEY',
 ]
 
 
