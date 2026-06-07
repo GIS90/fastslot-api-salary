@@ -84,7 +84,7 @@ class ApiRequestService:
         new_model.full_path = f"{path}{request_body.url.query}"
         new_model.host_url = f"{request_body.url.scheme}://{request_body.url.netloc}"
         new_model.url = str(request_body.url)
-        new_model.cost = cost
+        new_model.cost = round(cost, 4)
         # 其他信息
         new_model.create_time = now
         new_model.create_date = now_date

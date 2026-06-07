@@ -96,9 +96,8 @@ class ApiDownloadService(object):
         start_time = datetime.now()
         # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
+        # >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
         try:
-            # >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
-            ...
             if api == "SystemMainUser":
                 # 系统>权限管理>用户管理
                 # params.update({"enum_name": CsbEnum.SEX_TYPE.value})
@@ -123,27 +122,28 @@ class ApiDownloadService(object):
                     code=status_code.CODE_404_REQUEST_PARAMETER_VALUE_ERROR.value,
                     message="请求参数api值不合法")
         except Exception as e:
+            __task_status = TS.FAILURE.value
             __error = "服务端请求数据异常：" + str(e)
-        else:
-            end_time = datetime.now()
-            cost = (end_time - start_time).microseconds * pow(0.1, 6)
-            if cost == 0: cost = 0.0001
-            new_task_model: XtbUserTaskModel = await self.xtb_user_task_curd.new_model()
-            new_task_model.md5 = md5_func("%s-%s-%s-%s" % (rtx_id, params.get("api"), params.get("name"), get_now()))
-            new_task_model.api = params.get("api")
-            new_task_model.name = params.get("name")
-            new_task_model.data = params.get("type")
-            new_task_model.task = __task_status
-            new_task_model.create_time = start_time
-            new_task_model.cost = cost
-            new_task_model.update_time = end_time
-            new_task_model.rtx_id = rtx_id
-            new_task_model.status = False
-            await self.xtb_user_task_curd.add(db=self.db, model=new_task_model)
-            if __task_status == TS.FAILURE.value:
-                return FailureStatus(
-                    code=status_code.CODE_900_SERVER_API_EXCEPTION.value,
-                    message=__error)
+
+        end_time = datetime.now()
+        cost = (end_time - start_time).microseconds * pow(0.1, 6)
+        if cost == 0: cost = 0.0001
+        new_task_model: XtbUserTaskModel = await self.xtb_user_task_curd.new_model()
+        new_task_model.md5 = md5_func("%s-%s-%s-%s" % (rtx_id, params.get("api"), params.get("name"), get_now()))
+        new_task_model.api = params.get("api")
+        new_task_model.name = params.get("name")
+        new_task_model.data = params.get("type")
+        new_task_model.task = __task_status
+        new_task_model.create_time = start_time
+        new_task_model.cost = cost
+        new_task_model.update_time = end_time
+        new_task_model.rtx_id = rtx_id
+        new_task_model.status = False
+        await self.xtb_user_task_curd.add(db=self.db, model=new_task_model)
+        if __task_status == TS.FAILURE.value:
+            return FailureStatus(
+                code=status_code.CODE_900_SERVER_API_EXCEPTION.value,
+                message=__error)
 
         data = {'list': __res, 'total': len(__res), 'name': params.get("name")}
         return SuccessStatus(data=data)

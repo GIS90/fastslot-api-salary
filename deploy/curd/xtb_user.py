@@ -38,6 +38,7 @@ from sqlalchemy import func
 
 from deploy.curd.base_curd import BaseCurd
 from deploy.schema.dao.xtb_user import XtbUserModel
+from deploy.schema.dao.csb_enum_value import CsbEnumValueModel
 from deploy.utils.exception import SQLDBHandleException
 
 
@@ -121,12 +122,29 @@ class XtbUserCurd(BaseCurd):
         cls, db: AsyncSession, params: Dict, *args, **kwargs
     ) -> Optional[List]:
         try:
-            stmt = select(XtbUserModel)
+            stmt = select(
+                XtbUserModel.id,
+                XtbUserModel.rtx_id,
+                XtbUserModel.name,
+                CsbEnumValueModel.value.label("sex"),
+                XtbUserModel.phone,
+                XtbUserModel.email,
+                XtbUserModel.avatar,
+                XtbUserModel.introduction,
+                XtbUserModel.role,
+                XtbUserModel.department,
+                XtbUserModel.create_rtx,
+                XtbUserModel.create_time,
+                XtbUserModel.status
+            ).outerjoin(
+                CsbEnumValueModel,
+                XtbUserModel.sex == CsbEnumValueModel.key
+            )
             if params.get("md5"):
                 stmt = stmt.where(XtbUserModel.md5.in_(params.get("md5")))
             stmt = stmt.order_by(asc(XtbUserModel.create_time))
             result = await db.execute(stmt)
-            return result.scalars().all()
+            return result.all()
         except Exception as e:
             raise SQLDBHandleException(f"[{cls.__name__}*下载]{e}")
 

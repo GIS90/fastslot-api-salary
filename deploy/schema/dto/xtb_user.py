@@ -84,9 +84,16 @@ xtb_user_login_fields = [
 
 
 xtb_user_download_fields = {
+    "id": "序号",
     "rtx_id": "账号",
     "name": "昵称",
     "phone": "电话",
     "email": "邮箱",
-    "introduction": "自我介绍"
+    "sex": "性别",
+    "avatar": "头像URL地址",
+    "department": "部门",
+    "introduction": "自我介绍",
+    "create_rtx": "创建人",
+    # "create_time": "创建时间",
+    # "status": "状态",
 }
