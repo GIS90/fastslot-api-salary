@@ -115,12 +115,6 @@ class SystemMainUserService:
             if not model: continue
             _d = await model_converter_dict(model=model, fields=xtb_user_list_fields)
             if not _d: continue
-            if _d["sex"] == "M":
-                _d["sex"] = "男"
-            elif _d["sex"] == "F":
-                _d["sex"] = "女"
-            else:
-                _d["sex"] = "未知"
             data.append(_d)
         result: Dict = {
             "list": data,

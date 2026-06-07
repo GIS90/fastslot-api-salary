@@ -100,7 +100,24 @@ class XtbUserCurd(BaseCurd):
         cls, db: AsyncSession, offset: int = 0, limit: int = 15, content: str = None
     ) -> Optional[List]:
         try:
-            stmt = select(XtbUserModel)
+            stmt = select(
+                XtbUserModel.id,
+                XtbUserModel.rtx_id,
+                XtbUserModel.md5,
+                XtbUserModel.name,
+                CsbEnumValueModel.value.label("sex"),
+                XtbUserModel.phone,
+                XtbUserModel.email,
+                XtbUserModel.avatar,
+                XtbUserModel.introduction,
+                XtbUserModel.department,
+                XtbUserModel.create_rtx,
+                XtbUserModel.create_time,
+                XtbUserModel.status
+            ).outerjoin(
+                CsbEnumValueModel,
+                XtbUserModel.sex == CsbEnumValueModel.key
+            )
             if content:
                 stmt = stmt.where(
                     or_(
@@ -113,7 +130,7 @@ class XtbUserCurd(BaseCurd):
                 )
             stmt = stmt.order_by(asc(XtbUserModel.create_time)).offset(offset).limit(limit)
             result = await db.execute(stmt)
-            return result.scalars().all()
+            return result.all()
         except Exception as e:
             raise SQLDBHandleException(f"[{cls.__name__}*查询All]{e}")
 
