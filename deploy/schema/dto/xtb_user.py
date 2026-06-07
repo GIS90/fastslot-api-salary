@@ -91,7 +91,7 @@ xtb_user_download_fields = [
     {"key": "email", "type": ft.STR, "name": "邮箱", "null": True},
     {"key": "sex", "type": ft.STR, "name": "性别", "null": True},
     {"key": "avatar", "type": ft.STR, "name": "头像URL地址", "null": True},
-    # {"key": "department", "type": ft.STR, "name": "部门名称", "null": True},
+    {"key": "department", "type": ft.STR, "name": "部门名称", "null": True},
     {"key": "introduction", "type": ft.STR, "name": "个性签名", "null": True},
     {"key": "create_rtx", "type": ft.STR, "name": "创建人", "null": True},
     {"key": "create_time", "type": ft.DATETIME, "name": "创建时间", "null": True},

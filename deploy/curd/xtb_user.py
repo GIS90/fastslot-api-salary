@@ -157,8 +157,8 @@ class XtbUserCurd(BaseCurd):
                 CsbEnumValueModel,
                 XtbUserModel.sex == CsbEnumValueModel.key
             )
-            if params.get("md5"):
-                stmt = stmt.where(XtbUserModel.md5.in_(params.get("md5")))
+            if params.get("list"):
+                stmt = stmt.where(XtbUserModel.md5.in_(params.get("list")))
             stmt = stmt.order_by(asc(XtbUserModel.create_time))
             result = await db.execute(stmt)
             return result.all()

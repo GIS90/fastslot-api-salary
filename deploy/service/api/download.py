@@ -100,7 +100,6 @@ class ApiDownloadService(object):
         try:
             if api == "SystemMainUser":
                 # 系统>权限管理>用户管理
-                # params.update({"enum_name": CsbEnum.SEX_TYPE.value})
                 __res = await self.system_main_user_service.download(params=new_params)
             # elif api == "SystemMainRole":
             #     # 系统>权限管理>角色管理

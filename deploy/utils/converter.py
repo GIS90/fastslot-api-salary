@@ -88,10 +88,11 @@ async def model_converter_dict(
 
     model_dict: Dict = {}
     for field_key, field_type, field_name, field_null in valid_fields:
-        raw_value = getattr(model, field_key, None)
+        raw_value = getattr(model, field_key, "")
         # 显式判断 None 来决定是否使用默认值
         field_value = raw_value if raw_value is not None or field_null \
             else default_value
+        if field_value is None: field_value = ""
         try:
             match field_type:
                 case "str":
