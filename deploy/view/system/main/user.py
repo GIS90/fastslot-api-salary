@@ -39,6 +39,7 @@ from deploy.service.system.main.user import SystemMainUserService
 from deploy.utils.status import Status
 from deploy.utils.depend import pageable_like_params, depend_token_rtx, md5_params, md5_list_params
 from deploy.schema.po.system_main_user import XtbUserAddModel, XtbUserUpdateModel
+from deploy.schema.po.x import RequestMd5Models
 
 
 # router
@@ -137,20 +138,20 @@ async def delete_soft(
     return await user_service.delete_soft(rtx_id=token_rtx_id, md5=md5)
 
 
-@router.delete("/user.batch.hard", summary="批量硬删除")
+@router.put("/user.batch.hard", summary="批量硬删除")
 async def batch_delete_hard(
-    md5_list: List = Depends(md5_list_params),
+    params: Annotated[RequestMd5Models, Body()],
     token_rtx_id: str = Depends(depend_token_rtx),
     user_service: SystemMainUserService = Depends(get_user_service)
 ) -> Status:
-    return await user_service.batch_delete_hard(rtx_id=token_rtx_id, md5_list=md5_list)
+    return await user_service.batch_delete_hard(rtx_id=token_rtx_id, md5_list=params.model_dump().get("md5"))
 
 
-@router.delete("/user.batch.soft", summary="批量软删除")
+@router.put("/user.batch.soft", summary="批量软删除")
 async def batch_delete_soft(
-    md5_list: List = Depends(md5_list_params),
+    params: Annotated[RequestMd5Models, Body()],
     token_rtx_id: str = Depends(depend_token_rtx),
     user_service: SystemMainUserService = Depends(get_user_service)
 ) -> Status:
-    return await user_service.batch_delete_soft(rtx_id=token_rtx_id, md5_list=md5_list)
+    return await user_service.batch_delete_soft(rtx_id=token_rtx_id, md5_list=params.model_dump().get("md5"))
 
