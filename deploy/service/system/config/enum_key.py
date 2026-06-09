@@ -4,6 +4,7 @@
 ------------------------------------------------
 
 describe: 
+    system>config>enum_key service
 
 base_info:
     __author__ = PyGo

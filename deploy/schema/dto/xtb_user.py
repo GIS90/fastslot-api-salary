@@ -46,7 +46,7 @@ xtb_user_list_fields = [
     {"key": "department", "type": ft.STR, "name": "department", "null": False},
     {"key": "create_rtx", "type": ft.STR, "name": "createRtx", "null": True},
     {"key": "create_time", "type": ft.DATETIME, "name": "createTime", "null": True},
-    {"key": "status", "type": ft.BOOL, "name": "status", "null": False},
+    {"key": "status", "type": ft.BOOL, "name": "status", "null": False}
 ]
 
 
@@ -64,8 +64,7 @@ xtb_user_detail_fields = [
     {"key": "create_rtx", "type": ft.STR, "name": "createRtx", "null": True},
     {"key": "create_time", "type": ft.DATETIME, "name": "createTime", "null": True},
     {"key": "update_rtx", "type": ft.STR, "name": "updateRtx", "null": True},
-    {"key": "update_time", "type": ft.DATETIME, "name": "updateTime", "null": True},
-    {"key": "status", "type": ft.BOOL_TEXT, "name": "status"},
+    {"key": "update_time", "type": ft.DATETIME, "name": "updateTime", "null": True}
 ]
 
 

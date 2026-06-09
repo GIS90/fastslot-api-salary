@@ -34,6 +34,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from deploy.curd.xtb_user import XtbUserCurd
 from deploy.curd.xtb_role import XtbRoleCurd
 from deploy.curd.xtb_menu import XtbMenuCurd
+from deploy.service.system.ops.task import SystemOpsTaskService
 from deploy.utils.status import Status, SuccessStatus, FailureStatus
 from deploy.utils.status_value import (StatusCode as status_code,
                                        StatusMsg as status_msg)
@@ -60,6 +61,7 @@ class ApiUserService:
         self.xtb_user_curd: XtbUserCurd = XtbUserCurd()
         self.xtb_role_curd: XtbRoleCurd = XtbRoleCurd()
         self.xtb_menu_curd: XtbMenuCurd = XtbMenuCurd()
+        self.system_ops_task_service: SystemOpsTaskService = SystemOpsTaskService(db_connection=db_connection)
 
     def __str__(self):
         return "ApiUserService class."
@@ -576,3 +578,13 @@ class ApiUserService:
 
         # data.update({"tip": "系统系统系统系统系统系统系统系统系统系统系统系统系统系统"})
         return SuccessStatus(data=data)
+
+    async def task(self, rtx_id: str, params: Dict) -> Status:
+        """
+        用户Task列表
+        :param rtx_id: token_rtx_id
+        :param params: 分页参数
+        :return: [dict]status model
+        """
+        return await self.system_ops_task_service.pagination(rtx_id=rtx_id, params=params)
+

@@ -30,7 +30,7 @@ Life is short, I use python.
 
 ------------------------------------------------
 """
-from typing import Optional, List, Any
+from typing import Optional, List, Any, Dict
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select, update, delete, insert, asc, desc
 from sqlalchemy.orm.attributes import InstrumentedAttribute
@@ -120,6 +120,12 @@ class XtbXtcsCurd(BaseCurd):
             return result.scalars().all()
         except Exception as e:
             raise SQLDBHandleException(f"[{cls.__name__}*查询All]{e}")
+
+    @classmethod
+    async def download(
+            cls, db: AsyncSession, params: Dict, *args, **kwargs
+    ) -> Optional[List]:
+        ...
 
     @classmethod
     async def add(

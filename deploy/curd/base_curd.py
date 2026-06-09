@@ -54,12 +54,12 @@ class BaseCurd(ABC):
     ) -> Optional[List]:
         ...
 
-    # @classmethod
-    # @abstractmethod
-    # async def download(
-    #     cls, db: AsyncSession, params: dict
-    # ) -> Optional[List]:
-    #     ...
+    @classmethod
+    @abstractmethod
+    async def download(
+        cls, db: AsyncSession, params: dict
+    ) -> Optional[List]:
+        ...
 
     @classmethod
     @abstractmethod

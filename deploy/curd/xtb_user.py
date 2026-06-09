@@ -97,7 +97,7 @@ class XtbUserCurd(BaseCurd):
 
     @classmethod
     async def get_pagination(
-        cls, db: AsyncSession, offset: int = 0, limit: int = 15, content: str = None
+        cls, db: AsyncSession, offset: int = 0, limit: int = 15, content: str = None, *args, **kwargs
     ) -> Optional[List]:
         try:
             stmt = select(

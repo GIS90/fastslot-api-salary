@@ -30,7 +30,7 @@ Life is short, I use python.
 
 ------------------------------------------------
 """
-from typing import Optional, List, Any
+from typing import Optional, List, Any, Dict
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select, update, delete, insert, asc, desc
 from sqlalchemy.orm.attributes import InstrumentedAttribute
@@ -87,18 +87,23 @@ class XtbUserTaskCurd(BaseCurd):
 
     @classmethod
     async def get_pagination(
-        cls, db: AsyncSession, offset: int = 0, limit: int = 15
+        cls, db: AsyncSession, offset: int = 0, limit: int = 15, rtx_id: str = None
     ) -> Optional[List]:
         try:
-            stmt = (select(XtbUserTaskModel)
-                    .where(XtbUserTaskModel.status != 1)
-                    .order_by(desc(XtbUserTaskModel.create_time))
-                    .offset(offset)
-                    .limit(limit))
+            stmt = select(XtbUserTaskModel).where(XtbUserTaskModel.status != 1)
+            if rtx_id:
+                stmt = stmt.where(XtbUserTaskModel.rtx_id == rtx_id)
+            stmt = stmt.order_by(desc(XtbUserTaskModel.create_time)).offset(offset).limit(limit)
             result = await db.execute(stmt)
             return result.scalars().all()
         except Exception as e:
             raise SQLDBHandleException(f"[{cls.__name__}*查询All]{e}")
+
+    @classmethod
+    async def download(
+            cls, db: AsyncSession, params: Dict, *args, **kwargs
+    ) -> Optional[List]:
+        ...
 
     @classmethod
     async def add(
