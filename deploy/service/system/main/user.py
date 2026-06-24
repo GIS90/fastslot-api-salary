@@ -108,7 +108,13 @@ class SystemMainUserService:
             content=params.get("content")
         )
         if not models:
-            return FailureStatus(code=status_code.CODE_101_SUCCESS_NO_DATA)
+            __data = {
+                "list": [],
+                "page": params.get("page"),
+                "pageSize": params.get("limit"),
+                "total": 0
+            }
+            return FailureStatus(code=status_code.CODE_101_SUCCESS_NO_DATA, data=__data)
 
         data: List = list()
         for model in models:
@@ -118,6 +124,8 @@ class SystemMainUserService:
             data.append(_d)
         result: Dict = {
             "list": data,
+            "page": params.get("page"),
+            "pageSize": params.get("limit"),
             "total": await self.xtb_user_curd.get_count(self.db)
         }
         return SuccessStatus(data=result)

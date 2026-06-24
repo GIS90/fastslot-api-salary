@@ -271,7 +271,7 @@ CREATE TABLE `xtb_xtcs`  (
 delete from xtb_xtcs;
 
 insert into xtb_xtcs(`key`, `md5`, `remark`, `value`, `create_rtx`, `lock`, `status`, `order_id`) VALUES
-('ADMIN-', '2560983a81db89c5f8ac7bc59ceec23e', '管理员数据权限用户列表', 'abcd1234@', 'a1,b2,c3', False, False, 1),
+('ADMIN-DATA-AUTHORITY', '6cfc35fda5cebaa3d39afa1a438a0e27', '管理员数据权限用户列表', 'a1,b2,c3', 'admin', False, False, 1),
 ('USER-DEFAULT-PASSWORD', '2560983a81db89c5f8ac7bc59ceec23e', '用户默认密码', 'abcd1234@', 'admin', False, False, 2),
 ('USER-DEFAULT-AVATAR', 'ef2cee999bde28a0f2b2485127d8a389', '用户默认头像', 'http://2lstore.pygo.space/avatars/default.png', 'admin', False, False, 3),
 ('SYSTEM-TITLE', '1700a58b93fe99d9edf8eec318737f1e', '系统登录页信息展示：系统标题', '智行工具平台', 'admin', False, False, 4),
