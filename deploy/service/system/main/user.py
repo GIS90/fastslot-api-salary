@@ -164,7 +164,11 @@ class SystemMainUserService:
         await self.xtb_user_curd.update(db=self.db, model=data)
         return SuccessStatus()
 
-    async def __generator_default_password(self, password: str=_SERVER_USER_DEFAULT_PASSWORD) -> str:
+    async def __generator_default_password(
+            self,
+            password: str=_SERVER_USER_DEFAULT_PASSWORD,
+            encrypt: bool=False
+    ) -> str:
         """生成用户密码"""
         default_password: XtbXtcsModel = await self.xtb_xtcs_curd.get_by_key(
             db=self.db,
@@ -172,10 +176,10 @@ class SystemMainUserService:
             filter_lock=True
         )
         __value: str = getattr(default_password, "value") if default_password else password
-        return __value if __value else password
+        return generator_md5(v=__value) if encrypt else __value
 
     async def default_pwd(self, rtx_id: str) -> Status:
-        return SuccessStatus(data={"password": await self.__generator_default_password()})
+        return SuccessStatus(data={"password": await self.__generator_default_password(encrypt=False)})
 
     async def reset_pwd(self, rtx_id: str, md5: str) -> Status:
         __flag, data = await self.__valid_model_by_md5_or_rtx(
@@ -183,7 +187,7 @@ class SystemMainUserService:
         )
         if not __flag: return data
 
-        setattr(data, "password", await self.__generator_default_password())
+        setattr(data, "password", await self.__generator_default_password(encrypt=True))
         await self.xtb_user_curd.update(db=self.db, model=data)
         return SuccessStatus()
     
@@ -211,7 +215,6 @@ class SystemMainUserService:
                                  message="用户账号已存在，请更换")
 
         new_model: XtbUserModel = await self.xtb_user_curd.new_model()
-        __password: str = await self.__generator_default_password()
         __salt: str = random_string(length=16)
         new_model.md5 = generator_md5(v=f"{model.get('rtx_id')}-{get_now()}-{__salt}")
         new_model.avatar = await self.__default_avatar()
@@ -219,13 +222,13 @@ class SystemMainUserService:
         new_model.salt = __salt
         new_model.create_time = datetime.now()
         new_model.create_rtx = rtx_id
-        new_model.password = generator_md5(v=__password)
+        new_model.password = await self.__generator_default_password(encrypt=True)
 
         model["role"] = ','.join(model.get("role")) if model.get("role") else ""
         for k, v in model.items():
             setattr(new_model, k, v)
         await self.xtb_user_curd.add(db=self.db, model=new_model)
-        return SuccessStatus(data={"password": __password})
+        return SuccessStatus()
 
     async def update(self, rtx_id: str, model: Dict) -> Status:
         _md5: str = model.get("md5")

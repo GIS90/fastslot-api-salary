@@ -78,7 +78,7 @@ async def default_pwd(
 
 @router.put('/user.resetPwd', summary="重置密码")
 async def reset_pwd(
-    md5: str = Depends(md5_params),
+    md5: str = Body(..., embed=True),
     token_rtx_id: str = Depends(depend_token_rtx),
     user_service: SystemMainUserService = Depends(get_user_service)
 ) -> Status:
