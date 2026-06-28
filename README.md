@@ -1,12 +1,15 @@
 > ## 项目架构
 
 基于Python语言研发，使用FastAPI、Pydantic、异步数据库搭建的后端APIs脚手架，备具Restful API、JWT验证、Utils、Delib（第三方工具包封装）等功能，技术栈列表：
-- Python：开发语言，基于3.12版本开发
-- FastAPI：脚手架开发语言使用的web框架
-- Pydantic：数据验证库
-- Mysql：数据库
-- Uvicorn：web服务与应用app之间的管理
-- Supervisor：项目进程的启动、停止、重启等管理
+
+|    技术栈     |   版本   | 描述                              |
+|:----------:|:------:|:--------------------------------|
+| Python |  3.12  | 开发语言，官网：https://www.python.org/ |
+| FastAPI | 0.123.7  | 脚手架开发语言使用的Web框架，一款API异步框架，推荐    |
+|    Uvicorn    | 0.38.0 | web服务与应用app之间的管理                |
+|   Pydantic    | 2.12.4  | 数据验证库                           |
+|    Mysql    | 10.3.28-MariaDB | 数据库                             |
+|    Supervisor    | 4.2.2  | 项目进程的启动、停止、重启等管理                |
   
 ***git clone***之后修改配置即可运行，在此基础上可进行二次开发，用于后台独立运行。   
 项目可以运行于Linux、Windows、Macos等系统上，建议使用Centos7.5，支持性较好。
