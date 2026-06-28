@@ -32,7 +32,7 @@ Life is short, I use python.
 """
 from typing import Optional, List, Any, Dict
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy import select, update, delete, insert, asc, or_
+from sqlalchemy import select, update, delete, insert, asc, or_, desc
 from sqlalchemy.orm.attributes import InstrumentedAttribute
 from sqlalchemy import func
 
@@ -128,7 +128,7 @@ class XtbUserCurd(BaseCurd):
                         XtbUserModel.introduction.like(content)
                     )
                 )
-            stmt = stmt.order_by(asc(XtbUserModel.create_time)).offset(offset).limit(limit)
+            stmt = stmt.order_by(desc(XtbUserModel.create_time)).offset(offset).limit(limit)
             result = await db.execute(stmt)
             return result.all()
         except Exception as e:

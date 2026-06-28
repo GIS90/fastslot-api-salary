@@ -37,7 +37,8 @@ from typing import Any, List, Dict, Optional
 __all__ = [
     "model_converter_dict",
     "many_model_converter_dict",
-    "option_converter_dict"
+    "option_converter_dict",
+    "menu_converter_dict",
 ]
 
 
@@ -209,3 +210,139 @@ async def option_converter_dict(
         })
     else:
         return _res
+
+
+def menu_converter_dict(model, type_: str = 'base', format_: str = "tree") -> dict:
+    """
+    菜单字典化
+    :param model: model
+    :param type_:
+    :param format_: tree：菜单树格式 flat：扁平化菜单
+    :return: dict
+    """
+    if not model:
+        return {}
+
+    __xtb_menu_base_attrs = ['id', 'name', 'path', 'pid', 'level', 'md5', 'component', 'type', 'link', 'redirect', 'order_id']
+    __xtb_menu_meta_attrs = ['title', 'icon', 'cache', 'affix', 'full', 'hidden', 'tag', 'breadcrumb']
+    __xtb_menu_extend_attrs = ['create_time', 'create_rtx', 'delete_time', 'delete_rtx', 'status']
+    __xtb_menu_extend_attrs = ['create_time', 'create_rtx', 'delete_time', 'delete_rtx', 'status']
+
+    if type_ == 'base':
+        attrs = __xtb_menu_base_attrs
+    elif type_ == 'list':
+        attrs = __xtb_menu_base_attrs + __xtb_menu_extend_attrs
+    elif type_ == 'detail':
+        attrs = __xtb_menu_base_attrs + __xtb_menu_meta_attrs
+    elif type_ == 'all':
+        attrs = __xtb_menu_base_attrs + __xtb_menu_meta_attrs + __xtb_menu_extend_attrs
+    else:
+        attrs = __xtb_menu_base_attrs
+    # 去重
+    attrs = list(set(attrs))
+
+    _res = dict()
+    _meta = dict()
+
+    def __tree():
+        for attr in attrs:
+            if attr == 'id':
+                _res[attr] = model.id
+            elif attr == 'name':
+                _res[attr] = model.name
+            elif attr == 'path':
+                _res[attr] = model.path
+            elif attr == 'pid':
+                _res[attr] = model.pid
+            elif attr == 'level':
+                _res[attr] = model.level
+            elif attr == 'md5':
+                _res["md5"] = model.md5
+            elif attr == 'order_id':
+                _res[attr] = model.order_id
+            elif attr == 'component':
+                _res[attr] = model.component
+            elif attr == 'redirect':
+                _res[attr] = model.redirect
+            # > > > > > > > > > > > > > > > > > > > > > > > > > > > > > > > > > > > > > > > >
+            elif attr == 'type':
+                # 此菜单类型，MENU=菜单，LINK=外链，BUTTON=按钮
+                _meta[attr] = model.type or "MENU"
+            elif attr == 'title':
+                # 菜单标题
+                _meta[attr] = model.title
+            elif attr == 'icon':
+                # 菜单图标
+                _meta[attr] = model.icon
+            elif attr == 'cache':
+                # 是否缓存路由
+                _meta["isKeepAlive"] = True if model.cache else False
+            elif attr == 'affix':
+                # 菜单是否固定在标签页中 (首页通常是固定项)
+                _meta["isAffix"] = True if model.affix else False
+            elif attr == 'full':
+                # 菜单是否全屏 (示例：数据大屏页面)
+                _meta["isFull"] = True if model.full else False
+            elif attr == 'hidden':
+                # 是否在菜单中隐藏
+                _meta["isHide"] = True if model.hidden else False
+            elif attr == 'breadcrumb':
+                # 是否在面包屑菜单中显示
+                _meta["isBreadcrumb"] = True if model.breadcrumb else False
+            elif attr == 'tag':
+                _meta[attr] = model.tag
+        else:
+            _res['meta'] = _meta
+            return _res
+
+    def __flat():
+        for attr in attrs:
+            if attr == 'id':
+                _res[attr] = model.id
+            elif attr == 'name':
+                _res[attr] = model.name
+            elif attr == 'path':
+                _res[attr] = model.path
+            elif attr == 'pid':
+                _res[attr] = model.pid
+            elif attr == 'level':
+                _res[attr] = model.level
+            elif attr == 'md5':
+                _res["md5"] = model.md5
+            elif attr == 'order_id':
+                _res[attr] = model.order_id
+            elif attr == 'component':
+                _res[attr] = model.component
+            elif attr == 'redirect':
+                _res[attr] = model.redirect
+            # > > > > > > > > > > > > > > > > > > > > > > > > > > > > > > > > > > > > > > > >
+            elif attr == 'type':
+                # 此菜单类型，MENU=菜单，LINK=外链，BUTTON=按钮
+                _res[attr] = model.type or "MENU"
+            elif attr == 'title':
+                # 菜单标题
+                _res[attr] = model.title
+            elif attr == 'icon':
+                # 菜单图标
+                _res[attr] = model.icon
+            elif attr == 'cache':
+                # 是否缓存路由
+                _res["isKeepAlive"] = True if model.cache else False
+            elif attr == 'affix':
+                # 菜单是否固定在标签页中 (首页通常是固定项)
+                _res["isAffix"] = True if model.affix else False
+            elif attr == 'full':
+                # 菜单是否全屏 (示例：数据大屏页面)
+                _res["isFull"] = True if model.full else False
+            elif attr == 'hidden':
+                # 是否在菜单中隐藏
+                _res["isHide"] = True if model.hidden else False
+            elif attr == 'breadcrumb':
+                # 是否在面包屑菜单中显示
+                _res["isBreadcrumb"] = True if model.breadcrumb else False
+            elif attr == 'tag':
+                _res[attr] = model.tag
+        else:
+            return _res
+
+    return __tree() if format_ == "tree" else __flat()

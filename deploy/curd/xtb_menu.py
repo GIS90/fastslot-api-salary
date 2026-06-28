@@ -112,14 +112,10 @@ class XtbMenuCurd(BaseCurd):
         cls, db: AsyncSession, root: bool = True
     ) -> Optional[List]:
         try:
-            if root:
-                stmt = (select(XtbMenuModel)
-                        .where(XtbMenuModel.status != 1)
-                        .order_by(asc(XtbMenuModel.order_id), asc(XtbMenuModel.id)))
-            else:
-                stmt = (select(XtbMenuModel)
-                        .where(XtbMenuModel.status != 1, XtbMenuModel.id != MENU_ROOT_ID)
-                        .order_by(asc(XtbMenuModel.order_id), asc(XtbMenuModel.id)))
+            stmt = select(XtbMenuModel).where(XtbMenuModel.status != 1)
+            if not root:
+                stmt = stmt.where(XtbMenuModel.id != MENU_ROOT_ID)
+            stmt = stmt.order_by(asc(XtbMenuModel.order_id), asc(XtbMenuModel.id))
             result = await db.execute(stmt)
             return result.scalars().all()
         except Exception as e:

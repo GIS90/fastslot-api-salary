@@ -37,7 +37,6 @@ xtb_role_list_fields = [
     {"key": "md5", "type": ft.STR, "name": "md5", "null": False},
     {"key": "engname", "type": ft.STR, "name": "engname", "null": False},
     {"key": "chnname", "type": ft.STR, "name": "chnname", "null": False},
-    {"key": "authority", "type": ft.SPLITLIST, "name": "authority", "null": True},
     {"key": "introduction", "type": ft.STR, "name": "introduction", "null": True},
     {"key": "create_rtx", "type": ft.STR, "name": "createRtx", "null": True},
     {"key": "create_time", "type": ft.DATETIME, "name": "createTime", "null": True}

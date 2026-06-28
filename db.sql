@@ -77,7 +77,7 @@ CREATE TABLE `xtb_role`  (
     `engname` varchar(35) UNIQUE NOT NULL COMMENT '角色唯一标识，英文+数字组成',
     `chnname` varchar(35) NOT NULL COMMENT '角色中文名称',
     `md5` varchar(64) not null unique COMMENT '数据唯一标识：MD5-ID',
-    `authority` varchar(255) COMMENT '角色权限ID集合，用英文；分割',
+    `authority` varchar(255) COMMENT '角色权限ID集合，用英文,分割',
     `introduction` text COMMENT '描述',
     `create_rtx` varchar(35) COMMENT '创建用户RTX-ID',
     `create_time` datetime default CURRENT_TIMESTAMP COMMENT '创建时间',
@@ -229,7 +229,8 @@ VALUES
 (42, '参数配置', 'SystemConfigXtcs', '/system/config/xtcs', 41, 3, '01a048451007391f41a139858d9a9ac9', '/system/config/xtcs/index', FALSE, '', '', TRUE, FALSE, FALSE, 'MENU', TRUE, 10201, 'admin', FALSE, TRUE, ''),
 (43, '数据字典K', 'SystemConfigEK', '/system/config/ek', 41, 3, 'ae4f23009c2738728e4ecd415cbd6167', '/system/config/ek/index', FALSE, '', '', TRUE, FALSE, FALSE, 'MENU', TRUE, 10202, 'admin', FALSE, TRUE, ''),
 (44, '数据字典V', 'SystemConfigEV', '/system/config/ev', 41, 3, 'd8692fd595339b6cd2336589b96f79e0', '/system/config/ev/index', FALSE, '', '', TRUE, FALSE, FALSE, 'MENU', TRUE, 10203, 'admin', FALSE, TRUE, ''),
-(45, '后台API', 'SystemConfigApi', '/system/config/api', 41, 3, '4ae6c8f4429f7bacb050c9c980cf51d3', '/system/config/api/index', FALSE, '', '', TRUE, FALSE, FALSE, 'MENU', TRUE, 10204, 'admin', FALSE, TRUE, ''),
+(45, '报表配置', 'SystemConfigReport', '/system/config/report', 41, 3, '8607a3d3d8db823f68a24f335bf147d9', '/system/config/report/index', FALSE, '', '', TRUE, FALSE, FALSE, 'MENU', TRUE, 10204, 'admin', FALSE, TRUE, ''),
+(53, '后台API', 'SystemConfigApi', '/system/config/api', 41, 3, '4ae6c8f4429f7bacb050c9c980cf51d3', '/system/config/api/index', FALSE, '', '', TRUE, FALSE, FALSE, 'MENU', TRUE, 10205, 'admin', FALSE, TRUE, ''),
 -- * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
 --   > 系统维护[二级菜单]
 (46, '权限管理', 'SystemMain', '/system/main', 35, 2, '34e34c43ec6b943c10a3cc1a1a16fb11', '/system/main', FALSE, '', 'Lock', TRUE, FALSE, FALSE, 'MENU', TRUE, 10300, 'admin', FALSE, FALSE, ''),

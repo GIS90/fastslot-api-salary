@@ -33,14 +33,14 @@ Life is short, I use python.
 from deploy.schema._po_base_model import baseModel
 from deploy.utils.utils import alphanumeric_only
 from pydantic import Field, field_validator
-from typing import Optional
+from typing import Optional, List, Union
 
 
 __all__ = ["XtbRoleAddModel", "XtbRoleUpdateModel"]
 
 
 class __XtbRoleBaseModel(baseModel):
-    chnname: str = Field(..., min_length=1, max_length=30, description="角色中文名称", alias="chnname")
+    chnname: str = Field(..., min_length=1, max_length=35, description="角色中文名称", alias="chnname")
     introduction: Optional[str] = Field(..., max_length=255, description="角色描述")
 
     model_config = {
@@ -91,5 +91,18 @@ class XtbRoleUpdateModel(__XtbRoleBaseModel):
                     "chnname": "abcd木头人",
                     "introduction": "哈哈哈哈哈"
                 }
+            }
+        }
+
+
+class XtbRoleAuthModel(baseModel):
+    md5: str = Field(..., min_length=1, max_length=64, description="数据Md5-Id", alias="md5")
+    id: List[int] = Field(..., description="数据ID列表（元素为数值型），多个用逗号分隔，例如：1,2,3")
+
+    class Config:
+        json_schema_extra = {
+            "example": {
+                "md5": "adc",
+                "id": [1, 2, 3]
             }
         }
