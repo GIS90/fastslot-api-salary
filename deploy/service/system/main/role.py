@@ -89,7 +89,8 @@ class SystemMainRoleService:
         models: List[XtbRoleModel] = await self.xtb_role_curd.get_pagination(
             db=self.db,
             offset=params.get("offset"),
-            limit=params.get("limit")
+            limit=params.get("limit"),
+            content=params.get("content")
         )
         if not models:
             __data = {

@@ -35,26 +35,26 @@ from fastapi import APIRouter, Depends, Query, Body
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from deploy.curd.database import get_session
-from deploy.service.system.main.role import SystemMainRoleService
+from deploy.service.system.main.menu import SystemMainMenuService
 from deploy.utils.status import Status
 from deploy.utils.depend import pageable_params, depend_token_rtx
 from deploy.schema.po.system_main_role import XtbRoleAddModel, XtbRoleUpdateModel
 
-#
-# # router
-# router: APIRouter = APIRouter(prefix="/system/main/menu", tags=["系统管理-菜单管理"])
-# # service
-# def get_xtb_role_service(db: AsyncSession = Depends(get_session)) -> XtbRoleService:
-#     return XtbRoleService(db_connection=db)
-#
-#
-# @router.get("/list", summary="数据列表")
-# async def pagination(
-#     params: dict = Depends(pageable_params),
-#     token_rtx_id: str = Depends(depend_token_rtx),
-#     xtb_role_service: XtbRoleService = Depends(get_xtb_role_service)
-# ) -> Status:
-#     return await xtb_role_service.pagination(rtx_id=token_rtx_id, params=params)
+
+# router
+router: APIRouter = APIRouter(prefix="/system/main", tags=["系统管理-菜单管理"])
+# service
+def get_menu_service(db: AsyncSession = Depends(get_session)) -> SystemMainMenuService:
+    return SystemMainMenuService(db_connection=db)
+
+
+@router.get("/menu.list", summary="数据列表")
+async def pagination(
+    params: dict = Depends(pageable_params),
+    token_rtx_id: str = Depends(depend_token_rtx),
+    menu_service: SystemMainMenuService = Depends(get_menu_service)
+) -> Status:
+    return await menu_service.pagination(rtx_id=token_rtx_id, params=params)
 #
 #
 # @router.get("", summary="通过Md5-Id获取单条数据")

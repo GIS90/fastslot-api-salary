@@ -37,7 +37,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from deploy.curd.database import get_session
 from deploy.service.system.main.role import SystemMainRoleService
 from deploy.utils.status import Status
-from deploy.utils.depend import pageable_params, depend_token_rtx
+from deploy.utils.depend import pageable_like_params, depend_token_rtx
 from deploy.schema.po.system_main_role import XtbRoleAddModel, XtbRoleUpdateModel, XtbRoleAuthModel
 from deploy.schema.po.x import RequestMd5Models
 
@@ -51,7 +51,7 @@ def get_role_service(db: AsyncSession = Depends(get_session)) -> SystemMainRoleS
 
 @router.get("/role.list", summary="数据列表")
 async def pagination(
-    params: dict = Depends(pageable_params),
+    params: dict = Depends(pageable_like_params),
     token_rtx_id: str = Depends(depend_token_rtx),
     role_service: SystemMainRoleService = Depends(get_role_service)
 ) -> Status:

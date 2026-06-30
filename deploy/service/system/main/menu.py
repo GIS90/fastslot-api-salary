@@ -44,17 +44,17 @@ from deploy.utils.utils import get_now, d2s, md5 as generator_md5
 from deploy.config import server_role as SERVER_ROLE_ADMIN
 
 
-class XtbMenuService:
+class SystemMainMenuService:
 
     def __init__(self, db_connection: AsyncSession):
         """
-        XtbMenuService class initialize
+        SystemMainMenuService class initialize
         """
         self.db: AsyncSession = db_connection
         self.xtb_role_curd: XtbRoleCurd = XtbRoleCurd()
 
     def __str__(self):
-        return "XtbMenuService class."
+        return "SystemMainMenuService class."
 
     def __repr__(self):
         return self.__str__()
@@ -84,6 +84,23 @@ class XtbMenuService:
                         else await model_converter_dict(model=model, fields=fields, default_value="****"))
 
     async def pagination(self, rtx_id: str, params: Dict) -> Status:
+
+        all_menus, _ = self.xtb_menu_bo.get_all({}, root=False)
+        if not all_menus:
+            return SuccessStatus(status_id=Status_code.CODE_101_SUCCESS_NO_DATA.value, data=[])
+
+        auth_menu_list = []
+        for menu in all_menus:
+            # lose menu information
+            if not menu or menu.is_del: continue
+
+            _menu_d = xtb_menu_model_to_dict(menu, _type="detail", _format="flat")
+            if not _menu_d: continue
+            auth_menu_list.append(_menu_d)  # 管理角色菜单权限
+
+        tree_menu_list = build_menu_tree_iterative(flat_menus=auth_menu_list, root_id=MENU_ROOT_ID, id_key="id", parent_key="pid", children_key="children")
+        return SuccessStatus(data=tree_menu_list)
+
         models: List[XtbMenuModel] = await self.xtb_role_curd.get_pagination(
             db=self.db,
             offset=params.get("offset"),

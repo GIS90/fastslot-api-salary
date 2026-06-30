@@ -36,7 +36,7 @@ from pydantic import Field, field_validator
 from typing import Optional, List, Union
 
 
-__all__ = ["XtbRoleAddModel", "XtbRoleUpdateModel"]
+__all__ = ["XtbRoleAddModel", "XtbRoleUpdateModel", "XtbRoleAuthModel"]
 
 
 class __XtbRoleBaseModel(baseModel):
