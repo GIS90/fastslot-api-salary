@@ -160,14 +160,14 @@ class SystemMainUserService:
         )
         return data if __flag else {}
 
-    async def status(self, token_rtx_id: str, md5: str, value: bool) -> Status:
+    async def status(self, rtx_id: str, md5: str, value: bool) -> Status:
         __flag, data = await self.__valid_model_by_md5_or_rtx(
             query_id=md5, status_check=False, response_type="model", admin_check=True
         )
         if not __flag: return data
 
         setattr(data, "status", value)
-        setattr(data, "delete_rtx", token_rtx_id)
+        setattr(data, "delete_rtx", rtx_id)
         setattr(data, "delete_time", get_now())
         await self.xtb_user_curd.update(db=self.db, model=data)
         return SuccessStatus()

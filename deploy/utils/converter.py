@@ -212,7 +212,7 @@ async def option_converter_dict(
         return _res
 
 
-def menu_converter_dict(model, type_: str = 'base', format_: str = "tree") -> dict:
+async def menu_converter_dict(model, type_: str = 'base', format_: str = "tree") -> dict:
     """
     菜单字典化
     :param model: model
@@ -225,7 +225,6 @@ def menu_converter_dict(model, type_: str = 'base', format_: str = "tree") -> di
 
     __xtb_menu_base_attrs = ['id', 'name', 'path', 'pid', 'level', 'md5', 'component', 'type', 'link', 'redirect', 'order_id']
     __xtb_menu_meta_attrs = ['title', 'icon', 'cache', 'affix', 'full', 'hidden', 'tag', 'breadcrumb']
-    __xtb_menu_extend_attrs = ['create_time', 'create_rtx', 'delete_time', 'delete_rtx', 'status']
     __xtb_menu_extend_attrs = ['create_time', 'create_rtx', 'delete_time', 'delete_rtx', 'status']
 
     if type_ == 'base':

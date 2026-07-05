@@ -264,7 +264,7 @@ class SystemMainRoleService:
                     or menu.hidden:
                 continue
 
-            _d = menu_converter_dict(model=menu, type_="detail", format_="flat")
+            _d = await menu_converter_dict(model=menu, type_="detail", format_="flat")
             if not _d: continue
             admin_menu_list.append(int(_d.get("id")))   # 管理角色菜单权限
 

@@ -73,9 +73,6 @@ class XtbMenuCurd(BaseCurd):
     async def get_by_md5(self, db: AsyncSession, md5: str):
         return await self._get_model_by_field(db, XtbMenuModel.md5, md5)
 
-    async def get_by_name(self, db: AsyncSession, name: str):
-        return await self._get_model_by_field(db, XtbMenuModel.name, name)
-
     @classmethod
     async def get_count(cls, db: AsyncSession) -> int:
         try:
@@ -88,14 +85,17 @@ class XtbMenuCurd(BaseCurd):
 
     @classmethod
     async def get_pagination(
-        cls, db: AsyncSession, offset: int = 0, limit: int = 15
+            cls, db: AsyncSession, offset: int = 0, limit: int = 15, content: str = None, *args, **kwargs
     ) -> Optional[List]:
+        ...
+
+    @classmethod
+    async def get_all(cls, db: AsyncSession, root: bool = True) -> Optional[List]:
         try:
-            stmt = (select(XtbMenuModel)
-                    .where(XtbMenuModel.status != 1)
-                    .order_by(asc(XtbMenuModel.order_id), asc(XtbMenuModel.id))
-                    .offset(offset)
-                    .limit(limit))
+            stmt = select(XtbMenuModel).where(XtbMenuModel.status != 1)
+            if not root:
+                stmt = stmt.where(XtbMenuModel.id != MENU_ROOT_ID)
+            stmt = stmt.order_by(asc(XtbMenuModel.order_id), asc(XtbMenuModel.id))
             result = await db.execute(stmt)
             return result.scalars().all()
         except Exception as e:
@@ -106,20 +106,6 @@ class XtbMenuCurd(BaseCurd):
             cls, db: AsyncSession, params: Dict, *args, **kwargs
     ) -> Optional[List]:
         ...
-
-    @classmethod
-    async def get_all(
-        cls, db: AsyncSession, root: bool = True
-    ) -> Optional[List]:
-        try:
-            stmt = select(XtbMenuModel).where(XtbMenuModel.status != 1)
-            if not root:
-                stmt = stmt.where(XtbMenuModel.id != MENU_ROOT_ID)
-            stmt = stmt.order_by(asc(XtbMenuModel.order_id), asc(XtbMenuModel.id))
-            result = await db.execute(stmt)
-            return result.scalars().all()
-        except Exception as e:
-            raise SQLDBHandleException(f"[{cls.__name__}*查询All]{e}")
 
     @classmethod
     async def add(

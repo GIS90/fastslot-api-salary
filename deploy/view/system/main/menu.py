@@ -55,6 +55,26 @@ async def pagination(
     menu_service: SystemMainMenuService = Depends(get_menu_service)
 ) -> Status:
     return await menu_service.pagination(rtx_id=token_rtx_id, params=params)
+
+@router.delete("/menu.delete", summary="软删除")
+async def delete_soft(
+    md5: str = Query(..., description="数据Md5-Id"),
+    token_rtx_id: str = Depends(depend_token_rtx),
+    menu_service: SystemMainMenuService = Depends(get_menu_service)
+) -> Status:
+    return await menu_service.delete_soft(rtx_id=token_rtx_id, md5=md5)
+
+
+@router.delete('/menu.status', summary="启用/注销")
+async def status(
+    md5: str = Query(..., description="数据Md5-Id"),
+    value: bool = Query(..., description="状态"),
+    token_rtx_id: str = Depends(depend_token_rtx),
+    menu_service: SystemMainMenuService = Depends(get_menu_service)
+) -> Status:
+    return await menu_service.status(token_rtx_id, md5, value)
+
+
 #
 #
 # @router.get("", summary="通过Md5-Id获取单条数据")
@@ -93,14 +113,8 @@ async def pagination(
 #     return await xtb_role_service.delete_hard(rtx_id=token_rtx_id, md5=md5)
 #
 #
-# @router.delete("/soft", summary="软删除")
-# async def delete_soft(
-#     md5: str = Query(..., description="数据Md5-Id"),
-#     token_rtx_id: str = Depends(depend_token_rtx),
-#     xtb_role_service: XtbRoleService = Depends(get_xtb_role_service)
-# ) -> Status:
-#     return await xtb_role_service.delete_soft(rtx_id=token_rtx_id, md5=md5)
-#
+
+
 #
 # @router.delete("/batch/hard", summary="批量硬删除")
 # async def batch_delete_hard(
