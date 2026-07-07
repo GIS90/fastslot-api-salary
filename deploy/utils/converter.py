@@ -192,7 +192,7 @@ async def option_converter_dict(
     ]
     :param models: model list
     :param key_trans_int: 是否key为整型，默认False
-    :param lock_view: 是否key为整型，默认False
+    :param lock_view: 是否锁定不显示，默认False，只有True锁定才不显示
     :return: list
     """
     if not models: return None
@@ -212,7 +212,7 @@ async def option_converter_dict(
         return _res
 
 
-async def menu_converter_dict(model, type_: str = 'base', format_: str = "tree") -> dict:
+async def menu_converter_dict(model, type_: str = 'base', format_: str = "tree") -> Dict:
     """
     菜单字典化
     :param model: model
@@ -240,8 +240,8 @@ async def menu_converter_dict(model, type_: str = 'base', format_: str = "tree")
     # 去重
     attrs = list(set(attrs))
 
-    _res = dict()
-    _meta = dict()
+    _res: Dict = {}
+    _meta: Dict = {}
 
     def __tree():
         for attr in attrs:

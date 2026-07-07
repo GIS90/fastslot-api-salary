@@ -38,7 +38,7 @@ from deploy.curd.database import get_session
 from deploy.service.system.main.menu import SystemMainMenuService
 from deploy.utils.status import Status
 from deploy.utils.depend import pageable_params, depend_token_rtx
-from deploy.schema.po.system_main_role import XtbRoleAddModel, XtbRoleUpdateModel
+from deploy.schema.po.system_main_menu import XtbMenuBaseModel, XtbMenuUpdateModel
 
 
 # router
@@ -75,16 +75,25 @@ async def status(
     return await menu_service.status(token_rtx_id, md5, value)
 
 
-#
-#
-# @router.get("", summary="通过Md5-Id获取单条数据")
-# async def one_by_md5(
-#     md5: str = Query(..., description="数据Md5-Id"),
-#     token_rtx_id: str = Depends(depend_token_rtx),
-#     xtb_role_service: XtbRoleService = Depends(get_xtb_role_service)
-# ) -> Status:
-#     return await xtb_role_service.one_by_md5(rtx_id=token_rtx_id, md5=md5)
-#
+@router.get("/menu", summary="通过Md5-Id获取单条数据")
+async def one_by_md5(
+    md5: str = Query(..., description="数据Md5-Id"),
+    token_rtx_id: str = Depends(depend_token_rtx),
+    menu_service: SystemMainMenuService = Depends(get_menu_service)
+) -> Status:
+    return await menu_service.one_by_md5(rtx_id=token_rtx_id, md5=md5)
+
+
+@router.put("/menu", summary="更新")
+async def update(
+    params: Annotated[XtbMenuUpdateModel, Body()],
+    token_rtx_id: str = Depends(depend_token_rtx),
+    menu_service: SystemMainMenuService = Depends(get_menu_service)
+) -> Status:
+    return await menu_service.update(rtx_id=token_rtx_id, model=params.model_dump())
+
+
+
 #
 # @router.post("", summary="新增")
 # async def add(
@@ -95,13 +104,7 @@ async def status(
 #     return await xtb_role_service.add(rtx_id=token_rtx_id, model=params.model_dump())
 #
 #
-# @router.put("", summary="更新")
-# async def update(
-#     params: Annotated[XtbRoleUpdateModel, Body()],
-#     token_rtx_id: str = Depends(depend_token_rtx),
-#     xtb_role_service: XtbRoleService = Depends(get_xtb_role_service)
-# ) -> Status:
-#     return await xtb_role_service.update(rtx_id=token_rtx_id, model=params.model_dump())
+
 #
 #
 # @router.delete("/hard", summary="硬删除")

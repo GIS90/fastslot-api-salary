@@ -35,7 +35,7 @@ from pydantic import Field
 from typing import Optional
 
 
-class MenuBaseModel(baseModel):
+class XtbMenuBaseModel(baseModel):
     pid: int = Field(..., description="菜单父ID")
     name: str = Field(..., min_length=1, max_length=55, description="名称")
     path: str = Field(..., min_length=1, max_length=255, description="路由地址")
@@ -45,6 +45,7 @@ class MenuBaseModel(baseModel):
     component: str = Field(..., min_length=1, max_length=255, description="组件路径")
     redirect: Optional[str] = Field(..., max_length=255, description="重定向地址")
     icon: Optional[str] = Field(..., max_length=35, description="图标")
+    isHide: bool = Field(..., description="隐藏")
     isKeepAlive: bool = Field(..., description="缓存")
     isAffix: bool = Field(..., description="固定标签")
     isFull: bool = Field(..., description="全屏")
@@ -53,6 +54,6 @@ class MenuBaseModel(baseModel):
     order_id: int = Field(..., description="级别")
 
 
-class MenuEditModel(MenuBaseModel):
+class XtbMenuUpdateModel(XtbMenuBaseModel):
     id: int = Field(..., description="菜单ID")
-    md5: str = Field(..., min_length=1, max_length=55, description="数据MD5")
+    md5: str = Field(..., min_length=1, max_length=64, description="数据Md5-Id", alias="md5")

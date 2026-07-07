@@ -30,17 +30,22 @@ Life is short, I use python.
 
 ------------------------------------------------
 """
+from itertools import groupby
 from datetime import datetime
 from typing import Dict, List, Tuple, Literal, Any
 from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.util import await_only
+
 from deploy.curd.xtb_menu import XtbMenuCurd
+from deploy.curd.csb_enum_value import CsbEnumValueCurd
 from deploy.schema.dao.xtb_menu import XtbMenuModel
 from deploy.utils.status import Status, SuccessStatus, FailureStatus
 from deploy.utils.status_value import (StatusCode as status_code,
                                        StatusMsg as status_msg)
-from deploy.utils.converter import menu_converter_dict
+from deploy.utils.converter import menu_converter_dict, option_converter_dict
 from deploy.utils.utils import get_now, d2s, md5 as generator_md5, build_menu_tree_iterative
 from deploy.config import server_role as SERVER_ROLE_ADMIN, menu_root as MENU_ROOT_ID
+from deploy.utils.enumeration import CsbEnumKEY, MENU_LEVEL_ENUM
 
 
 class SystemMainMenuService:
@@ -51,6 +56,7 @@ class SystemMainMenuService:
         """
         self.db: AsyncSession = db_connection
         self.xtb_menu_curd: XtbMenuCurd = XtbMenuCurd()
+        self.csb_enum_value_curd: CsbEnumValueCurd = CsbEnumValueCurd()
 
     def __str__(self):
         return "SystemMainMenuService class."
@@ -98,17 +104,68 @@ class SystemMainMenuService:
 
         tree_menu_list = build_menu_tree_iterative(flat_menus=auth_menu_list, root_id=MENU_ROOT_ID, id_key="id", parent_key="pid", children_key="children")
         return SuccessStatus(data=tree_menu_list)
-    #
-    # async def one_by_md5(self, rtx_id: str, md5: str) -> Status:
-    #     __flag, data = await self.__valid_model_by_md5(
-    #         md5_id=md5,
-    #         status_check=False,
-    #         response_type="dict",
-    #         fields=xtb_role_detail_fields,
-    #         admin_check=False
-    #     )
-    #     return SuccessStatus(data=data) if __flag else data
-    #
+
+    async def _get_menu_group_option(self, root: bool = True):
+        # ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
+        # Group Option格式菜单
+        all_menus = await self.xtb_menu_curd.get_all(db=self.db, root=root)
+        all_menu_list: List = []
+        for menu in all_menus:
+            # lose menu information
+            if not menu or getattr(menu, "status"): continue
+
+            _menu_d: Dict = await menu_converter_dict(model=menu, type_="detail", format_="flat")
+            if not _menu_d: continue
+            all_menu_list.append({
+                "value": _menu_d.get("id"),
+                "label": _menu_d.get("title"),
+                "name": _menu_d.get("name"),
+                "group": _menu_d.get("level")
+            })
+        all_menu_group_list: List = []
+        if all_menu_list:
+            all_menu_list_sorted = sorted(all_menu_list, key=lambda x: x.get("group"))
+            for key, group in groupby(all_menu_list_sorted, key=lambda x: x.get("group")):
+                all_menu_group_list.append({
+                    "label": MENU_LEVEL_ENUM.get(int(key)) or "菜单级别",
+                    "options": list(group)
+                })
+        # ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
+        return all_menu_group_list
+
+    async def _get_csb_enum_option(
+            self,
+            key: str,
+            key_trans_int: bool = False,
+            filter_lock: bool = True,
+            lock_view: bool = False
+    ):
+        """
+        用户性别枚举值
+        :return: list
+        """
+        if not key:return []
+        _res = await self.csb_enum_value_curd.get_list_by_name(db=self.db, name=key, filter_lock=filter_lock)
+        return await option_converter_dict(models=_res, key_trans_int=key_trans_int, lock_view=lock_view) if _res else []
+
+    async def one_by_md5(self, rtx_id: str, md5: str) -> Status:
+        __flag, data = await self.__valid_model_by_md5(
+            md5_id=md5,
+            status_check=False,
+            response_type="dict",
+            fields="detail",
+            format_="flat",
+            root_check=False
+        )
+        if not __flag: return data
+        __res: Dict = {
+                "menu": data,
+                "menuOption": await self._get_menu_group_option(root=True),
+                "menuType": await self._get_csb_enum_option(key=CsbEnumKEY.MENU_TYPE, filter_lock=False, lock_view=True),
+                "menuLevel": await self._get_csb_enum_option(key=CsbEnumKEY.MENU_LEVEL, key_trans_int=True, filter_lock=False, lock_view=True)
+            }
+        return SuccessStatus(data=__res)
+
     # async def add(self, rtx_id: str, model: Dict) -> Status:
     #     # 验证角色名称是否已存在
     #     db_model: XtbMenuModel = await self.xtb_menu_curd.get_by_engname(
@@ -130,20 +187,31 @@ class SystemMainMenuService:
     #     await self.xtb_menu_curd.add(db=self.db, model=new_model)
     #     return SuccessStatus()
     #
-    # async def update(self, rtx_id: str, model: Dict) -> Status:
-    #     _md5: str = model.get("md5")
-    #     __flag, data = await self.__valid_model_by_md5(
-    #         md5_id=_md5, status_check=True, response_type="model", root_check=True
-    #     )
-    #     if not __flag: return data
-    #
-    #     del model["md5"]
-    #     model["update_rtx"] = rtx_id
-    #     model["update_time"] = get_now()
-    #     for k, v in model.items():
-    #         setattr(data, k, v)
-    #     await self.xtb_menu_curd.update(db=self.db, model=data)
-    #     return SuccessStatus()
+    async def update(self, rtx_id: str, model: Dict) -> Status:
+        _md5: str = model.get("md5")
+        __flag, data = await self.__valid_model_by_md5(
+            md5_id=_md5, status_check=False, response_type="model", root_check=False
+        )
+        if not __flag: return data
+
+        del model["md5"]
+        del model["id"]
+        model["update_rtx"] = rtx_id
+        model["update_time"] = get_now()
+        model["cache"] = model.get("isKeepAlive")
+        del model["isKeepAlive"]
+        model["affix"] = model.get("isAffix")
+        del model["isAffix"]
+        model["full"] = model.get("isFull")
+        del model["isFull"]
+        model["breadcrumb"] = model.get("isBreadcrumb")
+        del model["isBreadcrumb"]
+        model["hidden"] = model.get("isHide")
+        del model["isHide"]
+        for k, v in model.items():
+            setattr(data, k, v)
+        await self.xtb_menu_curd.update(db=self.db, model=data)
+        return SuccessStatus()
 
     async def delete_soft(self, rtx_id: str, md5: str) -> Status:
         __flag, data = await self.__valid_model_by_md5(

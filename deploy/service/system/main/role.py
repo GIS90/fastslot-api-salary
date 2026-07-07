@@ -40,7 +40,7 @@ from deploy.utils.status import Status, SuccessStatus, FailureStatus
 from deploy.utils.status_value import (StatusCode as status_code,
                                        StatusMsg as status_msg)
 from deploy.utils.converter import model_converter_dict, many_model_converter_dict, menu_converter_dict
-from deploy.schema.dto.xtb_role import xtb_role_list_fields, xtb_role_authority_fields
+from deploy.schema.dto.xtb_role import xtb_role_list_fields, xtb_role_download_fields
 from deploy.utils.utils import get_now, d2s, md5 as generator_md5, build_menu_tree_iterative
 from deploy.config import server_role as SERVER_ROLE_ADMIN, menu_root as MENU_ROOT_ID
 
@@ -235,6 +235,19 @@ class SystemMainRoleService:
         return SuccessStatus() if query_count == request_count \
             else FailureStatus(code=status_code.CODE_508_DATA_PART_DELETE,
                                message=f"总数{request_count}，成功删除{query_count}，查询失败{request_count - query_count}")
+
+
+    async def download(self, params: dict) -> List:
+        models = await self.xtb_role_curd.download(db=self.db, params=params)
+        data: List = list()
+        _id = 1
+        for u in models:
+            if not u: continue
+            _d = await model_converter_dict(model=u, fields=xtb_role_download_fields)
+            _d["序号"] = _id
+            _id +=  1
+            data.append(_d)
+        return data
 
     async def auth(self, rtx_id: str, md5: str) -> Status:
         # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

@@ -59,3 +59,14 @@ xtb_role_authority_fields = [
     {"key": "md5"},
     {"key": "authority", "type": ft.SPLITLIST, "name": "authority", "null": True},
 ]
+
+
+xtb_role_download_fields = [
+    {"key": "id", "type": ft.INT, "name": "序号", "null": True},
+    {"key": "engname", "type": ft.STR, "name": "角色ID", "null": False},
+    {"key": "chnname", "type": ft.STR, "name": "角色名称", "null": False},
+    {"key": "introduction", "type": ft.STR, "name": "角色介绍", "null": True},
+    {"key": "create_rtx", "type": ft.STR, "name": "创建人", "null": True},
+    {"key": "create_time", "type": ft.DATETIME, "name": "创建时间", "null": True}
+]
+

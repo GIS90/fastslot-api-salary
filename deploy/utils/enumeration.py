@@ -47,6 +47,7 @@ __all__ = [
     'DownloadExcelFormat',
     'DownloadExcelType',
     'TaskStatus',
+    'MENU_LEVEL_ENUM',
 ]
 
 
@@ -240,3 +241,18 @@ class TaskStatus(Enum):
     SUCCESS = "SUCCESS"
     FAILURE = "FAILURE"
     WORKING = "WORKING"
+
+
+MENU_LEVEL_ENUM = {
+    0: "根目录",
+    1: "一级菜单",
+    2: "二级菜单",
+    3: "三级菜单",
+    4: "四级菜单",
+    5: "五级菜单",
+    6: "六级菜单",
+    7: "七级菜单",
+    8: "八级菜单",
+    9: "九级菜单",
+    10: "十级菜单"
+}

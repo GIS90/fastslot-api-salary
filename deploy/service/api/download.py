@@ -40,6 +40,7 @@ from deploy.utils.utils import md5 as md5_func, get_now
 from deploy.curd.xtb_user_task import XtbUserTaskCurd
 from deploy.schema.dao.xtb_user_task import XtbUserTaskModel
 from deploy.service.system.main.user import SystemMainUserService
+from deploy.service.system.main.role import SystemMainRoleService
 
 
 class ApiDownloadService(object):
@@ -55,6 +56,7 @@ class ApiDownloadService(object):
         self.xtb_user_task_curd: XtbUserTaskCurd = XtbUserTaskCurd()
         self.system_config_csb_enum_v_service: SystemConfigEnumVService = SystemConfigEnumVService(db_connection=db_connection)
         self.system_main_user_service: SystemMainUserService = SystemMainUserService(db_connection=db_connection)
+        self.system_main_role_service: SystemMainRoleService = SystemMainRoleService(db_connection=db_connection)
 
 
     def __str__(self):
@@ -101,9 +103,9 @@ class ApiDownloadService(object):
             if api == "SystemMainUser":
                 # 系统>权限管理>用户管理
                 __res = await self.system_main_user_service.download(params=new_params)
-            # elif api == "SystemMainRole":
-            #     # 系统>权限管理>角色管理
-            #     __res = await self.system_main_service.role_download(params=new_params)
+            elif api == "SystemMainRole":
+                # 系统>权限管理>角色管理
+                __res = await self.system_main_role_service.download(params=new_params)
             # elif api == "SystemMainMenu":
             #     # 系统>权限管理>菜单管理
             #     __res = await self.system_main_service.menu_download(params=new_params)

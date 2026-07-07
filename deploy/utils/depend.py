@@ -40,7 +40,7 @@ from deploy.utils.utils import get_now
 from deploy.delib.redis_lib import RedisClientLib
 from deploy.config import redis_host, redis_port, redis_db, redis_password
 from deploy.schema.po.x import PageListModel, DownloadFileModel
-from deploy.schema.po.system_main_menu import MenuBaseModel, MenuEditModel
+from deploy.schema.po.system_main_menu import XtbMenuBaseModel, XtbMenuUpdateModel
 from deploy.curd.database import get_session_context
 from deploy.service.system.main.user import SystemMainUserService
 from deploy.utils.enumeration import DownloadExcelFormat as DEF
@@ -212,9 +212,9 @@ async def __menu_params(params: Dict) -> Dict:
     return new_params
 
 
-async def menu_edit_params(params: MenuEditModel) -> Dict:
+async def menu_edit_params(params: XtbMenuUpdateModel) -> Dict:
     return await __menu_params(params=params.model_dump())
 
 
-async def menu_add_params(params: MenuBaseModel) -> Dict:
+async def menu_add_params(params: XtbMenuBaseModel) -> Dict:
     return await __menu_params(params=params.model_dump())
