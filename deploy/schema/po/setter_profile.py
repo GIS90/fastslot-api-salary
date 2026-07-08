@@ -65,7 +65,7 @@ class ProfileUserBaseModel(baseModel):
     字段特殊验证：字母+数字
     """
     @field_validator("userId")
-    def field_is_alnum(cls, value: str) -> str:
+    def field_is_userId(cls, value: str) -> str:
         return alphanumeric_only(value=value, field="用户账户")
     # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 

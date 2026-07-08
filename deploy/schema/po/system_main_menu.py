@@ -31,8 +31,9 @@ Life is short, I use python.
 ------------------------------------------------
 """
 from deploy.schema._po_base_model import baseModel
-from pydantic import Field
+from pydantic import Field, field_validator
 from typing import Optional
+from deploy.utils.utils import letters_only
 
 
 class XtbMenuBaseModel(baseModel):
@@ -52,6 +53,16 @@ class XtbMenuBaseModel(baseModel):
     isBreadcrumb: bool = Field(..., description="面包屑菜单")
     tag: str = Field(..., max_length=10, description="TAG")
     order_id: int = Field(..., description="级别")
+
+
+    # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+    """
+    字段特殊验证：字母+数字
+    """
+    @field_validator("name")
+    def field_is_name(cls, value: str) -> str:
+        return letters_only(value=value, field="菜单名称")
+    # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 
 class XtbMenuUpdateModel(XtbMenuBaseModel):

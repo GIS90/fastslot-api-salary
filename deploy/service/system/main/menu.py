@@ -165,28 +165,45 @@ class SystemMainMenuService:
                 "menuLevel": await self._get_csb_enum_option(key=CsbEnumKEY.MENU_LEVEL, key_trans_int=True, filter_lock=False, lock_view=True)
             }
         return SuccessStatus(data=__res)
+    async def add_enum(self, rtx_id: str) -> Status:
+        data: Dict = {
+            "menuOption": await self._get_menu_group_option(root=True),
+            "menuType": await self._get_csb_enum_option(key=CsbEnumKEY.MENU_TYPE, filter_lock=False, lock_view=True),
+            "menuLevel": await self._get_csb_enum_option(key=CsbEnumKEY.MENU_LEVEL, key_trans_int=True, filter_lock=False, lock_view=True)
+        }
+        return SuccessStatus(data=data)
 
-    # async def add(self, rtx_id: str, model: Dict) -> Status:
-    #     # 验证角色名称是否已存在
-    #     db_model: XtbMenuModel = await self.xtb_menu_curd.get_by_engname(
-    #         db=self.db,
-    #         engname=model.get("engname"))
-    #     if db_model:
-    #         return FailureStatus(code=status_code.CODE_502_DATA_EXIST_NOT_ADD,
-    #                              message="角色ID已存在，请更换")
-    #
-    #     # 新增角色
-    #     new_model: XtbMenuModel = await self.xtb_menu_curd.new_model()
-    #     __now = datetime.now()
-    #     new_model.md5 = generator_md5(v=f"{model.get('engname')}-{d2s(__now)}-{rtx_id}")
-    #     new_model.create_time = __now
-    #     new_model.create_rtx = rtx_id
-    #     new_model.status = False
-    #     for k, v in model.items():
-    #         setattr(new_model, k, v)
-    #     await self.xtb_menu_curd.add(db=self.db, model=new_model)
-    #     return SuccessStatus()
-    #
+    async def add(self, rtx_id: str, model: Dict) -> Status:
+        # 验证角色名称是否已存在
+        db_model: XtbMenuModel = await self.xtb_menu_curd.get_by_name(
+            db=self.db,
+            name=model.get("name"))
+        if db_model:
+            return FailureStatus(code=status_code.CODE_502_DATA_EXIST_NOT_ADD,
+                                 message="菜单名称已存在，请更换")
+
+        # 新增角色
+        new_model: XtbMenuModel = await self.xtb_menu_curd.new_model()
+        __now = datetime.now()
+        new_model.md5 = generator_md5(v=f"{model.get('name')}-{d2s(__now)}-{rtx_id}")
+        new_model.create_time = __now
+        new_model.create_rtx = rtx_id
+        new_model.status = False
+        model["cache"] = model.get("isKeepAlive")
+        del model["isKeepAlive"]
+        model["affix"] = model.get("isAffix")
+        del model["isAffix"]
+        model["full"] = model.get("isFull")
+        del model["isFull"]
+        model["breadcrumb"] = model.get("isBreadcrumb")
+        del model["isBreadcrumb"]
+        model["hidden"] = model.get("isHide")
+        del model["isHide"]
+        for k, v in model.items():
+            setattr(new_model, k, v)
+        await self.xtb_menu_curd.add(db=self.db, model=new_model)
+        return SuccessStatus()
+
     async def update(self, rtx_id: str, model: Dict) -> Status:
         _md5: str = model.get("md5")
         __flag, data = await self.__valid_model_by_md5(

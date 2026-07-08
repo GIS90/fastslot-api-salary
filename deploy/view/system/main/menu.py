@@ -94,45 +94,18 @@ async def update(
 
 
 
-#
-# @router.post("", summary="新增")
-# async def add(
-#     params: Annotated[XtbRoleAddModel, Body()],
-#     token_rtx_id: str = Depends(depend_token_rtx),
-#     xtb_role_service: XtbRoleService = Depends(get_xtb_role_service)
-# ) -> Status:
-#     return await xtb_role_service.add(rtx_id=token_rtx_id, model=params.model_dump())
-#
-#
-
-#
-#
-# @router.delete("/hard", summary="硬删除")
-# async def delete_hard(
-#     md5: str = Query(..., description="数据Md5-Id"),
-#     token_rtx_id: str = Depends(depend_token_rtx),
-#     xtb_role_service: XtbRoleService = Depends(get_xtb_role_service)
-# ) -> Status:
-#     return await xtb_role_service.delete_hard(rtx_id=token_rtx_id, md5=md5)
-#
-#
+@router.get("/menu.addEnum", summary="新增枚举")
+async def add(
+    token_rtx_id: str = Depends(depend_token_rtx),
+    menu_service: SystemMainMenuService = Depends(get_menu_service)
+) -> Status:
+    return await menu_service.add_enum(rtx_id=token_rtx_id)
 
 
-#
-# @router.delete("/batch/hard", summary="批量硬删除")
-# async def batch_delete_hard(
-#     md5_list: List = Query(..., description="数据Md5-Id列表"),
-#     token_rtx_id: str = Depends(depend_token_rtx),
-#     xtb_role_service: XtbRoleService = Depends(get_xtb_role_service)
-# ) -> Status:
-#     return await xtb_role_service.batch_delete_hard(rtx_id=token_rtx_id, md5_list=md5_list)
-#
-#
-# @router.delete("/batch/soft", summary="批量软删除")
-# async def batch_delete_soft(
-#     md5_list: List = Query(..., description="数据Md5-Id列表"),
-#     token_rtx_id: str = Depends(depend_token_rtx),
-#     xtb_role_service: XtbRoleService = Depends(get_xtb_role_service)
-# ) -> Status:
-#     return await xtb_role_service.batch_delete_soft(rtx_id=token_rtx_id, md5_list=md5_list)
-#
+@router.post("/menu", summary="新增")
+async def add(
+    params: Annotated[XtbMenuBaseModel, Body()],
+    token_rtx_id: str = Depends(depend_token_rtx),
+    menu_service: SystemMainMenuService = Depends(get_menu_service)
+) -> Status:
+    return await menu_service.add(rtx_id=token_rtx_id, model=params.model_dump())

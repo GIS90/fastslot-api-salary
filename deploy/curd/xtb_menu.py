@@ -73,6 +73,9 @@ class XtbMenuCurd(BaseCurd):
     async def get_by_md5(self, db: AsyncSession, md5: str):
         return await self._get_model_by_field(db, XtbMenuModel.md5, md5)
 
+    async def get_by_name(self, db: AsyncSession, name: str):
+        return await self._get_model_by_field(db, XtbMenuModel.name, name)
+
     @classmethod
     async def get_count(cls, db: AsyncSession) -> int:
         try:

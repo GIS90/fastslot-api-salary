@@ -91,7 +91,7 @@ class XtbUserAddModel(__XtbUserBaseModel):
     字段特殊验证：字母+数字
     """
     @field_validator("rtx_id")
-    def field_is_alnum(cls, value: str) -> str:
+    def field_is_rtx_id(cls, value: str) -> str:
         return alphanumeric_only(value=value, field="用户账户")
     # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
