@@ -30,7 +30,7 @@ Life is short, I use python.
 
 ------------------------------------------------
 """
-from typing import Annotated, List
+from typing import Annotated
 from fastapi import APIRouter, Depends, Query, Body
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -44,7 +44,7 @@ from deploy.schema.po.system_main_menu import XtbMenuBaseModel, XtbMenuUpdateMod
 # router
 router: APIRouter = APIRouter(prefix="/system/main", tags=["系统管理-菜单管理"])
 # service
-def get_menu_service(db: AsyncSession = Depends(get_session)) -> SystemMainMenuService:
+def get_service(db: AsyncSession = Depends(get_session)) -> SystemMainMenuService:
     return SystemMainMenuService(db_connection=db)
 
 
@@ -52,17 +52,18 @@ def get_menu_service(db: AsyncSession = Depends(get_session)) -> SystemMainMenuS
 async def pagination(
     params: dict = Depends(pageable_params),
     token_rtx_id: str = Depends(depend_token_rtx),
-    menu_service: SystemMainMenuService = Depends(get_menu_service)
+    service: SystemMainMenuService = Depends(get_service)
 ) -> Status:
-    return await menu_service.pagination(rtx_id=token_rtx_id, params=params)
+    return await service.pagination(rtx_id=token_rtx_id, params=params)
+
 
 @router.delete("/menu.delete", summary="软删除")
 async def delete_soft(
     md5: str = Query(..., description="数据Md5-Id"),
     token_rtx_id: str = Depends(depend_token_rtx),
-    menu_service: SystemMainMenuService = Depends(get_menu_service)
+    service: SystemMainMenuService = Depends(get_service)
 ) -> Status:
-    return await menu_service.delete_soft(rtx_id=token_rtx_id, md5=md5)
+    return await service.delete(rtx_id=token_rtx_id, md5=md5)
 
 
 @router.delete('/menu.status', summary="启用/注销")
@@ -70,42 +71,41 @@ async def status(
     md5: str = Query(..., description="数据Md5-Id"),
     value: bool = Query(..., description="状态"),
     token_rtx_id: str = Depends(depend_token_rtx),
-    menu_service: SystemMainMenuService = Depends(get_menu_service)
+    service: SystemMainMenuService = Depends(get_service)
 ) -> Status:
-    return await menu_service.status(token_rtx_id, md5, value)
+    return await service.status(token_rtx_id, md5, value)
 
 
 @router.get("/menu", summary="通过Md5-Id获取单条数据")
 async def one_by_md5(
     md5: str = Query(..., description="数据Md5-Id"),
     token_rtx_id: str = Depends(depend_token_rtx),
-    menu_service: SystemMainMenuService = Depends(get_menu_service)
+    service: SystemMainMenuService = Depends(get_service)
 ) -> Status:
-    return await menu_service.one_by_md5(rtx_id=token_rtx_id, md5=md5)
+    return await service.one_by_md5(rtx_id=token_rtx_id, md5=md5)
 
 
 @router.put("/menu", summary="更新")
 async def update(
     params: Annotated[XtbMenuUpdateModel, Body()],
     token_rtx_id: str = Depends(depend_token_rtx),
-    menu_service: SystemMainMenuService = Depends(get_menu_service)
+    service: SystemMainMenuService = Depends(get_service)
 ) -> Status:
-    return await menu_service.update(rtx_id=token_rtx_id, model=params.model_dump())
-
+    return await service.update(rtx_id=token_rtx_id, model=params.model_dump())
 
 
 @router.get("/menu.addEnum", summary="新增枚举")
 async def add(
     token_rtx_id: str = Depends(depend_token_rtx),
-    menu_service: SystemMainMenuService = Depends(get_menu_service)
+    service: SystemMainMenuService = Depends(get_service)
 ) -> Status:
-    return await menu_service.add_enum(rtx_id=token_rtx_id)
+    return await service.add_enum(rtx_id=token_rtx_id)
 
 
 @router.post("/menu", summary="新增")
 async def add(
     params: Annotated[XtbMenuBaseModel, Body()],
     token_rtx_id: str = Depends(depend_token_rtx),
-    menu_service: SystemMainMenuService = Depends(get_menu_service)
+    service: SystemMainMenuService = Depends(get_service)
 ) -> Status:
-    return await menu_service.add(rtx_id=token_rtx_id, model=params.model_dump())
+    return await service.add(rtx_id=token_rtx_id, model=params.model_dump())
