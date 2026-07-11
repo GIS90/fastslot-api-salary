@@ -93,7 +93,7 @@ async def update(
     return await service.update(rtx_id=token_rtx_id, model=params.model_dump())
 
 
-@router.delete("/xtcs.delete", summary="软删除")
+@router.delete("/xtcs.delete", summary="单条软删除")
 async def delete(
     md5: str = Query(..., description="数据Md5-Id"),
     token_rtx_id: str = Depends(depend_token_rtx),

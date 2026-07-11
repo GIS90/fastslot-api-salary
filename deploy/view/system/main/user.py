@@ -119,7 +119,7 @@ async def update(
     return await service.update(rtx_id=token_rtx_id, model=params.model_dump())
 
 
-@router.delete("/user.hard", summary="硬删除")
+@router.delete("/user.hard", summary="单条硬删除")
 async def delete_hard(
     md5: str = Depends(md5_params),
     token_rtx_id: str = Depends(depend_token_rtx),
@@ -128,7 +128,7 @@ async def delete_hard(
     return await service.delete_hard(rtx_id=token_rtx_id, md5=md5)
 
 
-@router.delete("/user.soft", summary="软删除")
+@router.delete("/user.soft", summary="单条软删除")
 async def delete_soft(
     md5: str = Depends(md5_params),
     token_rtx_id: str = Depends(depend_token_rtx),

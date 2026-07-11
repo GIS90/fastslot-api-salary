@@ -57,7 +57,7 @@ async def pagination(
     return await service.pagination(rtx_id=token_rtx_id, params=params)
 
 
-@router.delete("/menu.delete", summary="软删除")
+@router.delete("/menu.delete", summary="单条软删除")
 async def delete_soft(
     md5: str = Query(..., description="数据Md5-Id"),
     token_rtx_id: str = Depends(depend_token_rtx),
