@@ -29,6 +29,64 @@ Life is short, I use python.
 
 ------------------------------------------------
 """
+from deploy.schema._po_base_model import baseModel
+from deploy.utils.utils import capital_letter_only
+from pydantic import Field, field_validator
 
-if __name__ == '__main__':
-    pass
+
+__all__ = ["XtbXtcsAddModel", "XtbXtcsUpdateModel"]
+
+
+class __XtbXtcsBaseModel(baseModel):
+    remark: str = Field(..., min_length=1, max_length=35, description="参数说明", alias="remark")
+    value: str = Field(..., min_length=1, max_length=255, description="参数值", alias="value")
+    order_id: int = Field(..., description="排序编号", alias="orderId")
+
+    model_config = {
+        "json_schema_extra": {
+            "example": {
+                "remark": "系统参数说明",
+                "value": "参数值",
+                "order_id": 1
+            }
+        }
+    }
+
+
+class XtbXtcsAddModel(__XtbXtcsBaseModel):
+    key: str = Field(..., min_length=1, max_length=35, description="参数名称（大写字母+中划线（-））", alias="key")
+
+    model_config = {
+        "json_schema_extra": {
+            "example": {
+                "key": "ABCD-EFG",
+                "remark": "系统参数说明",
+                "value": "参数值",
+                "order_id": 1
+            }
+        }
+    }
+
+    # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+    """
+    字段特殊验证：字母+数字
+    """
+    @field_validator("key")
+    def field_is_key(cls, value: str) -> str:
+        return capital_letter_only(value=value, field="参数名称")
+    # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+
+class XtbXtcsUpdateModel(__XtbXtcsBaseModel):
+    md5: str = Field(..., min_length=1, max_length=64, description="数据Md5-Id", alias="md5")
+
+    model_config = {
+            "json_schema_extra": {
+                "example": {
+                    "md5": "AAAAAAAAAA",
+                    "remark": "系统参数说明",
+                    "value": "参数值",
+                    "order_id": 1
+                }
+            }
+        }

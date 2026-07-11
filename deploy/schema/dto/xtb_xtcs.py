@@ -33,35 +33,32 @@ from deploy.utils.enumeration import FieldTypeEnum as ft
 
 
 xtb_xtcs_list_fields = [
-    {"key": "id", "type": ft.INT, "name": "id", "null": False},
-    {"key": "rtx_id", "type": ft.STR, "name": "rtxId", "null": False},
+    {"key": "key", "type": ft.STR, "name": "key", "null": False},
     {"key": "md5", "type": ft.STR, "name": "md5", "null": False},
-    {"key": "name", "type": ft.STR, "name": "name", "null": False},
-    {"key": "sex", "type": ft.STR, "name": "sex", "null": False},
-    {"key": "email", "type": ft.STR, "name": "email", "null": False},
-    {"key": "phone", "type": ft.STR, "name": "phone", "null": False},
-    {"key": "avatar", "type": ft.STR, "name": "avatar", "null": False},
-    {"key": "introduction", "type": ft.STR, "name": "introduction", "null": True},
-    {"key": "department", "type": ft.STR, "name": "department", "null": False},
-    {"key": "create_rtx", "type": ft.STR, "name": "createRtx", "null": True},
-    {"key": "create_time", "type": ft.DATETIME, "name": "createTime", "null": True},
-    {"key": "status", "type": ft.BOOL, "name": "status", "null": False},
+    {"key": "remark", "type": ft.STR, "name": "remark", "null": False},
+    {"key": "value", "type": ft.STR, "name": "value", "null": False},
+    {"key": "lock", "type": ft.BOOL, "name": "lock", "null": True},
+    {"key": "order_id", "type": ft.INT, "name": "orderId", "null": True}
 ]
 
 
 xtb_xtcs_detail_fields = [
-    {"key": "id", "type": ft.INT},
-    {"key": "rtx_id", "type": ft.STR, "name": "rtxId"},
-    {"key": "name"},
-    {"key": "sex"},
-    {"key": "email"},
-    {"key": "phone"},
-    {"key": "avatar"},
-    {"key": "introduction"},
+    {"key": "key"},
+    {"key": "md5"},
+    {"key": "remark"},
+    {"key": "value"},
+    {"key": "order_id", "type": ft.INT}
+]
+
+
+xtb_xtcs_view_fields = [
+    {"key": "key"},
+    {"key": "md5"},
+    {"key": "remark"},
+    {"key": "value"},
     {"key": "create_rtx", "type": ft.STR, "name": "createRtx", "null": True},
     {"key": "create_time", "type": ft.DATETIME, "name": "createTime", "null": True},
     {"key": "update_rtx", "type": ft.STR, "name": "updateRtx", "null": True},
     {"key": "update_time", "type": ft.DATETIME, "name": "updateTime", "null": True},
-    {"key": "status", "type": ft.BOOL_TEXT, "name": "status"},
+    {"key": "order_id", "type": ft.INT}
 ]
-

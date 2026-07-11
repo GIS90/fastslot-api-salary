@@ -658,3 +658,9 @@ def letters_only(value: str, field: str) -> str:
     if not re.match(r'^[a-zA-Z]+$', value):
         raise RequestValidationError(f"{field}字段只允许包含字母")
     return value
+
+
+def capital_letter_only(value: str, field: str) -> str:
+    if not re.match(r'^[A-Z\-]+$', value):
+        raise RequestValidationError(f"{field}字段只允许包含大写字母、连字符(-)")
+    return value

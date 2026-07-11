@@ -32,7 +32,7 @@ Life is short, I use python.
 """
 from typing import Optional, List, Any, Dict
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy import select, update, delete, insert, asc, desc
+from sqlalchemy import select, update, delete, insert, asc, desc, or_
 from sqlalchemy.orm.attributes import InstrumentedAttribute
 from sqlalchemy import func
 
@@ -107,15 +107,30 @@ class XtbXtcsCurd(BaseCurd):
             raise SQLDBHandleException(f"[{cls.__name__}*总数]{e}")
 
     @classmethod
+    async def get_count_by_md5_list(cls, db: AsyncSession, md5_list: List[str]) -> int:
+        try:
+            result = await db.execute(
+                select(func.count(XtbXtcsModel.id)).where(XtbXtcsModel.status != 1, XtbXtcsModel.md5.in_(md5_list))
+            )
+            return result.scalar()
+        except Exception as e:
+            raise SQLDBHandleException(f"[{cls.__name__}*查询总数]{e}")
+
+    @classmethod
     async def get_pagination(
-        cls, db: AsyncSession, offset: int = 0, limit: int = 15
+        cls, db: AsyncSession, offset: int = 0, limit: int = 15, content: str = None, *args, **kwargs
     ) -> Optional[List]:
         try:
-            stmt = (select(XtbXtcsModel)
-                    .where(XtbXtcsModel.status != 1)
-                    .order_by(asc(XtbXtcsModel.order_id), desc(XtbXtcsModel.id))
-                    .offset(offset)
-                    .limit(limit))
+            stmt = select(XtbXtcsModel).where(XtbXtcsModel.status != 1)
+            if content:
+                stmt = stmt.where(
+                    or_(
+                        XtbXtcsModel.key.like(content),
+                        XtbXtcsModel.remark.like(content),
+                        XtbXtcsModel.value.like(content)
+                    )
+                )
+            stmt = stmt.order_by(asc(XtbXtcsModel.order_id), desc(XtbXtcsModel.create_time)).offset(offset).limit(limit)
             result = await db.execute(stmt)
             return result.scalars().all()
         except Exception as e:

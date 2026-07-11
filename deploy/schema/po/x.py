@@ -58,6 +58,23 @@ class RequestMd5Model(baseModel):
     }
 
 
+class RequestMd5StatusModel(baseModel):
+    """
+    Md5状态参数请求体
+    """
+    md5: str = Query(..., min_length=MIN_LENGTH, max_length=MAX_LENGTH, description="数据Md5-Id")
+    value: bool = Query(..., description="状态")
+
+    model_config = {
+        "json_schema_extra": {
+            "example": {
+                "md5": "A",
+                "value": True,
+            }
+        }
+    }
+
+
 class RequestMd5Models(baseModel):
     """
     Md5通用参数请求体

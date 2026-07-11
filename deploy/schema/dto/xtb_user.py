@@ -61,10 +61,10 @@ xtb_user_detail_fields = [
     {"key": "avatar"},
     {"key": "introduction"},
     {"key": "role", "type": ft.SPLITLIST, "name": "role", "null": True},
-    {"key": "create_rtx", "type": ft.STR, "name": "createRtx", "null": True},
-    {"key": "create_time", "type": ft.DATETIME, "name": "createTime", "null": True},
-    {"key": "update_rtx", "type": ft.STR, "name": "updateRtx", "null": True},
-    {"key": "update_time", "type": ft.DATETIME, "name": "updateTime", "null": True}
+    # {"key": "create_rtx", "type": ft.STR, "name": "createRtx", "null": True},
+    # {"key": "create_time", "type": ft.DATETIME, "name": "createTime", "null": True},
+    # {"key": "update_rtx", "type": ft.STR, "name": "updateRtx", "null": True},
+    # {"key": "update_time", "type": ft.DATETIME, "name": "updateTime", "null": True}
 ]
 
 

@@ -52,7 +52,7 @@ class XtbMenuBaseModel(baseModel):
     isFull: bool = Field(..., description="全屏")
     isBreadcrumb: bool = Field(..., description="面包屑菜单")
     tag: str = Field(..., max_length=10, description="TAG")
-    order_id: int = Field(..., description="级别")
+    order_id: int = Field(..., description="排序编号")
 
 
     # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
