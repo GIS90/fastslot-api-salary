@@ -39,7 +39,7 @@ from deploy.service.system.main.user import SystemMainUserService
 from deploy.utils.status import Status
 from deploy.utils.depend import pageable_like_params, depend_token_rtx, md5_params, md5_list_params
 from deploy.schema.po.system_main_user import XtbUserAddModel, XtbUserUpdateModel
-from deploy.schema.po.x import RequestMd5Models
+from deploy.schema.po.x import RequestMd5Models, RequestMd5StatusModel
 
 
 # router
@@ -58,14 +58,13 @@ async def pagination(
     return await service.pagination(rtx_id=token_rtx_id, params=params)
 
 
-@router.delete('/user.status', summary="启用/注销")
+@router.put('/user.status', summary="启用/注销")
 async def status(
-    md5: str = Query(..., description="数据Md5-Id"),
-    value: bool = Query(..., description="状态"),
+    params: Annotated[RequestMd5StatusModel, Body()],
     token_rtx_id: str = Depends(depend_token_rtx),
     service: SystemMainUserService = Depends(get_service)
 ) -> Status:
-    return await service.status(token_rtx_id, md5, value)
+    return await service.status(token_rtx_id, params=params.model_dump())
 
 
 @router.get('/user.defaultPwd', summary="默认密码")

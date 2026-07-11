@@ -55,7 +55,6 @@ def register_app_exception(app: FastAPI, app_headers: Dict):
     :param app: FastAPI 应用实例，用于注册异常处理器。
     :param app_headers: 字典类型，包含需要在响应中附加的公共头部信息。
     """
-
     # RequestValidationError[请求参数验证错误]
     @app.exception_handler(RequestValidationError)
     async def request_validation_handle(request: Request, exec: RequestValidationError):
