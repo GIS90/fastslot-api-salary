@@ -140,7 +140,15 @@ class XtbXtcsCurd(BaseCurd):
     async def download(
             cls, db: AsyncSession, params: Dict, *args, **kwargs
     ) -> Optional[List]:
-        ...
+        try:
+            stmt = select(XtbXtcsModel).where(XtbXtcsModel.status != 1)
+            if params.get("list"):
+                stmt = stmt.where(XtbXtcsModel.md5.in_(params.get("list")))
+            stmt = stmt.order_by(asc(XtbXtcsModel.create_time))
+            result = await db.execute(stmt)
+            return result.scalars().all()
+        except Exception as e:
+            raise SQLDBHandleException(f"[{cls.__name__}*下载]{e}")
 
     @classmethod
     async def add(

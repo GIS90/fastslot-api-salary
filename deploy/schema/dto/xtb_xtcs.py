@@ -62,3 +62,14 @@ xtb_xtcs_view_fields = [
     {"key": "update_time", "type": ft.DATETIME, "name": "updateTime", "null": True},
     {"key": "order_id", "type": ft.INT, "name": "orderId", "null": True}
 ]
+
+xtb_xtcs_download_fields =  [
+    {"key": "key", "type": ft.STR, "name": "参数名称", "null": False},
+    {"key": "remark", "type": ft.STR, "name": "参数说明", "null": False},
+    {"key": "value", "type": ft.STR, "name": "参数值", "null": False},
+    {"key": "lock", "type": ft.LOCK_TEXT, "name": "状态", "null": True},
+    {"key": "create_rtx", "type": ft.STR, "name": "创建人", "null": True},
+    {"key": "create_time", "type": ft.DATETIME, "name": "创建时间", "null": True},
+    {"key": "update_rtx", "type": ft.STR, "name": "更新人", "null": True},
+    {"key": "update_time", "type": ft.DATETIME, "name": "更新时间", "null": True}
+]

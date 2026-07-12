@@ -110,6 +110,7 @@ async def batch_delete(
 ) -> Status:
     return await service.batch_delete(rtx_id=token_rtx_id, md5_list=params.model_dump().get("md5"))
 
+
 @router.get("/xtcs.view", summary="视图")
 async def view(
     md5: str = Query(..., description="数据Md5-Id"),

@@ -39,7 +39,8 @@ from deploy.utils.status import Status, SuccessStatus, FailureStatus
 from deploy.utils.status_value import (StatusCode as status_code,
                                        StatusMsg as status_msg)
 from deploy.utils.converter import model_converter_dict, many_model_converter_dict
-from deploy.schema.dto.xtb_xtcs import xtb_xtcs_list_fields, xtb_xtcs_detail_fields, xtb_xtcs_view_fields
+from deploy.schema.dto.xtb_xtcs import (xtb_xtcs_list_fields, xtb_xtcs_detail_fields,
+                                        xtb_xtcs_view_fields, xtb_xtcs_download_fields)
 from deploy.utils.utils import get_now, md5 as generator_md5, d2s
 
 
@@ -205,16 +206,15 @@ class SystemConfigXtcsService:
         )
         return SuccessStatus(data=data) if __flag else data
 
-    #
-    #
-    # async def download(self, params: dict) -> List:
-    #     models = await self.xtb_xtcs_curd.download(db=self.db, params=params)
-    #     data: List = list()
-    #     _id = 1
-    #     for u in models:
-    #         if not u: continue
-    #         _d = await model_converter_dict(model=u, fields=xtb_role_download_fields)
-    #         _d["序号"] = _id
-    #         _id +=  1
-    #         data.append(_d)
-    #     return data
+
+    async def download(self, params: dict) -> List:
+        models = await self.xtb_xtcs_curd.download(db=self.db, params=params)
+        data: List = list()
+        _id = 1
+        for u in models:
+            if not u: continue
+            _d = await model_converter_dict(model=u, fields=xtb_xtcs_download_fields)
+            _d["序号"] = _id
+            _id +=  1
+            data.append(_d)
+        return data

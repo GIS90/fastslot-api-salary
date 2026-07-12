@@ -41,6 +41,7 @@ from deploy.curd.xtb_user_task import XtbUserTaskCurd
 from deploy.schema.dao.xtb_user_task import XtbUserTaskModel
 from deploy.service.system.main.user import SystemMainUserService
 from deploy.service.system.main.role import SystemMainRoleService
+from deploy.service.system.config.xtcs import SystemConfigXtcsService
 
 
 class ApiDownloadService(object):
@@ -57,6 +58,7 @@ class ApiDownloadService(object):
         self.system_config_csb_enum_v_service: SystemConfigEnumVService = SystemConfigEnumVService(db_connection=db_connection)
         self.system_main_user_service: SystemMainUserService = SystemMainUserService(db_connection=db_connection)
         self.system_main_role_service: SystemMainRoleService = SystemMainRoleService(db_connection=db_connection)
+        self.system_config_xtcs_service: SystemConfigXtcsService = SystemConfigXtcsService(db_connection=db_connection)
 
 
     def __str__(self):
@@ -101,14 +103,14 @@ class ApiDownloadService(object):
         # >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
         try:
             if api == "SystemMainUser":
-                # 系统>权限管理>用户管理
+                # 系统>权限>用户管理
                 __res = await self.system_main_user_service.download(params=new_params)
             elif api == "SystemMainRole":
-                # 系统>权限管理>角色管理
+                # 系统>权限>角色管理
                 __res = await self.system_main_role_service.download(params=new_params)
-            # elif api == "SystemMainMenu":
-            #     # 系统>权限管理>菜单管理
-            #     __res = await self.system_main_service.menu_download(params=new_params)
+            elif api == "SystemConfigXtcs":
+                # 系统>配置>系统参数
+                __res = await self.system_config_xtcs_service.download(params=new_params)
             # elif api == "SystemOpsDict":
             #     # 系统>系统维护>数据字典
             #     __res = await self.system_ops_service.dict_enum_download(params=new_params)
