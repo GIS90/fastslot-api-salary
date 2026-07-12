@@ -138,7 +138,33 @@ class XtbUserTaskCurd(BaseCurd):
     async def download(
             cls, db: AsyncSession, params: Dict, *args, **kwargs
     ) -> Optional[List]:
-        ...
+        try:
+            stmt = (select(
+                XtbUserTaskModel.rtx_id,
+                XtbUserTaskModel.api,
+                XtbUserTaskModel.name,
+                XtbUserTaskModel.md5,
+                XtbUserTaskModel.data,
+                EV1.value.label("data_value"),
+                XtbUserTaskModel.task,
+                EV2.value.label("task_value"),
+                XtbUserTaskModel.cost,
+                XtbUserTaskModel.create_time,
+                XtbUserTaskModel.update_time,
+            ).outerjoin(
+                EV1,
+                XtbUserTaskModel.data == EV1.key
+            ).outerjoin(
+                EV2,
+                XtbUserTaskModel.task == EV2.key
+            ).where(XtbUserTaskModel.status != 1))
+            if params.get("list"):
+                stmt = stmt.where(XtbUserTaskModel.md5.in_(params.get("list")))
+            stmt = stmt.order_by(desc(XtbUserTaskModel.create_time))
+            result = await db.execute(stmt)
+            return result.all()
+        except Exception as e:
+            raise SQLDBHandleException(f"[{cls.__name__}*查询All]{e}")
 
     @classmethod
     async def add(

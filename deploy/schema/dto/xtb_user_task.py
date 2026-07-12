@@ -63,17 +63,13 @@ xtb_user_task_detail_fields = [
 
 
 xtb_user_task_download_fields = [
-    {"key": "id", "type": ft.INT, "name": "序号", "null": True},
-    {"key": "rtx_id", "type": ft.STR, "name": "用户账号", "null": True},
-    {"key": "name", "type": ft.STR, "name": "用户昵称", "null": True},
-    {"key": "phone", "type": ft.STR, "name": "电话", "null": True},
-    {"key": "email", "type": ft.STR, "name": "邮箱", "null": True},
-    {"key": "sex", "type": ft.STR, "name": "性别", "null": True},
-    {"key": "avatar", "type": ft.STR, "name": "头像URL地址", "null": True},
-    {"key": "department", "type": ft.STR, "name": "部门名称", "null": True},
-    {"key": "introduction", "type": ft.STR, "name": "个性签名", "null": True},
-    {"key": "create_rtx", "type": ft.STR, "name": "创建人", "null": True},
-    {"key": "create_time", "type": ft.DATETIME, "name": "创建时间", "null": True},
-    {"key": "status", "type": ft.USER_STATUS_TEXT, "name": "状态", "null": True},
+    {"key": "create_time", "type": ft.STR, "name": "创建时间"},
+    {"key": "rtx_id", "type": ft.STR, "name": "系统用户"},
+    {"key": "name", "type": ft.STR, "name": "文件名称"},
+    {"key": "md5", "type": ft.STR, "name": "MD5值"},
+    {"key": "api", "type": ft.STR, "name": "接口名称"},
+    {"key": "data_value", "type": ft.STR, "name": "下载类型"},
+    {"key": "task_value", "type": ft.STR, "name": "任务状态"},
+    {"key": "cost", "type": ft.FLOAT, "name": "耗时（单位：s）"},
 ]
 
