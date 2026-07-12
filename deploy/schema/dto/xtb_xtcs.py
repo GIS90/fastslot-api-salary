@@ -47,7 +47,7 @@ xtb_xtcs_detail_fields = [
     {"key": "md5"},
     {"key": "remark"},
     {"key": "value"},
-    {"key": "order_id", "type": ft.INT}
+    {"key": "order_id", "type": ft.INT, "name": "orderId", "null": True}
 ]
 
 
@@ -60,5 +60,5 @@ xtb_xtcs_view_fields = [
     {"key": "create_time", "type": ft.DATETIME, "name": "createTime", "null": True},
     {"key": "update_rtx", "type": ft.STR, "name": "updateRtx", "null": True},
     {"key": "update_time", "type": ft.DATETIME, "name": "updateTime", "null": True},
-    {"key": "order_id", "type": ft.INT}
+    {"key": "order_id", "type": ft.INT, "name": "orderId", "null": True}
 ]

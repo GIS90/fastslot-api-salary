@@ -130,7 +130,7 @@ class XtbXtcsCurd(BaseCurd):
                         XtbXtcsModel.value.like(content)
                     )
                 )
-            stmt = stmt.order_by(asc(XtbXtcsModel.order_id), desc(XtbXtcsModel.create_time)).offset(offset).limit(limit)
+            stmt = stmt.order_by(asc(XtbXtcsModel.order_id), asc(XtbXtcsModel.create_time)).offset(offset).limit(limit)
             result = await db.execute(stmt)
             return result.scalars().all()
         except Exception as e:

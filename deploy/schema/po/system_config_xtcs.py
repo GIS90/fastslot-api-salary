@@ -54,7 +54,7 @@ class __XtbXtcsBaseModel(baseModel):
 
 
 class XtbXtcsAddModel(__XtbXtcsBaseModel):
-    key: str = Field(..., min_length=1, max_length=35, description="参数名称（大写字母+中划线（-））", alias="key")
+    key: str = Field(..., min_length=1, max_length=35, description="参数名称（大写字母、数字和中划线（-））", alias="key")
 
     model_config = {
         "json_schema_extra": {
