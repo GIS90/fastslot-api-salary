@@ -36,7 +36,7 @@ from jose import JWTError, jwt, ExpiredSignatureError
 
 from deploy.utils.utils import d2s, get_now_time, d2ts, ts2d
 from deploy.utils.exception import JwtCredentialsException
-from deploy.config import (jwt_secret_key, jwt_algorithm, jwt_expire,
+from deploy.config import (jwt_secret_key, jwt_algorithm, redis_expire,
                            redis_host, redis_port, redis_db, redis_password)
 from deploy.delib.redis_lib import RedisClientLib
 
@@ -46,8 +46,8 @@ __JWT_TOKEN_SECRET_KEY: str = jwt_secret_key
 __JWT_TOKEN_ALGORITHM: str = jwt_algorithm
 # 访问令牌过期[默认时间]，单位：分
 __TOKEN_EXPIRE_MINUTE: int = 4 * 60
-if jwt_expire:
-    __TOKEN_EXPIRE_MINUTE = jwt_expire
+if redis_expire:
+    __TOKEN_EXPIRE_MINUTE = redis_expire
 
 # redis-cli
 redis_cli = RedisClientLib(

@@ -586,5 +586,5 @@ class ApiUserService:
         :param params: 分页参数
         :return: [dict]status model
         """
-        return await self.system_ops_task_service.pagination(rtx_id=rtx_id, params=params)
+        return await self.system_ops_task_service.pagination(rtx_id=rtx_id, params=params, _all=False)
 

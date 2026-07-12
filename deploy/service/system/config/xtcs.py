@@ -206,7 +206,6 @@ class SystemConfigXtcsService:
         )
         return SuccessStatus(data=data) if __flag else data
 
-
     async def download(self, params: dict) -> List:
         models = await self.xtb_xtcs_curd.download(db=self.db, params=params)
         data: List = list()

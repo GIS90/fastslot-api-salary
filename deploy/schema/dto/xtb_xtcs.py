@@ -4,6 +4,7 @@
 ------------------------------------------------
 
 describe: 
+    xtb_xtcs fields
 
 base_info:
     __author__ = PyGo

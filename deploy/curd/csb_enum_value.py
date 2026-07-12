@@ -108,6 +108,25 @@ class CsbEnumValueCurd(BaseCurd):
             raise SQLDBHandleException(f"[{cls.__name__}*查询Many]{e}")
 
     @classmethod
+    async def get_list_by_names(
+            cls,
+            db: AsyncSession,
+            name_list: List[str],
+            filter_lock: bool = False
+    ) -> Union[List, None]:
+        try:
+            stmt = select(CsbEnumValueModel).where(
+                CsbEnumValueModel.name.in_(name_list),
+                CsbEnumValueModel.status != 1)
+            if filter_lock:
+                stmt = stmt.where(CsbEnumValueModel.lock != True)
+            result = await db.execute(stmt)
+
+            return result.scalars().all()
+        except Exception as e:
+            raise SQLDBHandleException(f"[{cls.__name__}*查询Many]{e}")
+
+    @classmethod
     async def get_count(cls, db: AsyncSession) -> int:
         try:
             result = await db.execute(

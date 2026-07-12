@@ -425,7 +425,7 @@ insert into csb_enum_value(`name`, `md5`, `key`, `value`, `remark`, `lock`, `sta
 -- ----------------------------------------------------------------------------------------------
 
 -- = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
--- xtb_task 系统表-用户任务表
+-- xtb_user_task 系统表-用户任务表
 -- create table && index
 DROP TABLES IF EXISTS `xtb_user_task`;
 CREATE TABLE `xtb_user_task`  (

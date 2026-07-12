@@ -30,8 +30,8 @@ Life is short, I use python.
 
 ------------------------------------------------
 """
-from datetime import datetime
-from typing import Dict, List, Tuple, Literal, Any
+import json
+from typing import Dict, List, Tuple, Literal, Any, Optional, Union
 from sqlalchemy.ext.asyncio import AsyncSession
 from deploy.curd.csb_enum_value import CsbEnumValueCurd
 from deploy.schema.dao.csb_enum_value import CsbEnumValueModel
@@ -39,13 +39,8 @@ from deploy.utils.status import Status, SuccessStatus, FailureStatus
 from deploy.utils.status_value import (StatusCode as status_code,
                                        StatusMsg as status_msg)
 from deploy.utils.converter import model_converter_dict, option_converter_dict
-from deploy.schema.dto.xtb_xtcs import xtb_xtcs_list_fields, xtb_xtcs_detail_fields
-from deploy.config import server_user, server_password, server_avatar
-
-
-_SERVER_USER_ADMIN: str = server_user
-_SERVER_USER_DEFAULT_PASSWORD: str = server_password
-_SERVER_USER_DEFAULT_AVATAR: str = server_avatar
+from deploy.config import (redis_host, redis_port, redis_password, redis_db, redis_expire)
+from deploy.delib.redis_lib import RedisClientLib
 
 
 class SystemConfigEnumVService:
@@ -55,6 +50,7 @@ class SystemConfigEnumVService:
         SystemConfigEnumVService class initialize
         """
         self.db: AsyncSession = db_connection
+        self.redis_cli = RedisClientLib(host=redis_host, port=redis_port, db=redis_db, password=redis_password)
         self.csb_enum_v_curd: CsbEnumValueCurd = CsbEnumValueCurd()
 
     def __str__(self):
@@ -68,7 +64,7 @@ class SystemConfigEnumVService:
             md5_id: str,
             status_check: bool = True,
             response_type: Literal["dict", "model"] = "model",
-            fields: List[Dict] = xtb_xtcs_detail_fields,
+            fields: List[Dict] = '',
             lock_check: bool = False
     ) -> Tuple[bool, Any]:
         if not md5_id:
@@ -92,3 +88,27 @@ class SystemConfigEnumVService:
 
         enum_v_model = await self.csb_enum_v_curd.get_list_by_name(db=self.db, name=name)
         return [] if not enum_v_model else await option_converter_dict(enum_v_model, lock_view=lock_view)
+
+    async def get_enum_by_name(self, name: str, response_: Literal["option", "dict"] = "dict") -> Union[List, Dict, None]:
+        if response_ not in ["option", "dict"]:
+            return None
+        # redis 缓存
+        __redis_key = f"kv_{response_}_{name}"
+        redis_value = self.redis_cli.get_key(key=__redis_key)
+        if redis_value: return json.loads(redis_value)
+
+        # 数据库
+        models = await self.csb_enum_v_curd.get_list_by_name(db=self.db, name=name, filter_lock=False)
+        if not models: return None
+        if response_ == "dict":
+            __redis_value: Dict = {}
+            for model in models:
+                if not model or not getattr(model, "key"): continue
+                __redis_value[getattr(model, "key")] = getattr(model, "value")
+        else:
+            __redis_value: List = await option_converter_dict(models=models, key_trans_int=False, lock_view=True)
+
+        self.redis_cli.set_key(key=__redis_key, value=json.dumps(__redis_value), ex=redis_expire*60)    # 默认是秒
+        return __redis_value
+
+

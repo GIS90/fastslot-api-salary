@@ -107,12 +107,12 @@ redis_host: str = data["redis"].get("host")
 redis_port: int = data["redis"].get("port")
 redis_db: int = data["redis"].get("db")
 redis_password: str = data["redis"].get("password")
+redis_expire: int = data["redis"].get("expire")
 
 # jwt
 jwt_token_verify: bool = data["jwt"].get("verify")
 jwt_secret_key: str = data["jwt"].get("secret_key")
 jwt_algorithm: str = data["jwt"].get("algorithm")
-jwt_expire: int = data["jwt"].get("expire")
 
 # log
 log_folder: str = data["log"].get("folder")

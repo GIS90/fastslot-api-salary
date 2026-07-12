@@ -38,6 +38,7 @@ from deploy.view.upload import router as upload_router
 from deploy.view.system.main.user import router as system_main_user_router
 from deploy.view.system.main.role import router as system_mian_role_router
 from deploy.view.system.main.menu import router as system_mian_menu_router
+from deploy.view.system.ops.task import router as system_ops_task_router
 from deploy.view.system.config.xtcs import router as system_config_xtcs_router
 from deploy.view.setter.profile import router as setter_profile_router
 
@@ -51,14 +52,11 @@ View根据系统设计的api进行模块划分，其中有3个比较特殊（不
 
 功能模块
   系统
-    权限管理
-      - user：用户管理
-      - role：角色管理
-      - role：菜单管理
-    系统配置
-      - xtcs：参数配置
+    权限管理：[user]用户管理 role：角色管理 role：菜单管理
+    系统维护：[task]：任务中心
+    系统配置：[xtcs]：参数配置
   设置
-    - profile：个人中心
+    [profile]个人中心
     
 """
 __all__ = ["add_routers"]
@@ -72,6 +70,7 @@ add_routers = [
     system_main_user_router,
     system_mian_role_router,
     system_mian_menu_router,
+    system_ops_task_router,
     system_config_xtcs_router,
     setter_profile_router,
 ]

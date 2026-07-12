@@ -30,11 +30,12 @@ Life is short, I use python.
 
 ------------------------------------------------
 """
-from datetime import datetime
 from typing import Dict, List, Tuple, Literal, Any
 from sqlalchemy.ext.asyncio import AsyncSession
 from deploy.curd.xtb_user_task import XtbUserTaskCurd
+from deploy.curd.csb_enum_value import CsbEnumValueCurd
 from deploy.schema.dao.xtb_user_task import XtbUserTaskModel
+from deploy.service.system.config.enum_value import SystemConfigEnumVService
 from deploy.utils.status import Status, SuccessStatus, FailureStatus
 from deploy.utils.status_value import (StatusCode as status_code,
                                        StatusMsg as status_msg)
@@ -44,8 +45,8 @@ from deploy.schema.dto.xtb_user_task import (
     xtb_user_task_list_fields,
     xtb_user_task_download_fields
 )
-from deploy.utils.utils import get_now, d2s, md5 as generator_md5
-from deploy.config import server_role as SERVER_ROLE_ADMIN
+from deploy.utils.utils import get_now
+from deploy.utils.enumeration import CsbEnumKEY
 
 
 class SystemOpsTaskService:
@@ -56,6 +57,8 @@ class SystemOpsTaskService:
         """
         self.db: AsyncSession = db_connection
         self.xtb_user_task_curd: XtbUserTaskCurd = XtbUserTaskCurd()
+        self.csb_enum_value_curd: CsbEnumValueCurd = CsbEnumValueCurd()
+        self.csb_enum_value_service: SystemConfigEnumVService = SystemConfigEnumVService(db_connection=self.db)
 
     def __str__(self):
         return "SystemMainRoleService class."
@@ -84,15 +87,22 @@ class SystemOpsTaskService:
         return (True, model if response_type == "model"
                         else await model_converter_dict(model=model, fields=fields, default_value="****"))
 
-    async def pagination(self, rtx_id: str, params: Dict) -> Status:
+    async def pagination(self, rtx_id: str, params: Dict, _all: bool = False) -> Status:
+        __rtx_id=None if _all else rtx_id
         models: List[XtbUserTaskModel] = await self.xtb_user_task_curd.get_pagination(
             db=self.db,
             offset=params.get("offset"),
             limit=params.get("limit"),
-            rtx_id=rtx_id
+            rtx_id=__rtx_id
         )
         if not models:
-            return FailureStatus(code=status_code.CODE_101_SUCCESS_NO_DATA)
+            __data = {
+                "list": [],
+                "page": params.get("page"),
+                "pageSize": params.get("limit"),
+                "total": 0
+            }
+            return FailureStatus(code=status_code.CODE_101_SUCCESS_NO_DATA, data=__data)
 
         id_value: int = params.get("offset") + 1
         data: List = await many_model_converter_dict(
@@ -103,9 +113,19 @@ class SystemOpsTaskService:
         )
         result: Dict = {
             "list": data,
-            "total": await self.xtb_user_task_curd.get_count(self.db)
+            "page": params.get("page"),
+            "pageSize": params.get("limit"),
+            "total": await self.xtb_user_task_curd.get_count(self.db, rtx_id=__rtx_id)
         }
         return SuccessStatus(data=result)
+
+    async def filter_(self, rtx_id: str) -> Status:
+        data = {
+            "status": await self.csb_enum_value_service.get_enum_by_name(name=CsbEnumKEY.TASK_STATUS.value, response_="option"),
+            "ds": await self.csb_enum_value_service.get_enum_by_name(name=CsbEnumKEY.DOWNLOAD_SELECT.value, response_="option"),
+            "user": []
+        }
+        return SuccessStatus(data=data)
 
     async def one_by_md5(self, rtx_id: str, md5: str) -> Status:
         __flag, data = await self.__valid_model_by_md5(
@@ -115,3 +135,53 @@ class SystemOpsTaskService:
             fields=xtb_user_task_detail_fields
         )
         return SuccessStatus(data=data) if __flag else data
+
+    async def update(self, rtx_id: str, model: Dict) -> Status:
+        _md5: str = model.get("md5")
+        __flag, data = await self.__valid_model_by_md5(
+            md5_id=_md5, status_check=True, response_type="model"
+        )
+        if not __flag: return data
+
+        del model["md5"]
+        if model.get("key"): del model["key"]
+        model["update_rtx"] = rtx_id
+        model["update_time"] = get_now()
+        for k, v in model.items():
+            setattr(data, k, v)
+        await self.xtb_user_task_curd.update(db=self.db, model=data)
+        return SuccessStatus()
+
+    async def delete(self, rtx_id: str, md5: str) -> Status:
+        __flag, data = await self.__valid_model_by_md5(
+            md5_id=md5, status_check=True, response_type="model"
+        )
+        if not __flag: return data
+
+        setattr(data, "status", True)
+        setattr(data, "delete_rtx", rtx_id)
+        setattr(data, "delete_time", get_now())
+        await self.xtb_user_task_curd.update(db=self.db, model=data)
+        return SuccessStatus()
+
+    async def batch_delete(self, rtx_id: str, md5_list: List) -> Status:
+        query_count: int = await self.xtb_user_task_curd.get_count_by_md5_list(db=self.db, md5_list=md5_list)
+        if not query_count:
+            return FailureStatus(code=status_code.CODE_501_DATA_NOT_EXIST)
+        request_count: int = len(md5_list)
+        await self.xtb_user_task_curd.batch_soft_delete_update(db=self.db, md5_list=md5_list, rtx_id=rtx_id)
+        return SuccessStatus() if query_count == request_count \
+            else FailureStatus(code=status_code.CODE_508_DATA_PART_DELETE,
+                               message=f"总数{request_count}，成功删除{query_count}，查询失败{request_count - query_count}")
+
+    async def download(self, params: dict) -> List:
+        models = await self.xtb_user_task_curd.download(db=self.db, params=params)
+        data: List = list()
+        _id = 1
+        for u in models:
+            if not u: continue
+            _d = await model_converter_dict(model=u, fields=xtb_user_task_download_fields)
+            _d["序号"] = _id
+            _id +=  1
+            data.append(_d)
+        return data

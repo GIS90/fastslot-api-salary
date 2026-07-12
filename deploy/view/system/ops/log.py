@@ -4,16 +4,16 @@
 ------------------------------------------------
 
 describe: 
-    system>config>enum_value view
+    system>ops>log view
 
 base_info:
     __author__ = PyGo
-    __time__ = 2026/6/6 22:08
+    __time__ = 2026/7/12 15:06
     __version__ = v.1.0.0
     __mail__ = gaoming971366@163.com
     __blog__ = www.pygo2.top
     __project__ = fastslot-api-salary
-    __file_name__ = enum_value.py
+    __file_name__ = log.py
 
 usage:
     
@@ -31,3 +31,5 @@ Life is short, I use python.
 ------------------------------------------------
 """
 
+if __name__ == '__main__':
+    pass

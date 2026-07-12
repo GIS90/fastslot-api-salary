@@ -39,7 +39,9 @@ xtb_user_task_list_fields = [
     {"key": "api", "type": ft.STR, "name": "api", "null": False},
     {"key": "name", "type": ft.STR, "name": "name", "null": False},
     {"key": "data", "type": ft.STR, "name": "data", "null": False},
+    {"key": "data_value", "type": ft.STR, "name": "dataText", "null": False},
     {"key": "task", "type": ft.STR, "name": "task", "null": False},
+    {"key": "task_value", "type": ft.STR, "name": "taskText", "null": False},
     {"key": "cost", "type": ft.FLOAT, "name": "cost", "null": True},
     {"key": "create_time", "type": ft.DATETIME, "name": "createTime", "null": True},
     {"key": "update_time", "type": ft.DATETIME, "name": "createTime", "null": True}
@@ -47,16 +49,16 @@ xtb_user_task_list_fields = [
 
 
 xtb_user_task_detail_fields = [
-    {"key": "rtx_id"},
+    {"key": "rtx_id", "name": "rtxId"},
     {"key": "md5"},
     {"key": "api"},
     {"key": "name"},
     {"key": "data"},
+    {"key": "data_value", "type": ft.STR, "name": "dataText", "null": False},
     {"key": "task"},
+    {"key": "task_value", "type": ft.STR, "name": "taskText", "null": False},
     {"key": "cost"},
-    {"key": "create_time", "type": ft.DATETIME},
-    {"key": "update_time", "type": ft.DATETIME},
-    {"key": "status", "type": ft.BOOL},
+    {"key": "create_time", "type": ft.DATETIME, "name": "createTime"}
 ]
 
 

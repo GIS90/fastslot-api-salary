@@ -35,10 +35,16 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select, update, delete, insert, asc, desc
 from sqlalchemy.orm.attributes import InstrumentedAttribute
 from sqlalchemy import func
+from sqlalchemy.orm import aliased
 
 from deploy.curd.base_curd import BaseCurd
 from deploy.schema.dao.xtb_user_task import XtbUserTaskModel
+from deploy.schema.dao.csb_enum_value import CsbEnumValueModel
 from deploy.utils.exception import SQLDBHandleException
+
+
+EV1 = aliased(CsbEnumValueModel)
+EV2 = aliased(CsbEnumValueModel)
 
 
 class XtbUserTaskCurd(BaseCurd):
@@ -76,26 +82,55 @@ class XtbUserTaskCurd(BaseCurd):
         return await self._get_model_by_field(db, XtbUserTaskModel.md5, md5)
 
     @classmethod
-    async def get_count(cls, db: AsyncSession) -> int:
+    async def get_count(cls, db: AsyncSession, rtx_id: str = None) -> int:
         try:
-            result = await db.execute(
-                select(func.count(XtbUserTaskModel.id)).where(XtbUserTaskModel.status != 1)
-            )
+            stmt = select(func.count(XtbUserTaskModel.id)).where(XtbUserTaskModel.status != 1)
+            if rtx_id:
+                stmt = stmt.where(XtbUserTaskModel.rtx_id == rtx_id)
+            result = await db.execute(stmt)
             return result.scalar()
         except Exception as e:
             raise SQLDBHandleException(f"[{cls.__name__}*总数]{e}")
+
+    @classmethod
+    async def get_count_by_md5_list(cls, db: AsyncSession, md5_list: List[str]) -> int:
+        try:
+            result = await db.execute(
+                select(func.count(XtbUserTaskModel.id)).where(XtbUserTaskModel.status != 1, XtbUserTaskModel.md5.in_(md5_list))
+            )
+            return result.scalar()
+        except Exception as e:
+            raise SQLDBHandleException(f"[{cls.__name__}*查询总数]{e}")
 
     @classmethod
     async def get_pagination(
         cls, db: AsyncSession, offset: int = 0, limit: int = 15, rtx_id: str = None
     ) -> Optional[List]:
         try:
-            stmt = select(XtbUserTaskModel).where(XtbUserTaskModel.status != 1)
+            stmt = (select(
+                XtbUserTaskModel.rtx_id,
+                XtbUserTaskModel.api,
+                XtbUserTaskModel.name,
+                XtbUserTaskModel.md5,
+                XtbUserTaskModel.data,
+                EV1.value.label("data_value"),
+                XtbUserTaskModel.task,
+                EV2.value.label("task_value"),
+                XtbUserTaskModel.cost,
+                XtbUserTaskModel.create_time,
+                XtbUserTaskModel.update_time,
+            ).outerjoin(
+                EV1,
+                XtbUserTaskModel.data == EV1.key
+            ).outerjoin(
+                EV2,
+                XtbUserTaskModel.task == EV2.key
+            ).where(XtbUserTaskModel.status != 1))
             if rtx_id:
                 stmt = stmt.where(XtbUserTaskModel.rtx_id == rtx_id)
             stmt = stmt.order_by(desc(XtbUserTaskModel.create_time)).offset(offset).limit(limit)
             result = await db.execute(stmt)
-            return result.scalars().all()
+            return result.all()
         except Exception as e:
             raise SQLDBHandleException(f"[{cls.__name__}*查询All]{e}")
 

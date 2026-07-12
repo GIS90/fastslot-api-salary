@@ -38,7 +38,7 @@ from deploy.curd.database import get_session
 from deploy.schema.po.access import O2LUserLogin
 from deploy.utils.status import Status, SuccessStatus, FailureStatus
 from deploy.utils.status_value import StatusCode as Status_code
-from deploy.config import redis_host, redis_port, redis_db, redis_password, jwt_expire
+from deploy.config import redis_host, redis_port, redis_db, redis_password, redis_expire
 from deploy.utils.token import encode_access_token
 from deploy.delib.redis_lib import RedisClientLib
 from deploy.utils.depend import __get_token_rtx
@@ -52,7 +52,7 @@ def get_user_service(db: AsyncSession = Depends(get_session)):
     return SystemMainUserService(db_connection=db)
 # redis-cli
 redis_cli = RedisClientLib(host=redis_host, port=redis_port, db=redis_db, password=redis_password)
-__JWT_TOKEN_EXPIRE_MINUTES = jwt_expire
+__JWT_TOKEN_EXPIRE_MINUTES = redis_expire
 
 # * * * * * * * * * * * * * * * * * * * * * * * * * * [ APIs] * * * * * * * * * * * * * * * * * * * * * * * * * * *
 """

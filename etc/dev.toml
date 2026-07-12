@@ -38,13 +38,13 @@ host = "110.40.141.32"
 port = 9777
 db = 10
 password = ""
+expire = 240    # 单位：分，默认4小时 = 4 * 60
 
 # JWT Token
 [jwt]
 verify = true
 secret_key = "Enjoy the good life every day！！!"
 algorithm = "HS256"
-expire = 240    # 单位：分，默认4小时 = 4 * 60
 
 # 日志
 [log]
