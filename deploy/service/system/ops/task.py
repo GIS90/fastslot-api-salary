@@ -91,22 +91,24 @@ class SystemOpsTaskService:
 
     async def pagination(self, rtx_id: str, params: Dict, _all: bool = False) -> Status:
         __rtx_id=None if _all else rtx_id
+        pagination_offset = (params.get("page") - 1) * params.get("pageSize")
         models: List[XtbUserTaskModel] = await self.xtb_user_task_curd.get_pagination(
             db=self.db,
-            offset=params.get("offset"),
-            limit=params.get("limit"),
-            rtx_id=__rtx_id
+            offset=pagination_offset,
+            limit=params.get("pageSize"),
+            rtx_id=__rtx_id,
+            filter_=params.get("filter")
         )
         if not models:
             __data = {
                 "list": [],
                 "page": params.get("page"),
-                "pageSize": params.get("limit"),
+                "pageSize": params.get("pageSize"),
                 "total": 0
             }
             return FailureStatus(code=status_code.CODE_101_SUCCESS_NO_DATA, data=__data)
 
-        id_value: int = params.get("offset") + 1
+        id_value: int = pagination_offset + 1
         data: List = await many_model_converter_dict(
             models=models,
             fields=xtb_user_task_list_fields,
@@ -116,8 +118,8 @@ class SystemOpsTaskService:
         result: Dict = {
             "list": data,
             "page": params.get("page"),
-            "pageSize": params.get("limit"),
-            "total": await self.xtb_user_task_curd.get_count(self.db, rtx_id=__rtx_id)
+            "pageSize": params.get("pageSize"),
+            "total": await self.xtb_user_task_curd.get_count(self.db, rtx_id=__rtx_id, filter_=params.get("filter"))
         }
         return SuccessStatus(data=result)
 

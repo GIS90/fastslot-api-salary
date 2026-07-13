@@ -37,9 +37,8 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from deploy.curd.database import get_session
 from deploy.service.system.ops.task import SystemOpsTaskService
 from deploy.utils.status import Status
-from deploy.utils.depend import pageable_like_params, depend_token_rtx
-from deploy.schema.po.system_config_task import XtbUserTaskAddModel, XtbUserTaskUpdateModel
-from deploy.schema.po.x import RequestMd5Models
+from deploy.utils.depend import depend_token_rtx
+from deploy.schema.po.x import PageFilterModel, RequestMd5Models
 
 
 # router
@@ -49,13 +48,13 @@ def get_service(db: AsyncSession = Depends(get_session)) -> SystemOpsTaskService
     return SystemOpsTaskService(db_connection=db)
 
 
-@router.get("/task.list", summary="数据列表")
+@router.post("/task.list", summary="数据列表")
 async def pagination(
-    params: dict = Depends(pageable_like_params),
+    params: Annotated[PageFilterModel, Body()],
     token_rtx_id: str = Depends(depend_token_rtx),
     service: SystemOpsTaskService = Depends(get_service)
 ) -> Status:
-    return await service.pagination(rtx_id=token_rtx_id, params=params, _all=True)
+    return await service.pagination(rtx_id=token_rtx_id, params=params.model_dump(), _all=True)
 
 
 @router.get("/task.filter", summary="过滤条件")

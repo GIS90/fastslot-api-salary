@@ -82,11 +82,21 @@ class XtbUserTaskCurd(BaseCurd):
         return await self._get_model_by_field(db, XtbUserTaskModel.md5, md5)
 
     @classmethod
-    async def get_count(cls, db: AsyncSession, rtx_id: str = None) -> int:
+    async def get_count(cls, db: AsyncSession, rtx_id: str = None, filter_: Dict = {}) -> int:
         try:
             stmt = select(func.count(XtbUserTaskModel.id)).where(XtbUserTaskModel.status != 1)
             if rtx_id:
                 stmt = stmt.where(XtbUserTaskModel.rtx_id == rtx_id)
+            if filter_.get("ds"):
+                stmt = stmt.where(XtbUserTaskModel.data.in_(filter_.get("ds")))
+            if filter_.get("status"):
+                stmt = stmt.where(XtbUserTaskModel.task.in_(filter_.get("status")))
+            if filter_.get("user"):
+                stmt = stmt.where(XtbUserTaskModel.rtx_id.in_(filter_.get("user")))
+            if filter_.get("content"):
+                stmt = stmt.where(XtbUserTaskModel.name.like(f"%{filter_.get('content')}%"))
+            if filter_.get("dateRange"):
+                stmt = stmt.where(XtbUserTaskModel.create_time.between(filter_.get("dateRange")[0], filter_.get("dateRange")[1]))
             result = await db.execute(stmt)
             return result.scalar()
         except Exception as e:
@@ -104,7 +114,7 @@ class XtbUserTaskCurd(BaseCurd):
 
     @classmethod
     async def get_pagination(
-        cls, db: AsyncSession, offset: int = 0, limit: int = 15, rtx_id: str = None
+        cls, db: AsyncSession, offset: int = 0, limit: int = 15, rtx_id: str = None, filter_: Dict = {}
     ) -> Optional[List]:
         try:
             stmt = (select(
@@ -128,6 +138,16 @@ class XtbUserTaskCurd(BaseCurd):
             ).where(XtbUserTaskModel.status != 1))
             if rtx_id:
                 stmt = stmt.where(XtbUserTaskModel.rtx_id == rtx_id)
+            if filter_.get("ds"):
+                stmt = stmt.where(XtbUserTaskModel.data.in_(filter_.get("ds")))
+            if filter_.get("status"):
+                stmt = stmt.where(XtbUserTaskModel.task.in_(filter_.get("status")))
+            if filter_.get("user"):
+                stmt = stmt.where(XtbUserTaskModel.rtx_id.in_(filter_.get("user")))
+            if filter_.get("content"):
+                stmt = stmt.where(XtbUserTaskModel.name.like(f"%{filter_.get('content')}%"))
+            if filter_.get("dateRange"):
+                stmt = stmt.where(XtbUserTaskModel.create_time.between(filter_.get("dateRange")[0], filter_.get("dateRange")[1]))
             stmt = stmt.order_by(desc(XtbUserTaskModel.create_time)).offset(offset).limit(limit)
             result = await db.execute(stmt)
             return result.all()

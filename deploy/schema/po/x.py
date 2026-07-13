@@ -146,21 +146,39 @@ class DownloadFileModel(baseModel):
 
 class PageListModel(baseModel):
     """
+    List数据查询：分页参数
+    """
+    page: int = Field(..., ge=MIN_LENGTH, description="页码"),
+    pageSize: int = Field(..., ge=MIN_LENGTH, description="条数"),
+
+    model_config = {
+        "json_schema_extra": {
+            "example": {
+                "page": 1,
+                "pageSize": 10
+            }
+        }
+    }
+
+
+class PageFilterModel(PageListModel):
+    """
     List数据查询：分页参数 + 条件数据模型（type：dict）
     """
     page: int = Field(..., ge=MIN_LENGTH, description="页码"),
     pageSize: int = Field(..., ge=MIN_LENGTH, description="条数"),
-    content: Optional[dict] = Field(..., description="非模糊查询")
+    filter: Optional[dict] = Field(..., description="查询条件")
 
     model_config = {
         "json_schema_extra": {
             "example": {
                 "page": 1,
                 "pageSize": 10,
-                "content": {
-                    "name": "PyGo"
+                "filter": {
+                    "name1": "PyGo",
+                    "name2": "PyGo",
+                    "name3": "PyGo",
                 }
             }
         }
     }
-

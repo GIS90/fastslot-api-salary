@@ -160,14 +160,14 @@ async def pageable_like_params(
 async def pageable_model_params(
     params: PageListModel
 ) -> Dict:
-    page, pageSize, content = params.page, params.pageSize, params.content
-    if content.get("content"):
-        content["content"] = "%" + content.get("content") + "%"
-    if content.get("dateRange"):
-        content["start"] = content.get("dateRange")[0] + " 00:00:00"
-        content["end"] = content.get("dateRange")[1] + " 23:59:59"
-        content.pop("dateRange")
-    return {"page": page, "limit": pageSize, "offset": (page - 1) * pageSize, "content": content}
+    page, pageSize, filter_ = params.page, params.pageSize, params.filter
+    if filter_.get("content"):
+        filter_["content"] = "%" + filter_.get("content") + "%"
+    if filter_.get("dateRange"):
+        filter_["start"] = filter_.get("dateRange")[0] + " 00:00:00"
+        filter_["end"] = filter_.get("dateRange")[1] + " 23:59:59"
+        filter_.pop("dateRange")
+    return {"page": page, "limit": pageSize, "offset": (page - 1) * pageSize, "filter_": filter_}
 
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
