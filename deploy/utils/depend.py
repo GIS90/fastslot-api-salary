@@ -39,7 +39,7 @@ from deploy.utils.exception import JwtCredentialsException, UserInvalidException
 from deploy.utils.utils import get_now
 from deploy.delib.redis_lib import RedisClientLib
 from deploy.config import redis_host, redis_port, redis_db, redis_password
-from deploy.schema.po.x import PageListModel, DownloadFileModel
+from deploy.schema.po.x import PageFilterModel, DownloadFileModel
 from deploy.schema.po.system_main_menu import XtbMenuBaseModel, XtbMenuUpdateModel
 from deploy.curd.database import get_session_context
 from deploy.service.system.main.user import SystemMainUserService
@@ -158,7 +158,7 @@ async def pageable_like_params(
 
 
 async def pageable_model_params(
-    params: PageListModel
+    params: PageFilterModel
 ) -> Dict:
     page, pageSize, filter_ = params.page, params.pageSize, params.filter
     if filter_.get("content"):
