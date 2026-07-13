@@ -315,3 +315,16 @@ class SystemMainUserService:
             )
         )
         return data
+
+    async def option(self, status_view: bool = False) -> List:
+        models = await self.xtb_user_curd.option(db=self.db, status=status_view)
+        option_list: List = []
+        for model in models:
+            if not model: continue
+            option_list.append({
+                "label": getattr(model, "name"),
+                "value": getattr(model, "rtx_id"),
+                "disabled": getattr(model, "status", False)
+            })
+        else:
+            return option_list

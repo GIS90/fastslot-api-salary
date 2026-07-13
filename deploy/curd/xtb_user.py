@@ -166,6 +166,20 @@ class XtbUserCurd(BaseCurd):
             raise SQLDBHandleException(f"[{cls.__name__}*下载]{e}")
 
     @classmethod
+    async def option(
+        cls, db: AsyncSession, status: bool = False
+    ) -> Optional[List]:
+        try:
+            stmt = select(XtbUserModel)
+            if status:
+                stmt = stmt.where(XtbUserModel.status != status)
+            stmt = stmt.order_by(asc(XtbUserModel.create_time))
+            result = await db.execute(stmt)
+            return result.scalars().all()
+        except Exception as e:
+            raise SQLDBHandleException(f"[{cls.__name__}*下载]{e}")
+
+    @classmethod
     async def get_rtx_by_md5_list(
         cls, db: AsyncSession, md5_list: List
     ) -> Optional[List]:

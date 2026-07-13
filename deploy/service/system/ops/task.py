@@ -36,6 +36,7 @@ from deploy.curd.xtb_user_task import XtbUserTaskCurd
 from deploy.curd.csb_enum_value import CsbEnumValueCurd
 from deploy.schema.dao.xtb_user_task import XtbUserTaskModel
 from deploy.service.system.config.enum_value import SystemConfigEnumVService
+from deploy.service.system.main.user import SystemMainUserService
 from deploy.utils.status import Status, SuccessStatus, FailureStatus
 from deploy.utils.status_value import (StatusCode as status_code,
                                        StatusMsg as status_msg)
@@ -59,6 +60,7 @@ class SystemOpsTaskService:
         self.xtb_user_task_curd: XtbUserTaskCurd = XtbUserTaskCurd()
         self.csb_enum_value_curd: CsbEnumValueCurd = CsbEnumValueCurd()
         self.csb_enum_value_service: SystemConfigEnumVService = SystemConfigEnumVService(db_connection=self.db)
+        self.xtb_user_service: SystemMainUserService = SystemMainUserService(db_connection=self.db)
 
     def __str__(self):
         return "SystemMainRoleService class."
@@ -123,7 +125,7 @@ class SystemOpsTaskService:
         data = {
             "status": await self.csb_enum_value_service.get_enum_by_name(name=CsbEnumKEY.TASK_STATUS.value, response_="option"),
             "ds": await self.csb_enum_value_service.get_enum_by_name(name=CsbEnumKEY.DOWNLOAD_SELECT.value, response_="option"),
-            "user": []
+            "user": await self.xtb_user_service.option(status_view=True)
         }
         return SuccessStatus(data=data)
 
