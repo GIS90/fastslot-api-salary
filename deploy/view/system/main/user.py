@@ -85,7 +85,7 @@ async def reset_pwd(
 
 
 @router.get("/user", summary="通过Md5-Id获取单条数据")
-async def one_by_md5(
+async def one(
     md5: str = Depends(md5_params),
     token_rtx_id: str = Depends(depend_token_rtx),
     service: SystemMainUserService = Depends(get_service)

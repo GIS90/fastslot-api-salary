@@ -77,7 +77,7 @@ async def status(
 
 
 @router.get("/menu", summary="通过Md5-Id获取单条数据")
-async def one_by_md5(
+async def one(
     md5: str = Query(..., description="数据Md5-Id"),
     token_rtx_id: str = Depends(depend_token_rtx),
     service: SystemMainMenuService = Depends(get_service)
