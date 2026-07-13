@@ -165,8 +165,6 @@ class PageFilterModel(PageListModel):
     """
     List数据查询：分页参数 + 条件数据模型（type：dict）
     """
-    page: int = Field(..., ge=MIN_LENGTH, description="页码"),
-    pageSize: int = Field(..., ge=MIN_LENGTH, description="条数"),
     filter: Optional[dict] = Field(..., description="查询条件")
 
     model_config = {
