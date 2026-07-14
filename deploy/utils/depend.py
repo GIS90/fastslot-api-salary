@@ -138,7 +138,7 @@ async def pageable_params(
     page: int = Query(default=1, ge=MIN_LENGTH, description="页码"),
     pageSize: int = Query(default=15, ge=MIN_LENGTH, description="条数"),
 ) -> Dict:
-    return {"page": page, "limit": pageSize, "offset": (page - 1) * pageSize}
+    return {"page": page, "pageSize": pageSize, "limit": pageSize, "offset": (page - 1) * pageSize}
 
 
 async def pageable_query_params(
@@ -146,7 +146,7 @@ async def pageable_query_params(
     pageSize: int = Query(default=15, ge=MIN_LENGTH, description="条数"),
     content: str | None = Query(default=None, max_length=MAX_LENGTH, description="非模糊查询"),
 ) -> Dict:
-    return {"page": page, "limit": pageSize, "offset": (page - 1) * pageSize, "content": content}
+    return {"page": page, "pageSize": pageSize, "limit": pageSize, "offset": (page - 1) * pageSize, "content": content}
 
 
 async def pageable_like_params(
@@ -154,7 +154,7 @@ async def pageable_like_params(
     pageSize: int = Query(default=15, ge=MIN_LENGTH, description="条数"),
     content: Optional[str] = Query(default=None, max_length=MAX_LENGTH, description="模糊查询参数"),
 ) -> Dict:
-    return {"page": page, "limit": pageSize, "offset": (page - 1) * pageSize, "content": f"%{content}%"}
+    return {"page": page, "pageSize": pageSize, "limit": pageSize, "offset": (page - 1) * pageSize, "content": f"%{content}%"}
 
 
 async def pageable_model_params(
@@ -167,7 +167,7 @@ async def pageable_model_params(
         filter_["start"] = filter_.get("dateRange")[0] + " 00:00:00"
         filter_["end"] = filter_.get("dateRange")[1] + " 23:59:59"
         filter_.pop("dateRange")
-    return {"page": page, "limit": pageSize, "offset": (page - 1) * pageSize, "filter_": filter_}
+    return {"page": page, "pageSize": pageSize, "limit": pageSize, "offset": (page - 1) * pageSize, "filter_": filter_}
 
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

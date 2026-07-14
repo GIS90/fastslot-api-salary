@@ -90,8 +90,13 @@ class SystemOpsTaskService:
                         else await model_converter_dict(model=model, fields=fields, default_value="****"))
 
     async def pagination(self, rtx_id: str, params: Dict, _all: bool = False) -> Status:
-        __rtx_id=None if _all else rtx_id
-        pagination_offset = (params.get("page") - 1) * params.get("pageSize")
+        if _all:
+            __rtx_id = None
+            pagination_offset = (params.get("page") - 1) * params.get("pageSize")
+        else:
+            __rtx_id = rtx_id
+            pagination_offset = params.get("offset")
+            params["filter"]: Dict = {}
         models: List[XtbUserTaskModel] = await self.xtb_user_task_curd.get_pagination(
             db=self.db,
             offset=pagination_offset,

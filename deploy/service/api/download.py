@@ -29,12 +29,13 @@ Life is short, I use python.
 
 ------------------------------------------------
 """
+from enum import Enum, unique
 from typing import List, Dict, Optional
 from datetime import datetime
 from sqlalchemy.ext.asyncio import AsyncSession
 from deploy.utils.status import Status, SuccessStatus, FailureStatus
 from deploy.service.system.config.enum_value import SystemConfigEnumVService
-from deploy.utils.enumeration import CsbEnumKEY, DownloadExcelType as DET, TaskStatus as TS
+from deploy.utils.enumeration import CsbEnumKEY
 from deploy.utils.status_value import StatusCode as status_code
 from deploy.utils.utils import md5 as md5_func, get_now
 from deploy.curd.xtb_user_task import XtbUserTaskCurd
@@ -43,6 +44,27 @@ from deploy.service.system.main.user import SystemMainUserService
 from deploy.service.system.main.role import SystemMainRoleService
 from deploy.service.system.config.xtcs import SystemConfigXtcsService
 from deploy.service.system.ops.task import SystemOpsTaskService
+
+
+@unique
+class DET(Enum):
+    """
+    DownloadExcelType
+    文件下载数据方式
+    """
+    ALL = "ALL"
+    SELECT = "SELECT"
+
+
+@unique
+class TS(Enum):
+    """
+    TaskStatus
+    文件下载状态
+    """
+    SUCCESS = "SUCCESS"
+    FAILURE = "FAILURE"
+    WORKING = "WORKING"
 
 
 class ApiDownloadService(object):
