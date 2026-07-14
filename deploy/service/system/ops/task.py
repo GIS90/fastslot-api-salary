@@ -125,8 +125,12 @@ class SystemOpsTaskService:
 
     async def filter_(self, rtx_id: str) -> Status:
         data = {
-            "status": await self.csb_enum_value_service.enum_by_name(name=CsbEnumKEY.TASK_STATUS.value, response_="option", filter_lock=True),
-            "ds": await self.csb_enum_value_service.enum_by_name(name=CsbEnumKEY.DOWNLOAD_SELECT.value, response_="option", filter_lock=True),
+            "status": await self.csb_enum_value_service.enum_by_name(
+                name=CsbEnumKEY.TASK_STATUS.value, response_="option", filter_lock=True, key_trans_int=False
+            ),
+            "ds": await self.csb_enum_value_service.enum_by_name(
+                name=CsbEnumKEY.DOWNLOAD_SELECT.value, response_="option", filter_lock=True,  key_trans_int=False
+            ),
             "user": await self.xtb_user_service.option(status_view=True)
         }
         return SuccessStatus(data=data)

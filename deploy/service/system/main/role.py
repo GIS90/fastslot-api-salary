@@ -195,7 +195,6 @@ class SystemMainRoleService:
         await self.xtb_role_curd.delete(db=self.db, model=data)
         return SuccessStatus()
 
-
     async def delete_soft(self, rtx_id: str, md5: str) -> Status:
         __flag, data = await self.__valid_model_by_md5(
             md5_id=md5, status_check=True, response_type="model", admin_check=True
@@ -225,7 +224,6 @@ class SystemMainRoleService:
             else FailureStatus(code=status_code.CODE_508_DATA_PART_DELETE,
                                message=f"总数{request_count}，成功删除{query_count}，查询失败{request_count-query_count}")
 
-
     async def batch_delete_soft(self, rtx_id: str, md5_list: List) -> Status:
         __flag, data = await self.__verify_contain_admin_role(md5_list)
         if __flag: return data
@@ -235,7 +233,6 @@ class SystemMainRoleService:
         return SuccessStatus() if query_count == request_count \
             else FailureStatus(code=status_code.CODE_508_DATA_PART_DELETE,
                                message=f"总数{request_count}，成功删除{query_count}，查询失败{request_count - query_count}")
-
 
     async def download(self, params: dict) -> List:
         models = await self.xtb_role_curd.download(db=self.db, params=params)

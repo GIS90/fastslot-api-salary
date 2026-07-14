@@ -114,8 +114,8 @@ class SetterProfileService:
         }
         data = {
             "user": user,
-            "sexEnum": await self.csb_enum_v_service.get_select_option_data(
-                name=CsbEnumKEY.SEX_TYPE.value, lock_view=False)
+            "sexEnum": await self.csb_enum_v_service.enum_by_name(
+                name=CsbEnumKEY.SEX_TYPE.value, response_="option", filter_lock=True, key_trans_int=False)
         }
         return SuccessStatus(data=data)
 

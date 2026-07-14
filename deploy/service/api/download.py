@@ -70,11 +70,15 @@ class ApiDownloadService(object):
         return self.__str__()
 
     async def download_enum(self, rtx_id: str) -> Status:
-        res = {
-            "typeList":  await self.system_config_csb_enum_v_service.get_select_option_data(name=CsbEnumKEY.DOWNLOAD_SELECT.value, lock_view=False),
-            "formatList":  await self.system_config_csb_enum_v_service.get_select_option_data(name=CsbEnumKEY.DOWNLOAD_FORMAT.value, lock_view=False)
+        __res: Dict = {
+            "typeList": await self.system_config_csb_enum_v_service.enum_by_name(
+                name=CsbEnumKEY.DOWNLOAD_SELECT.value, response_="option", filter_lock=True, key_trans_int=False
+            ),
+            "formatList": await self.system_config_csb_enum_v_service.enum_by_name(
+                name=CsbEnumKEY.DOWNLOAD_FORMAT.value, response_="option", filter_lock=True, key_trans_int=False
+            )
         }
-        return SuccessStatus(data=res)
+        return SuccessStatus(data=__res)
 
     async def download(self, rtx_id: str, params: Dict) -> Status:
         dl_type = params.get("type")

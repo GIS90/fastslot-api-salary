@@ -34,18 +34,18 @@ from itertools import groupby
 from datetime import datetime
 from typing import Dict, List, Tuple, Literal, Any
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy.util import await_only
 
 from deploy.curd.xtb_menu import XtbMenuCurd
 from deploy.curd.csb_enum_value import CsbEnumValueCurd
+from deploy.service.system.config.enum_value import SystemConfigEnumVService
 from deploy.schema.dao.xtb_menu import XtbMenuModel
 from deploy.utils.status import Status, SuccessStatus, FailureStatus
 from deploy.utils.status_value import (StatusCode as status_code,
                                        StatusMsg as status_msg)
 from deploy.utils.converter import menu_converter_dict, option_converter_dict
 from deploy.utils.utils import get_now, d2s, md5 as generator_md5, build_menu_tree_iterative
-from deploy.config import server_role as SERVER_ROLE_ADMIN, menu_root as MENU_ROOT_ID
-from deploy.utils.enumeration import CsbEnumKEY, MENU_LEVEL_ENUM
+from deploy.config import menu_root as MENU_ROOT_ID
+from deploy.utils.enumeration import CsbEnumKEY
 
 
 class SystemMainMenuService:
@@ -57,6 +57,7 @@ class SystemMainMenuService:
         self.db: AsyncSession = db_connection
         self.xtb_menu_curd: XtbMenuCurd = XtbMenuCurd()
         self.csb_enum_value_curd: CsbEnumValueCurd = CsbEnumValueCurd()
+        self.csb_enum_v_service: SystemConfigEnumVService = SystemConfigEnumVService(db_connection=db_connection)
 
     def __str__(self):
         return "SystemMainMenuService class."
@@ -123,11 +124,17 @@ class SystemMainMenuService:
                 "group": _menu_d.get("level")
             })
         all_menu_group_list: List = []
+        __MENU_LEVEL_ENUM: Dict = await self.csb_enum_v_service.enum_by_name(
+            name=CsbEnumKEY.MENU_LEVEL.value,
+            key_trans_int=False,
+            response_="dict",
+            filter_lock=False
+        )
         if all_menu_list:
             all_menu_list_sorted = sorted(all_menu_list, key=lambda x: x.get("group"))
             for key, group in groupby(all_menu_list_sorted, key=lambda x: x.get("group")):
                 all_menu_group_list.append({
-                    "label": MENU_LEVEL_ENUM.get(int(key)) or "菜单级别",
+                    "label": __MENU_LEVEL_ENUM.get(str(key)) or "菜单级别",
                     "options": list(group)
                 })
         # ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
@@ -161,15 +168,24 @@ class SystemMainMenuService:
         __res: Dict = {
                 "menu": data,
                 "menuOption": await self._get_menu_group_option(root=True),
-                "menuType": await self._get_csb_enum_option(key=CsbEnumKEY.MENU_TYPE, filter_lock=False, lock_view=True),
-                "menuLevel": await self._get_csb_enum_option(key=CsbEnumKEY.MENU_LEVEL, key_trans_int=True, filter_lock=False, lock_view=True)
+                "menuType": await self.csb_enum_v_service.enum_by_name(
+                    name=CsbEnumKEY.MENU_TYPE.value, response_="option", filter_lock=False, key_trans_int=False
+                ),
+                "menuLevel": await self.csb_enum_v_service.enum_by_name(
+                    name=CsbEnumKEY.MENU_LEVEL.value, response_="option", filter_lock=True, key_trans_int=True
+                )
             }
         return SuccessStatus(data=__res)
+
     async def add_enum(self, rtx_id: str) -> Status:
         data: Dict = {
             "menuOption": await self._get_menu_group_option(root=True),
-            "menuType": await self._get_csb_enum_option(key=CsbEnumKEY.MENU_TYPE, filter_lock=False, lock_view=True),
-            "menuLevel": await self._get_csb_enum_option(key=CsbEnumKEY.MENU_LEVEL, key_trans_int=True, filter_lock=False, lock_view=True)
+            "menuType": await self.csb_enum_v_service.enum_by_name(
+                name=CsbEnumKEY.MENU_TYPE.value, response_="option", filter_lock=False, key_trans_int=False
+            ),
+            "menuLevel": await self.csb_enum_v_service.enum_by_name(
+                name=CsbEnumKEY.MENU_LEVEL.value, response_="option", filter_lock=True, key_trans_int=True
+            )
         }
         return SuccessStatus(data=data)
 
@@ -241,7 +257,6 @@ class SystemMainMenuService:
         setattr(data, "delete_time", get_now())
         await self.xtb_menu_curd.update(db=self.db, model=data)
         return SuccessStatus()
-
 
     async def status(self, rtx_id: str, md5: str, value: bool) -> Status:
         __flag, data = await self.__valid_model_by_md5(

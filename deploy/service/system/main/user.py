@@ -201,8 +201,10 @@ class SystemMainUserService:
     
     async def add_enum(self, rtx_id: str) -> Status:
         _d = {
-            "sexEnum": await self.csb_enum_v_service.get_select_option_data(name=CsbEnumKEY.SEX_TYPE.value, lock_view=False),
-            "roleList": await self.role_service.role_select_option()
+            "roleList": await self.role_service.role_select_option(),
+            "sexEnum": await self.csb_enum_v_service.enum_by_name(
+                name=CsbEnumKEY.SEX_TYPE.value, response_="option", filter_lock=True, key_trans_int=False
+            )
         }
         return SuccessStatus(data=_d)
     
@@ -264,7 +266,6 @@ class SystemMainUserService:
 
         await self.xtb_user_curd.delete(db=self.db, model=data)
         return SuccessStatus()
-
 
     async def delete_soft(self, rtx_id: str, md5: str) -> Status:
         __flag, data = await self.__valid_model_by_md5_or_rtx(

@@ -110,7 +110,8 @@ class SystemConfigEnumVService:
             self,
             name: str,
             response_: Literal["option", "dict"] = "dict",
-            filter_lock: bool = False
+            filter_lock: bool = True,
+            key_trans_int: bool = False,
         ) -> Union[List, Dict, None]:
         if response_ not in ["option", "dict"]:
             return None
@@ -127,9 +128,10 @@ class SystemConfigEnumVService:
             __ev_value: Dict = {}
             for model in models:
                 if not model or not getattr(model, "key"): continue
-                __ev_value[getattr(model, "key")] = getattr(model, "value")
+                __key = int(getattr(model, "key")) if key_trans_int else getattr(model, "key")
+                __ev_value[__key] = getattr(model, "value")
         else:
-            __ev_value: List = await option_converter_dict(models=models, key_trans_int=False, lock_view=True)
+            __ev_value: List = await option_converter_dict(models=models, key_trans_int=key_trans_int, lock_view=True)
         if __ev_value:
             self.redis_cli.set_key(key=__ev_redis_key, value=json.dumps(__ev_value), ex=await self.__get_redis_expire())    # 默认是秒
         return __ev_value
