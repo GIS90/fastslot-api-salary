@@ -671,9 +671,10 @@ def format_redis_key(
         key: str,
         type_: Literal["ev", "xtcs"],
         ev_response: Literal["option", "dict"] = "dict",
+        ev_filter_lock: bool = False,
         xtcs_response: Literal["str", "int"] = "str"
 ):
     if type_ == "ev":
-        return  f"kv_{ev_response}_{key}"
+        return  f"kv_{ev_response}_{ev_filter_lock}_{key}"
     else:
         return f"xtcs_{xtcs_response}_{key}"

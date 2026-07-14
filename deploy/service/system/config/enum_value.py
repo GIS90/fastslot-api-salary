@@ -106,16 +106,21 @@ class SystemConfigEnumVService:
         self.redis_cli.set_key(key=redis_key, value=redis_expire * 60)
         return redis_expire * 60
 
-    async def enum_by_name(self, name: str, response_: Literal["option", "dict"] = "dict") -> Union[List, Dict, None]:
+    async def enum_by_name(
+            self,
+            name: str,
+            response_: Literal["option", "dict"] = "dict",
+            filter_lock: bool = False
+        ) -> Union[List, Dict, None]:
         if response_ not in ["option", "dict"]:
             return None
         # redis 缓存
-        __ev_redis_key = format_redis_key(key=name, type_="ev", ev_response=response_)
+        __ev_redis_key = format_redis_key(key=name, type_="ev", ev_response=response_, ev_filter_lock=filter_lock)
         ev_redis_value = self.redis_cli.get_key(key=__ev_redis_key)
         if ev_redis_value and ev_redis_value != "null": return json.loads(ev_redis_value)
 
         # 数据库
-        models = await self.csb_enum_v_curd.get_list_by_name(db=self.db, name=name, filter_lock=False)
+        models = await self.csb_enum_v_curd.get_list_by_name(db=self.db, name=name, filter_lock=filter_lock)
         if not models:
             return None
         if response_ == "dict":
