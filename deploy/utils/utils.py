@@ -664,3 +664,16 @@ def capital_letter_only(value: str, field: str) -> str:
     if not re.match(r'^[A-Z0-9\-]+$', value):
         raise RequestValidationError(f"{field}字段只允许包含大写字母、数字和连字符(-)")
     return value
+
+
+""" - - - - - - - - - - - - - - - - - Redis - - - - - - - - - - - - - - - - -"""
+def format_redis_key(
+        key: str,
+        type_: Literal["ev", "xtcs"],
+        ev_response: Literal["option", "dict"] = "dict",
+        xtcs_response: Literal["str", "int"] = "str"
+):
+    if type_ == "ev":
+        return  f"kv_{ev_response}_{key}"
+    else:
+        return f"xtcs_{xtcs_response}_{key}"

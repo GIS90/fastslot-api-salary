@@ -34,6 +34,7 @@ import json
 from typing import Dict, List, Tuple, Literal, Any, Optional, Union
 from sqlalchemy.ext.asyncio import AsyncSession
 from deploy.curd.csb_enum_value import CsbEnumValueCurd
+from deploy.curd.xtb_xtcs import XtbXtcsCurd
 from deploy.schema.dao.csb_enum_value import CsbEnumValueModel
 from deploy.utils.status import Status, SuccessStatus, FailureStatus
 from deploy.utils.status_value import (StatusCode as status_code,
@@ -41,6 +42,8 @@ from deploy.utils.status_value import (StatusCode as status_code,
 from deploy.utils.converter import model_converter_dict, option_converter_dict
 from deploy.config import (redis_host, redis_port, redis_password, redis_db, redis_expire)
 from deploy.delib.redis_lib import RedisClientLib
+from deploy.utils.enumeration import XtbXtcsKEY
+from deploy.utils.utils import format_redis_key
 
 
 class SystemConfigEnumVService:
@@ -52,6 +55,7 @@ class SystemConfigEnumVService:
         self.db: AsyncSession = db_connection
         self.redis_cli = RedisClientLib(host=redis_host, port=redis_port, db=redis_db, password=redis_password)
         self.csb_enum_v_curd: CsbEnumValueCurd = CsbEnumValueCurd()
+        self.xtb_xtcs_curd: XtbXtcsCurd = XtbXtcsCurd()
 
     def __str__(self):
         return "SystemConfigEnumVService class."
@@ -85,30 +89,44 @@ class SystemConfigEnumVService:
 
     async def get_select_option_data(self, name: str, lock_view: bool = False) -> List:
         if not name: return []
-
         enum_v_model = await self.csb_enum_v_curd.get_list_by_name(db=self.db, name=name)
         return [] if not enum_v_model else await option_converter_dict(enum_v_model, lock_view=lock_view)
 
-    async def get_enum_by_name(self, name: str, response_: Literal["option", "dict"] = "dict") -> Union[List, Dict, None]:
+    async def __get_redis_expire(self):
+        # redis
+        redis_key = format_redis_key(key=XtbXtcsKEY.REDIS_CACHE_EXPIRE.value, type_="xtcs", xtcs_response="int")
+        redis_value = self.redis_cli.get_key(key=redis_key)
+        if redis_value: return redis_value
+        # 数据库
+        model = await self.xtb_xtcs_curd.get_by_key(db=self.db, key=XtbXtcsKEY.REDIS_CACHE_EXPIRE.value, filter_lock=True)
+        if model and getattr(model, "value", None):
+            self.redis_cli.set_key(key=redis_key, value=getattr(model, "value"))
+            return getattr(model, "value")
+        # 默认
+        self.redis_cli.set_key(key=redis_key, value=redis_expire * 60)
+        return redis_expire * 60
+
+    async def enum_by_name(self, name: str, response_: Literal["option", "dict"] = "dict") -> Union[List, Dict, None]:
         if response_ not in ["option", "dict"]:
             return None
         # redis 缓存
-        __redis_key = f"kv_{response_}_{name}"
-        redis_value = self.redis_cli.get_key(key=__redis_key)
-        if redis_value: return json.loads(redis_value)
+        __ev_redis_key = format_redis_key(key=name, type_="ev", ev_response=response_)
+        ev_redis_value = self.redis_cli.get_key(key=__ev_redis_key)
+        if ev_redis_value and ev_redis_value != "null": return json.loads(ev_redis_value)
 
         # 数据库
         models = await self.csb_enum_v_curd.get_list_by_name(db=self.db, name=name, filter_lock=False)
-        if not models: return None
+        if not models:
+            return None
         if response_ == "dict":
-            __redis_value: Dict = {}
+            __ev_value: Dict = {}
             for model in models:
                 if not model or not getattr(model, "key"): continue
-                __redis_value[getattr(model, "key")] = getattr(model, "value")
+                __ev_value[getattr(model, "key")] = getattr(model, "value")
         else:
-            __redis_value: List = await option_converter_dict(models=models, key_trans_int=False, lock_view=True)
-
-        self.redis_cli.set_key(key=__redis_key, value=json.dumps(__redis_value), ex=redis_expire*60)    # 默认是秒
-        return __redis_value
+            __ev_value: List = await option_converter_dict(models=models, key_trans_int=False, lock_view=True)
+        if __ev_value:
+            self.redis_cli.set_key(key=__ev_redis_key, value=json.dumps(__ev_value), ex=await self.__get_redis_expire())    # 默认是秒
+        return __ev_value
 
 
