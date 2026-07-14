@@ -131,7 +131,7 @@ async def auth(
 
 
 @router.put("/role.auth", summary="权限菜单")
-async def one_by_md5(
+async def auth_update(
     params: Annotated[XtbRoleAuthModel, Body()],
     token_rtx_id: str = Depends(depend_token_rtx),
     service: SystemMainRoleService = Depends(get_service)

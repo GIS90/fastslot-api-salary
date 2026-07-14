@@ -68,20 +68,20 @@ async def status(
 
 
 @router.get('/user.defaultPwd', summary="默认密码")
-async def default_pwd(
+async def default_password(
     token_rtx_id: str = Depends(depend_token_rtx),
     service: SystemMainUserService = Depends(get_service)
 ) -> Status:
-    return await service.default_pwd(rtx_id=token_rtx_id)
+    return await service.default_password(rtx_id=token_rtx_id)
 
 
 @router.put('/user.resetPwd', summary="重置密码")
-async def reset_pwd(
+async def reset_password(
     md5: str = Body(..., embed=True),
     token_rtx_id: str = Depends(depend_token_rtx),
     service: SystemMainUserService = Depends(get_service)
 ) -> Status:
-    return await service.reset_pwd(rtx_id=token_rtx_id, md5=md5)
+    return await service.reset_password(rtx_id=token_rtx_id, md5=md5)
 
 
 @router.get("/user", summary="通过Md5-Id获取单条数据")
@@ -94,7 +94,7 @@ async def one(
 
 
 @router.get("/user.addEnum", summary="新增枚举值")
-async def one_by_md5(
+async def add_enum(
     token_rtx_id: str = Depends(depend_token_rtx),
     service: SystemMainUserService = Depends(get_service)
 ) -> Status:

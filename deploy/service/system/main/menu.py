@@ -230,7 +230,7 @@ class SystemMainMenuService:
         await self.xtb_menu_curd.update(db=self.db, model=data)
         return SuccessStatus()
 
-    async def delete(self, rtx_id: str, md5: str) -> Status:
+    async def delete_(self, rtx_id: str, md5: str) -> Status:
         __flag, data = await self.__valid_model_by_md5(
             md5_id=md5, status_check=True, response_type="model", root_check=True
         )

@@ -75,12 +75,12 @@ async def one(
 
 
 @router.delete("/task.delete", summary="单条软删除")
-async def delete(
+async def delete_(
     md5: str = Query(..., description="数据Md5-Id"),
     token_rtx_id: str = Depends(depend_token_rtx),
     service: SystemOpsTaskService = Depends(get_service)
 ) -> Status:
-    return await service.delete(rtx_id=token_rtx_id, md5=md5)
+    return await service.delete_(rtx_id=token_rtx_id, md5=md5)
 
 
 @router.put("/task.batch.delete", summary="批量软删除")

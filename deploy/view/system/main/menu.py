@@ -58,12 +58,12 @@ async def pagination(
 
 
 @router.delete("/menu.delete", summary="单条软删除")
-async def delete_soft(
+async def delete_(
     md5: str = Query(..., description="数据Md5-Id"),
     token_rtx_id: str = Depends(depend_token_rtx),
     service: SystemMainMenuService = Depends(get_service)
 ) -> Status:
-    return await service.delete(rtx_id=token_rtx_id, md5=md5)
+    return await service.delete_(rtx_id=token_rtx_id, md5=md5)
 
 
 @router.delete('/menu.status', summary="启用/注销")
@@ -95,7 +95,7 @@ async def update(
 
 
 @router.get("/menu.addEnum", summary="新增枚举")
-async def add(
+async def add_enum(
     token_rtx_id: str = Depends(depend_token_rtx),
     service: SystemMainMenuService = Depends(get_service)
 ) -> Status:

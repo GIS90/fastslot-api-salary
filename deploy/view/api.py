@@ -63,6 +63,8 @@ async def m1_case() -> dict:
     :return: json
     """
     return await api_service.m1_case()
+
+
 # - - - - - - - - - - - - - - - - - - - - 文件下载 - - - - - - - - - - - - - - - - - - - -
 @router.get('/download.enum', summary="[下载]枚举")
 async def download_enum(
@@ -80,7 +82,8 @@ async def download(
 ) -> Status:
     return await download_service.download(rtx_id=token_rtx_id, params=params)
 
-# - - - - - - - - - - - - - - - - - - - - 用户权限 - - - - - - - - - - - - - - - - - - - -
+
+# - - - - - - - - - - - - - - - - - - - - 用户系统权限 - - - - - - - - - - - - - - - - - - - -
 @router.get("/auth", summary="用户菜单权限，用于系统登录后获取用户权限菜单树")
 async def auth(
     token_rtx_id: str = Depends(depend_token_rtx),

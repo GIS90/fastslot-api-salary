@@ -173,7 +173,7 @@ class SystemConfigXtcsService:
         await self.xtb_xtcs_curd.update(db=self.db, model=data)
         return SuccessStatus()
 
-    async def delete(self, rtx_id: str, md5: str) -> Status:
+    async def delete_(self, rtx_id: str, md5: str) -> Status:
         __flag, data = await self.__valid_model_by_md5_or_key(
             query_id=md5, status_check=True, response_type="model", query_type="md5", lock_check=False
         )

@@ -186,10 +186,10 @@ class SystemMainUserService:
         __value: str = getattr(default_password, "value") if default_password else password
         return generator_md5(v=__value) if encrypt else __value
 
-    async def default_pwd(self, rtx_id: str) -> Status:
+    async def default_password(self, rtx_id: str) -> Status:
         return SuccessStatus(data={"password": await self.__generator_default_password(encrypt=False)})
 
-    async def reset_pwd(self, rtx_id: str, md5: str) -> Status:
+    async def reset_password(self, rtx_id: str, md5: str) -> Status:
         __flag, data = await self.__valid_model_by_md5_or_rtx(
             query_id=md5, status_check=True, response_type="model", admin_check=True
         )
