@@ -30,7 +30,7 @@ Life is short, I use python.
 
 ------------------------------------------------
 """
-from typing import Dict, List, Tuple, Literal, Any
+from typing import Dict, List, Tuple, Literal, Any, Union
 from sqlalchemy.ext.asyncio import AsyncSession
 from deploy.curd.xtb_request import XtbRequestCurd
 from deploy.curd.csb_enum_value import CsbEnumValueCurd
@@ -89,7 +89,7 @@ class SystemOpsLogService:
         return (True, model if response_type == "model"
                         else await model_converter_dict(model=model, fields=fields, default_value="****"))
 
-    async def __get_tag(self) -> Dict[str, str]:
+    async def __get_tag(self, type_: Literal["option", "dict"] = "dict") -> Union[List, Dict]:
         """
         因为枚举值的tag在数据库中存储key-value反的，所以需要反转
         """
@@ -97,14 +97,26 @@ class SystemOpsLogService:
             db=self.db,
             name=CsbEnumKEY.API_TYPE,
             filter_lock=False)
-        if not enum_v_model:
-            return API_TYPE_DICT
-        __tag: Dict = {}
-        for model in enum_v_model:
-            if not model or not getattr(model, "key") or not getattr(model, "value"): continue
-            __tag[str(model.value).upper()] = str(model.key).lower() if getattr(model, "value") else "info"
+        __default: Dict = API_TYPE_DICT
+        if type_ == "dict":
+            __tag: Dict = {}
+            if not enum_v_model: return __default
+            for model in enum_v_model:
+                if not model or not getattr(model, "key") or not getattr(model, "value"): continue
+                __tag[str(model.value).upper()] = str(model.key).lower() if getattr(model, "value") else "info"
+            else:
+                return __tag
         else:
-            return __tag
+            __tag: List = []
+            if not enum_v_model:
+                for k in __default.keys():
+                    if not k: continue
+                    __tag.append({"label": k, "value": k})
+            for model in enum_v_model:
+                if not model or not getattr(model, "value"): continue
+                __tag.append({"label": str(model.value).upper(), "value": str(model.value).upper()})
+            else:
+                return __tag
 
     async def pagination(self, rtx_id: str, params: Dict, _all: bool = False) -> Status:
         if _all:
@@ -114,8 +126,6 @@ class SystemOpsLogService:
             __rtx_id = rtx_id
             pagination_offset = params.get("offset")
             params["filter"]: Dict = {}
-        print("*" * 100)
-        print(params.get("filter"))
         models: List[XtbRequestModel] = await self.xtb_request_curd.pagination(
             db=self.db,
             offset=pagination_offset,
@@ -134,7 +144,7 @@ class SystemOpsLogService:
 
         id_value: int = pagination_offset + 1
         data: List = []
-        tag: Dict = await self.__get_tag()
+        tag: Dict = await self.__get_tag(type_="dict")
         for model in models:
             _d = await model_converter_dict(model=model, fields=xtb_request_list_fields)
             if not _d: continue
@@ -153,9 +163,7 @@ class SystemOpsLogService:
 
     async def filter_(self, rtx_id: str) -> Status:
         data = {
-            "api": await self.system_config_ev_service.enum_by_name(
-                name=CsbEnumKEY.API_TYPE.value, response_="option", filter_lock=True, key_trans_int=False
-            ),
+            "api": await self.__get_tag(type_="option"),
             "user": await self.system_main_user_service.option(status_view=True)
         }
         return SuccessStatus(data=data)

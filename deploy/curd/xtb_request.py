@@ -38,6 +38,7 @@ from sqlalchemy import func
 from deploy.curd.base_curd import BaseCurd
 from deploy.schema.dao.xtb_request import XtbRequestModel
 from deploy.utils.exception import SQLDBHandleException
+from deploy.utils.utils import automatic_time
 
 
 class XtbRequestCurd(BaseCurd):
@@ -72,7 +73,8 @@ class XtbRequestCurd(BaseCurd):
         return await self._get_model_by_field(db, XtbRequestModel.md5, md5)
 
     @classmethod
-    async def count(cls, db: AsyncSession, rtx_id: str = None, **filter_) -> int:
+    async def count(cls, db: AsyncSession, rtx_id: str = None, filter_: Dict | None = None) -> int:
+        if filter_ is None: filter_ = {}
         try:
             stmt = select(func.count(XtbRequestModel.id)).where(XtbRequestModel.status != 1)
             if rtx_id:
@@ -84,7 +86,8 @@ class XtbRequestCurd(BaseCurd):
             if filter_.get("content"):
                 stmt = stmt.where(XtbRequestModel.url.like(f"%{filter_.get('content')}%"))
             if filter_.get("dateRange"):
-                stmt = stmt.where(XtbRequestModel.create_time.between(filter_.get("dateRange")[0], filter_.get("dateRange")[1]))
+                __start, __end = automatic_time(dateRange=filter_.get("dateRange"))
+                stmt = stmt.where(XtbRequestModel.create_time.between(__start, __end))
             result = await db.execute(stmt)
             return result.scalar()
         except Exception as e:
@@ -105,8 +108,9 @@ class XtbRequestCurd(BaseCurd):
 
     @classmethod
     async def pagination(
-        cls, db: AsyncSession, offset: int = 0, limit: int = 15, rtx_id: str = None, **filter_
+        cls, db: AsyncSession, offset: int = 0, limit: int = 15, rtx_id: str = None, filter_: Dict | None = None
     ) -> Optional[List]:
+        if filter_ is None: filter_ = {}
         try:
             stmt = select(XtbRequestModel).where(XtbRequestModel.status != 1)
             if rtx_id:
@@ -118,7 +122,8 @@ class XtbRequestCurd(BaseCurd):
             if filter_.get("content"):
                 stmt = stmt.where(XtbRequestModel.url.like(f"%{filter_.get('content')}%"))
             if filter_.get("dateRange"):
-                stmt = stmt.where(XtbRequestModel.create_time.between(filter_.get("dateRange")[0], filter_.get("dateRange")[1]))
+                __start, __end = automatic_time(dateRange=filter_.get("dateRange"))
+                stmt = stmt.where(XtbRequestModel.create_time.between(__start, __end))
             stmt = (stmt
                     .order_by(desc(XtbRequestModel.id))
                     .offset(offset)

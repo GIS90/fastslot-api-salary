@@ -72,9 +72,12 @@ xtb_request_detail_fields = [
 
 xtb_request_download_fields = [
     {"key": "id", "type": ft.INT, "name": "序号", "null": True},
-    {"key": "engname", "type": ft.STR, "name": "角色ID", "null": False},
-    {"key": "chnname", "type": ft.STR, "name": "角色名称", "null": False},
-    {"key": "introduction", "type": ft.STR, "name": "角色介绍", "null": True},
-    {"key": "create_rtx", "type": ft.STR, "name": "创建人", "null": True},
-    {"key": "create_time", "type": ft.DATETIME, "name": "创建时间", "null": True}
+    {"key": "create_time", "type": ft.DATETIME, "name": "创建时间", "null": True},
+    {"key": "rtx_id", "type": ft.STR, "name": "系统用户", "null": True},
+    {"key": "ip", "type": ft.STR, "name": "IP来源", "null": True},
+    {"key": "method", "type": ft.STR, "name": "请求方式", "null": True},
+    {"key": "url", "type": ft.STR, "name": "请求URL", "null": True},
+    {"key": "path", "type": ft.STR, "name": "请求路径", "null": True},
+    {"key": "params", "type": ft.STR, "name": "请求参数", "null": True},
+    {"key": "cost", "type": ft.FLOAT, "name": "耗时（单位：s）", "null": True}
 ]

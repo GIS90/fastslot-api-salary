@@ -41,6 +41,8 @@ from deploy.curd.base_curd import BaseCurd
 from deploy.schema.dao.xtb_user_task import XtbUserTaskModel
 from deploy.schema.dao.csb_enum_value import CsbEnumValueModel
 from deploy.utils.exception import SQLDBHandleException
+from deploy.utils.enumeration import CsbEnumKEY
+from deploy.utils.utils import automatic_time
 
 
 EV1 = aliased(CsbEnumValueModel)
@@ -82,7 +84,8 @@ class XtbUserTaskCurd(BaseCurd):
         return await self._get_model_by_field(db, XtbUserTaskModel.md5, md5)
 
     @classmethod
-    async def count(cls, db: AsyncSession, rtx_id: str = None, **filter_) -> int:
+    async def count(cls, db: AsyncSession, rtx_id: str = None, filter_: Dict | None = None) -> int:
+        if filter_ is None: filter_ = {}
         try:
             stmt = select(func.count(XtbUserTaskModel.id)).where(XtbUserTaskModel.status != 1)
             if rtx_id:
@@ -96,7 +99,8 @@ class XtbUserTaskCurd(BaseCurd):
             if filter_.get("content"):
                 stmt = stmt.where(XtbUserTaskModel.name.like(f"%{filter_.get('content')}%"))
             if filter_.get("dateRange"):
-                stmt = stmt.where(XtbUserTaskModel.create_time.between(filter_.get("dateRange")[0], filter_.get("dateRange")[1]))
+                __start, __end = automatic_time(dateRange=filter_.get("dateRange"))
+                stmt = stmt.where(XtbUserTaskModel.create_time.between(__start, __end))
             result = await db.execute(stmt)
             return result.scalar()
         except Exception as e:
@@ -117,8 +121,9 @@ class XtbUserTaskCurd(BaseCurd):
 
     @classmethod
     async def pagination(
-        cls, db: AsyncSession, offset: int = 0, limit: int = 15, rtx_id: str = None, filter_: Dict = {}
+        cls, db: AsyncSession, offset: int = 0, limit: int = 15, rtx_id: str = None, filter_: Dict | None = None
     ) -> Optional[List]:
+        if filter_ is None: filter_ = {}
         try:
             stmt = (select(
                 XtbUserTaskModel.rtx_id,
@@ -138,7 +143,11 @@ class XtbUserTaskCurd(BaseCurd):
             ).outerjoin(
                 EV2,
                 XtbUserTaskModel.task == EV2.key
-            ).where(XtbUserTaskModel.status != 1))
+            ).where(
+                XtbUserTaskModel.status != 1,
+                EV1.name == CsbEnumKEY.DOWNLOAD_SELECT.value,
+                EV2.name == CsbEnumKEY.TASK_STATUS.value
+            ))
             if rtx_id:
                 stmt = stmt.where(XtbUserTaskModel.rtx_id == rtx_id)
             if filter_.get("ds"):
@@ -150,7 +159,8 @@ class XtbUserTaskCurd(BaseCurd):
             if filter_.get("content"):
                 stmt = stmt.where(XtbUserTaskModel.name.like(f"%{filter_.get('content')}%"))
             if filter_.get("dateRange"):
-                stmt = stmt.where(XtbUserTaskModel.create_time.between(filter_.get("dateRange")[0], filter_.get("dateRange")[1]))
+                __start, __end = automatic_time(dateRange=filter_.get("dateRange"))
+                stmt = stmt.where(XtbUserTaskModel.create_time.between(__start, __end))
             stmt = stmt.order_by(desc(XtbUserTaskModel.create_time)).offset(offset).limit(limit)
             result = await db.execute(stmt)
             return result.all()
@@ -180,7 +190,11 @@ class XtbUserTaskCurd(BaseCurd):
             ).outerjoin(
                 EV2,
                 XtbUserTaskModel.task == EV2.key
-            ).where(XtbUserTaskModel.status != 1))
+            ).where(
+                XtbUserTaskModel.status != 1,
+                EV1.name == CsbEnumKEY.DOWNLOAD_SELECT.value,
+                EV2.name == CsbEnumKEY.TASK_STATUS.value
+            ))
             if params.get("list"):
                 stmt = stmt.where(XtbUserTaskModel.md5.in_(params.get("list")))
             stmt = stmt.order_by(desc(XtbUserTaskModel.create_time))

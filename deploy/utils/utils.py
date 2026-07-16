@@ -242,6 +242,15 @@ def get_day_week_date(query_date) -> Dict:
     return _res
 
 
+def automatic_time(dateRange: List) -> Tuple:
+    """
+    自动时间范围
+
+    :param dateRange: 时间范围
+    :return: 时间范围
+    """
+    return f"{dateRange[0]} 00:00:00", f"{dateRange[1]} 23:59:59"
+
 """ - - - - - - - - - - - - - - - - - 用户类 - - - - - - - - - - - - - - - - -"""
 
 

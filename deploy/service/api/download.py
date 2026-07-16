@@ -44,6 +44,7 @@ from deploy.service.system.main.user import SystemMainUserService
 from deploy.service.system.main.role import SystemMainRoleService
 from deploy.service.system.config.xtcs import SystemConfigXtcsService
 from deploy.service.system.ops.task import SystemOpsTaskService
+from deploy.service.system.ops.log import SystemOpsLogService
 
 
 @unique
@@ -83,6 +84,7 @@ class ApiDownloadService(object):
         self.system_main_role_service: SystemMainRoleService = SystemMainRoleService(db_connection=db_connection)
         self.system_config_xtcs_service: SystemConfigXtcsService = SystemConfigXtcsService(db_connection=db_connection)
         self.system_ops_task_service: SystemOpsTaskService = SystemOpsTaskService(db_connection=db_connection)
+        self.system_ops_log_service: SystemOpsLogService = SystemOpsLogService(db_connection=db_connection)
 
 
     def __str__(self):
@@ -142,9 +144,9 @@ class ApiDownloadService(object):
             # elif api == "SystemOpsDict":
             #     # 系统>系统维护>数据字典
             #     __res = await self.system_ops_service.dict_enum_download(params=new_params)
-            # elif api == "SystemOpsLog":
-            #     # 系统>系统维护>系统日志
-            #     __res = await self.system_ops_service.log_download(params=new_params)
+            elif api == "SystemOpsLog":
+                # 系统>系统维护>系统日志
+                __res = await self.system_ops_log_service.download(params=new_params)
             elif api == "SystemOpsTask":
                 # 系统>系统维护>任务中心
                 __res = await self.system_ops_task_service.download(params=new_params)

@@ -40,6 +40,7 @@ from deploy.curd.base_curd import BaseCurd
 from deploy.schema.dao.xtb_user import XtbUserModel
 from deploy.schema.dao.csb_enum_value import CsbEnumValueModel
 from deploy.utils.exception import SQLDBHandleException
+from deploy.utils.enumeration import CsbEnumKEY
 
 
 class XtbUserCurd(BaseCurd):
@@ -118,6 +119,7 @@ class XtbUserCurd(BaseCurd):
                 CsbEnumValueModel,
                 XtbUserModel.sex == CsbEnumValueModel.key
             )
+            stmt = stmt.where(CsbEnumValueModel.name == CsbEnumKEY.SEX_TYPE.value)
             if content:
                 stmt = stmt.where(
                     or_(
@@ -157,6 +159,7 @@ class XtbUserCurd(BaseCurd):
                 CsbEnumValueModel,
                 XtbUserModel.sex == CsbEnumValueModel.key
             )
+            stmt = stmt.where(CsbEnumValueModel.name == CsbEnumKEY.SEX_TYPE.value)
             if params.get("list"):
                 stmt = stmt.where(XtbUserModel.md5.in_(params.get("list")))
             stmt = stmt.order_by(asc(XtbUserModel.create_time))
