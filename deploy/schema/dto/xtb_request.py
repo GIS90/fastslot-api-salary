@@ -55,11 +55,12 @@ xtb_request_list_fields = [
 
 
 xtb_request_detail_fields = [
+    {"key": "rtx_id", "type": ft.STR, "name": "rtxId", "null": False},
     {"key": "md5"},
     {"key": "ip"},
     {"key": "method"},
     {"key": "url"},
-    {"key": "params"},
+    {"key": "params", "null": True},
     {"key": "path"},
     {"key": "full_path"},
     {"key": "host_url"},

@@ -114,6 +114,8 @@ class SystemOpsLogService:
             __rtx_id = rtx_id
             pagination_offset = params.get("offset")
             params["filter"]: Dict = {}
+        print("*" * 100)
+        print(params.get("filter"))
         models: List[XtbRequestModel] = await self.xtb_request_curd.pagination(
             db=self.db,
             offset=pagination_offset,
