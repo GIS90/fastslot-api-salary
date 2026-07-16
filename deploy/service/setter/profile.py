@@ -161,55 +161,8 @@ class SetterProfileService:
         await self.xtb_user_curd.update(db=self.db, model=data)
         return SuccessStatus()
 
-    async def __get_tag(self) -> Dict[str, str]:
-        enum_v_model = await self.csb_enum_v_curd.get_list_by_name(
-            db=self.db,
-            name=CsbEnumKEY.API_TYPE,
-            filter_lock=True)
-        if not enum_v_model:
-            return  {
-            "GET": "primary",
-            "POST": "success",
-            "PUT": "warning",
-            "DELETE": "danger",
-        }
-        __tag = {}
-        for model in enum_v_model:
-            if not model: continue
-            if not getattr(model, "key"): continue
-            __tag[model.key] = str(model.value).lower() if getattr(model, "value") else "info"
-        else:
-            return __tag
-
     async def profile_log(self, rtx_id: str, params: dict) -> Status:
         return await self.system_ops_log_service.pagination(rtx_id=rtx_id, params=params, _all=False)
-
-        models: List = await self.xtb_request_curd.pagination(
-            db=self.db,
-            offset=params.get("offset"),
-            limit=params.get("limit"),
-            rtx_id=rtx_id
-        )
-        if not models:
-            return FailureStatus(code=status_code.CODE_101_SUCCESS_NO_DATA)
-
-        data: List = list()
-        id_value: int = params.get("offset") + 1
-        tag: Dict[str, str] = await self.__get_tag()
-        for model in models:
-            _d = await model_converter_dict(model=model, fields=profile_request_list_fields)
-            if not _d: continue
-            _d["id"] = id_value
-            id_value += 1
-            _d["tag"] = tag.get(_d.get("method")) if _d.get("method") else "info"
-            data.append(_d)
-        result: Dict = {
-            "list": data,
-            "total": await self.xtb_request_curd.count(self.db, rtx_id),
-            "page": params.get("page"),
-            "pageSize": params.get("limit")
-        }
-        return SuccessStatus(data=result)
 
     async def profile_avatar(self, rtx_id: str, image_file: UploadFile) -> Status:
         # ======================= 1、data legal check =======================

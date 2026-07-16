@@ -56,8 +56,8 @@ class SystemMainMenuService:
         """
         self.db: AsyncSession = db_connection
         self.xtb_menu_curd: XtbMenuCurd = XtbMenuCurd()
-        self.csb_enum_value_curd: CsbEnumValueCurd = CsbEnumValueCurd()
-        self.csb_enum_v_service: SystemConfigEnumVService = SystemConfigEnumVService(db_connection=db_connection)
+        self.csb_ev_curd: CsbEnumValueCurd = CsbEnumValueCurd()
+        self.system_config_ev_service: SystemConfigEnumVService = SystemConfigEnumVService(db_connection=db_connection)
 
     def __str__(self):
         return "SystemMainMenuService class."
@@ -124,7 +124,7 @@ class SystemMainMenuService:
                 "group": _menu_d.get("level")
             })
         all_menu_group_list: List = []
-        __MENU_LEVEL_ENUM: Dict = await self.csb_enum_v_service.enum_by_name(
+        __MENU_LEVEL_ENUM: Dict = await self.system_config_ev_service.enum_by_name(
             name=CsbEnumKEY.MENU_LEVEL.value,
             key_trans_int=False,
             response_="dict",
@@ -152,7 +152,7 @@ class SystemMainMenuService:
         :return: list
         """
         if not key:return []
-        _res = await self.csb_enum_value_curd.get_list_by_name(db=self.db, name=key, filter_lock=filter_lock)
+        _res = await self.csb_ev_curd.get_list_by_name(db=self.db, name=key, filter_lock=filter_lock)
         return await option_converter_dict(models=_res, key_trans_int=key_trans_int, lock_view=lock_view) if _res else []
 
     async def one_by_md5(self, rtx_id: str, md5: str) -> Status:
@@ -168,10 +168,10 @@ class SystemMainMenuService:
         __res: Dict = {
                 "menu": data,
                 "menuOption": await self._get_menu_group_option(root=True),
-                "menuType": await self.csb_enum_v_service.enum_by_name(
+                "menuType": await self.system_config_ev_service.enum_by_name(
                     name=CsbEnumKEY.MENU_TYPE.value, response_="option", filter_lock=False, key_trans_int=False
                 ),
-                "menuLevel": await self.csb_enum_v_service.enum_by_name(
+                "menuLevel": await self.system_config_ev_service.enum_by_name(
                     name=CsbEnumKEY.MENU_LEVEL.value, response_="option", filter_lock=True, key_trans_int=True
                 )
             }
@@ -180,10 +180,10 @@ class SystemMainMenuService:
     async def add_enum(self, rtx_id: str) -> Status:
         data: Dict = {
             "menuOption": await self._get_menu_group_option(root=True),
-            "menuType": await self.csb_enum_v_service.enum_by_name(
+            "menuType": await self.system_config_ev_service.enum_by_name(
                 name=CsbEnumKEY.MENU_TYPE.value, response_="option", filter_lock=False, key_trans_int=False
             ),
-            "menuLevel": await self.csb_enum_v_service.enum_by_name(
+            "menuLevel": await self.system_config_ev_service.enum_by_name(
                 name=CsbEnumKEY.MENU_LEVEL.value, response_="option", filter_lock=True, key_trans_int=True
             )
         }

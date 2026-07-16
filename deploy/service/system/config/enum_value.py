@@ -54,7 +54,7 @@ class SystemConfigEnumVService:
         """
         self.db: AsyncSession = db_connection
         self.redis_cli = RedisClientLib(host=redis_host, port=redis_port, db=redis_db, password=redis_password)
-        self.csb_enum_v_curd: CsbEnumValueCurd = CsbEnumValueCurd()
+        self.csb_ev_curd: CsbEnumValueCurd = CsbEnumValueCurd()
         self.xtb_xtcs_curd: XtbXtcsCurd = XtbXtcsCurd()
 
     def __str__(self):
@@ -76,7 +76,7 @@ class SystemConfigEnumVService:
                 code=status_code.CODE_400_REQUEST_PARAMETER_MISS,
                 message="缺少md5参数")
 
-        model: CsbEnumValueModel = await self.csb_enum_v_curd.get_by_md5(db=self.db, md5=md5_id, filter_lock=False)
+        model: CsbEnumValueModel = await self.csb_ev_curd.get_by_md5(db=self.db, md5=md5_id, filter_lock=False)
         if not model:
             return False, FailureStatus(code=status_code.CODE_501_DATA_NOT_EXIST)
         if status_check and getattr(model, "status", None):
@@ -89,7 +89,7 @@ class SystemConfigEnumVService:
 
     async def get_select_option_data(self, name: str, lock_view: bool = False) -> List:
         if not name: return []
-        enum_v_model = await self.csb_enum_v_curd.get_list_by_name(db=self.db, name=name)
+        enum_v_model = await self.csb_ev_curd.get_list_by_name(db=self.db, name=name)
         return [] if not enum_v_model else await option_converter_dict(enum_v_model, lock_view=lock_view)
 
     async def __get_redis_expire(self):
@@ -121,7 +121,7 @@ class SystemConfigEnumVService:
         if ev_redis_value and ev_redis_value != "null": return json.loads(ev_redis_value)
 
         # 数据库
-        models = await self.csb_enum_v_curd.get_list_by_name(db=self.db, name=name, filter_lock=filter_lock)
+        models = await self.csb_ev_curd.get_list_by_name(db=self.db, name=name, filter_lock=filter_lock)
         if not models:
             return None
         if response_ == "dict":

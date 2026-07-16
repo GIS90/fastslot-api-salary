@@ -64,8 +64,8 @@ class SystemMainUserService:
         self.db: AsyncSession = db_connection
         self.xtb_user_curd: XtbUserCurd = XtbUserCurd()
         self.xtb_xtcs_curd: XtbXtcsCurd = XtbXtcsCurd()
-        self.csb_enum_v_service: SystemConfigEnumVService = SystemConfigEnumVService(db_connection=db_connection)
-        self.role_service: SystemMainRoleService = SystemMainRoleService(db_connection=db_connection)
+        self.system_config_ev_service: SystemConfigEnumVService = SystemConfigEnumVService(db_connection=db_connection)
+        self.system_main_role_service: SystemMainRoleService = SystemMainRoleService(db_connection=db_connection)
 
     def __str__(self):
         return "SystemMainUserService class."
@@ -149,8 +149,8 @@ class SystemMainUserService:
 
         _d = {
             "user": data,
-            "sexEnum": await self.csb_enum_v_service.get_select_option_data(name=CsbEnumKEY.SEX_TYPE.value, lock_view=False),
-            "roleList": await self.role_service.role_select_option()
+            "sexEnum": await self.system_config_ev_service.get_select_option_data(name=CsbEnumKEY.SEX_TYPE.value, lock_view=False),
+            "roleList": await self.system_main_role_service.role_select_option()
         }
         return SuccessStatus(data=_d)
 
@@ -201,8 +201,8 @@ class SystemMainUserService:
     
     async def add_enum(self, rtx_id: str) -> Status:
         _d = {
-            "roleList": await self.role_service.role_select_option(),
-            "sexEnum": await self.csb_enum_v_service.enum_by_name(
+            "roleList": await self.system_main_role_service.role_select_option(),
+            "sexEnum": await self.system_config_ev_service.enum_by_name(
                 name=CsbEnumKEY.SEX_TYPE.value, response_="option", filter_lock=True, key_trans_int=False
             )
         }

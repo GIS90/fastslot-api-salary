@@ -59,8 +59,8 @@ class SystemOpsLogService:
         self.db: AsyncSession = db_connection
         self.xtb_request_curd: XtbRequestCurd = XtbRequestCurd()
         self.csb_ev_curd: CsbEnumValueCurd = CsbEnumValueCurd()
-        self.xtb_user_service: SystemMainUserService = SystemMainUserService(db_connection=self.db)
-        self.csb_enum_value_service: SystemConfigEnumVService = SystemConfigEnumVService(db_connection=self.db)
+        self.system_main_user_service: SystemMainUserService = SystemMainUserService(db_connection=self.db)
+        self.system_config_ev_service: SystemConfigEnumVService = SystemConfigEnumVService(db_connection=self.db)
 
     def __str__(self):
         return "SystemMainRoleService class."
@@ -151,10 +151,10 @@ class SystemOpsLogService:
 
     async def filter_(self, rtx_id: str) -> Status:
         data = {
-            "api": await self.csb_enum_value_service.enum_by_name(
+            "api": await self.system_config_ev_service.enum_by_name(
                 name=CsbEnumKEY.API_TYPE.value, response_="option", filter_lock=True, key_trans_int=False
             ),
-            "user": await self.xtb_user_service.option(status_view=True)
+            "user": await self.system_main_user_service.option(status_view=True)
         }
         return SuccessStatus(data=data)
 
