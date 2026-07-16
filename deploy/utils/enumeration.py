@@ -30,6 +30,7 @@ Life is short, I use python.
 
 ------------------------------------------------
 """
+from typing import Dict
 from enum import Enum, unique, IntEnum, StrEnum
 from colorama import Fore, Back, Style
 
@@ -44,7 +45,8 @@ __all__ = [
     'FieldTypeEnum',
     'XtbXtcsKEY',
     'CsbEnumKEY',
-    'DownloadExcelFormat'
+    'DownloadExcelFormat',
+    'API_TYPE_DICT',
 ]
 
 
@@ -226,4 +228,10 @@ class DownloadExcelFormat(StrEnum):
     XLSX = ".xlsx"
 
 
+API_TYPE_DICT: Dict[str, str] =  {
+    "GET": "primary",
+    "POST": "success",
+    "PUT": "warning",
+    "DELETE": "danger",
+}
 

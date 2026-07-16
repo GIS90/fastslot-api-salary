@@ -44,12 +44,12 @@ class BaseCurd(ABC):
 
     @classmethod
     @abstractmethod
-    async def get_count(cls, db: AsyncSession) -> int:
+    async def count(cls, db: AsyncSession) -> int:
         ...
 
     @classmethod
     @abstractmethod
-    async def get_pagination(
+    async def pagination(
         cls, db: AsyncSession, offset: int = 0, limit: int = 15
     ) -> Optional[List]:
         ...

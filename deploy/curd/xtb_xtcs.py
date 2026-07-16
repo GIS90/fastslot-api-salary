@@ -97,7 +97,7 @@ class XtbXtcsCurd(BaseCurd):
         return await self._get_model_by_field(db, XtbXtcsModel.md5, md5, filter_lock)
 
     @classmethod
-    async def get_count(cls, db: AsyncSession) -> int:
+    async def count(cls, db: AsyncSession) -> int:
         try:
             result = await db.execute(
                 select(func.count(XtbXtcsModel.id)).where(XtbXtcsModel.status != 1)
@@ -107,7 +107,7 @@ class XtbXtcsCurd(BaseCurd):
             raise SQLDBHandleException(f"[{cls.__name__}*总数]{e}")
 
     @classmethod
-    async def get_count_by_md5_list(cls, db: AsyncSession, md5_list: List[str]) -> int:
+    async def count_by_md5_list(cls, db: AsyncSession, md5_list: List[str]) -> int:
         try:
             result = await db.execute(
                 select(func.count(XtbXtcsModel.id)).where(XtbXtcsModel.status != 1, XtbXtcsModel.md5.in_(md5_list))
@@ -117,7 +117,7 @@ class XtbXtcsCurd(BaseCurd):
             raise SQLDBHandleException(f"[{cls.__name__}*查询总数]{e}")
 
     @classmethod
-    async def get_pagination(
+    async def pagination(
         cls, db: AsyncSession, offset: int = 0, limit: int = 15, content: str = None, *args, **kwargs
     ) -> Optional[List]:
         try:

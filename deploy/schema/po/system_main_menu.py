@@ -4,7 +4,7 @@
 ------------------------------------------------
 
 describe:
-    menu
+    xtb_menu
 
 base_info:
     __author__ = PyGo

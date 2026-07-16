@@ -86,7 +86,7 @@ class SystemConfigXtcsService:
                         else await model_converter_dict(model=model, fields=fields, default_value="****"))
 
     async def pagination(self, rtx_id: str, params: Dict) -> Status:
-        models: List[XtbXtcsModel] = await self.xtb_xtcs_curd.get_pagination(
+        models: List[XtbXtcsModel] = await self.xtb_xtcs_curd.pagination(
             db=self.db,
             offset=params.get("offset"),
             limit=params.get("limit"),
@@ -112,7 +112,7 @@ class SystemConfigXtcsService:
             "list": data,
             "page": params.get("page"),
             "pageSize": params.get("limit"),
-            "total": await self.xtb_xtcs_curd.get_count(self.db)
+            "total": await self.xtb_xtcs_curd.count(self.db)
         }
         return SuccessStatus(data=result)
 
@@ -186,7 +186,7 @@ class SystemConfigXtcsService:
         return SuccessStatus()
 
     async def batch_delete(self, rtx_id: str, md5_list: List) -> Status:
-        query_count: int = await self.xtb_xtcs_curd.get_count_by_md5_list(db=self.db, md5_list=md5_list)
+        query_count: int = await self.xtb_xtcs_curd.count_by_md5_list(db=self.db, md5_list=md5_list)
         if not query_count:
             return FailureStatus(code=status_code.CODE_501_DATA_NOT_EXIST)
         request_count: int = len(md5_list)

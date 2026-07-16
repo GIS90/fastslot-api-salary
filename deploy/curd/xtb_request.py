@@ -72,24 +72,53 @@ class XtbRequestCurd(BaseCurd):
         return await self._get_model_by_field(db, XtbRequestModel.md5, md5)
 
     @classmethod
-    async def get_count(cls, db: AsyncSession, rtx_id: Optional[str] = None) -> int:
+    async def count(cls, db: AsyncSession, rtx_id: str = None, **filter_) -> int:
         try:
             stmt = select(func.count(XtbRequestModel.id)).where(XtbRequestModel.status != 1)
             if rtx_id:
                 stmt = stmt.where(XtbRequestModel.rtx_id == rtx_id)
+            if filter_.get("method"):
+                stmt = stmt.where(XtbRequestModel.method.in_(filter_.get("method")))
+            if filter_.get("user"):
+                stmt = stmt.where(XtbRequestModel.rtx_id.in_(filter_.get("user")))
+            if filter_.get("content"):
+                stmt = stmt.where(XtbRequestModel.url.like(f"%{filter_.get('content')}%"))
+            if filter_.get("dateRange"):
+                stmt = stmt.where(XtbRequestModel.create_time.between(filter_.get("dateRange")[0], filter_.get("dateRange")[1]))
             result = await db.execute(stmt)
             return result.scalar()
         except Exception as e:
             raise SQLDBHandleException(f"[{cls.__name__}*总数]{e}")
 
     @classmethod
-    async def get_pagination(
-        cls, db: AsyncSession, offset: int = 0, limit: int = 15, rtx_id: Optional[str] = None, **kwargs
+    async def count_by_md5_list(cls, db: AsyncSession, md5_list: List[str]) -> int:
+        try:
+            result = await db.execute(
+                select(func.count(XtbRequestModel.id)).where(
+                    XtbRequestModel.status != 1,
+                    XtbRequestModel.md5.in_(md5_list)
+                )
+            )
+            return result.scalar()
+        except Exception as e:
+            raise SQLDBHandleException(f"[{cls.__name__}*查询总数]{e}")
+
+    @classmethod
+    async def pagination(
+        cls, db: AsyncSession, offset: int = 0, limit: int = 15, rtx_id: str = None, **filter_
     ) -> Optional[List]:
         try:
             stmt = select(XtbRequestModel).where(XtbRequestModel.status != 1)
             if rtx_id:
                 stmt = stmt.where(XtbRequestModel.rtx_id == rtx_id)
+            if filter_.get("method"):
+                stmt = stmt.where(XtbRequestModel.method.in_(filter_.get("method")))
+            if filter_.get("user"):
+                stmt = stmt.where(XtbRequestModel.rtx_id.in_(filter_.get("user")))
+            if filter_.get("content"):
+                stmt = stmt.where(XtbRequestModel.url.like(f"%{filter_.get('content')}%"))
+            if filter_.get("dateRange"):
+                stmt = stmt.where(XtbRequestModel.create_time.between(filter_.get("dateRange")[0], filter_.get("dateRange")[1]))
             stmt = (stmt
                     .order_by(desc(XtbRequestModel.id))
                     .offset(offset)
@@ -104,7 +133,15 @@ class XtbRequestCurd(BaseCurd):
     async def download(
             cls, db: AsyncSession, params: Dict, *args, **kwargs
     ) -> Optional[List]:
-        ...
+        try:
+            stmt = select(XtbRequestModel).where(XtbRequestModel.status != 1)
+            if params.get("list"):
+                stmt = stmt.where(XtbRequestModel.md5.in_(params.get("list")))
+            stmt = stmt.order_by(desc(XtbRequestModel.create_time))
+            result = await db.execute(stmt)
+            return result.scalars().all()
+        except Exception as e:
+            raise SQLDBHandleException(f"[{cls.__name__}*下载]{e}")
 
     @classmethod
     async def add(
