@@ -86,7 +86,7 @@ class SystemMainRoleService:
                         else await model_converter_dict(model=model, fields=fields, default_value="****"))
 
     async def pagination(self, rtx_id: str, params: Dict) -> Status:
-        models: List[XtbRoleModel] = await self.xtb_role_curd.get_pagination(
+        models: List[XtbRoleModel] = await self.xtb_role_curd.pagination(
             db=self.db,
             offset=params.get("offset"),
             limit=params.get("limit"),
@@ -112,7 +112,7 @@ class SystemMainRoleService:
             "list": data,
             "page": params.get("page"),
             "pageSize": params.get("limit"),
-            "total": await self.xtb_role_curd.get_count(self.db)
+            "total": await self.xtb_role_curd.count(self.db)
         }
         return SuccessStatus(data=result)
 

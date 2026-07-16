@@ -89,7 +89,7 @@ class CsbEnumKeyCurd(BaseCurd):
         return await self._get_model_by_field(db, CsbEnumKeyModel.md5, md5, filter_lock)
 
     @classmethod
-    async def get_count(cls, db: AsyncSession) -> int:
+    async def count(cls, db: AsyncSession) -> int:
         try:
             result = await db.execute(
                 select(func.count(CsbEnumKeyModel.id)).where(CsbEnumKeyModel.status != 1)
@@ -99,7 +99,7 @@ class CsbEnumKeyCurd(BaseCurd):
             raise SQLDBHandleException(f"[{cls.__name__}*总数]{e}")
 
     @classmethod
-    async def get_pagination(
+    async def pagination(
         cls, db: AsyncSession, offset: int = 0, limit: int = 15
     ) -> Optional[List]:
         try:

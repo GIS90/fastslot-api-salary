@@ -101,7 +101,7 @@ class SystemMainUserService:
                         else await model_converter_dict(model=model, fields=fields, default_value="****"))
 
     async def pagination(self, rtx_id: str, params: Dict) -> Status:
-        models: List = await self.xtb_user_curd.get_pagination(
+        models: List = await self.xtb_user_curd.pagination(
             db=self.db,
             offset=params.get("offset"),
             limit=params.get("limit"),
@@ -126,7 +126,7 @@ class SystemMainUserService:
             "list": data,
             "page": params.get("page"),
             "pageSize": params.get("limit"),
-            "total": await self.xtb_user_curd.get_count(self.db)
+            "total": await self.xtb_user_curd.count(self.db)
         }
         return SuccessStatus(data=result)
 

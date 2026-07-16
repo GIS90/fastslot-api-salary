@@ -37,6 +37,7 @@ from deploy.curd.xtb_request import XtbRequestCurd
 from deploy.curd.csb_enum_value import CsbEnumValueCurd
 from deploy.schema.dao.xtb_user import XtbUserModel
 from deploy.service.system.config.enum_value import SystemConfigEnumVService
+from deploy.service.system.ops.log import SystemOpsLogService
 from deploy.utils.status import Status, SuccessStatus, FailureStatus
 from deploy.utils.status_value import (StatusCode as status_code,
                                        StatusMsg as status_msg)
@@ -62,6 +63,7 @@ class SetterProfileService:
         self.xtb_request_curd: XtbRequestCurd = XtbRequestCurd()
         self.csb_enum_v_curd: CsbEnumValueCurd = CsbEnumValueCurd()
         self.csb_enum_v_service: SystemConfigEnumVService = SystemConfigEnumVService(db_connection=db_connection)
+        self.system_ops_log_service: SystemOpsLogService = SystemOpsLogService(db_connection=db_connection)
         self.image_lib: ImageLib = ImageLib()
         self.qiniu_store_lib: QiNiuStoreLib = QiNiuStoreLib(
             space_url=store_yun_base,
@@ -158,6 +160,7 @@ class SetterProfileService:
         setattr(data, "password", generator_md5(v=newPassword))
         await self.xtb_user_curd.update(db=self.db, model=data)
         return SuccessStatus()
+
     async def __get_tag(self) -> Dict[str, str]:
         enum_v_model = await self.csb_enum_v_curd.get_list_by_name(
             db=self.db,
@@ -179,7 +182,9 @@ class SetterProfileService:
             return __tag
 
     async def profile_log(self, rtx_id: str, params: dict) -> Status:
-        models: List = await self.xtb_request_curd.get_pagination(
+        return await self.system_ops_log_service.pagination(rtx_id=rtx_id, params=params, _all=False)
+
+        models: List = await self.xtb_request_curd.pagination(
             db=self.db,
             offset=params.get("offset"),
             limit=params.get("limit"),
@@ -200,7 +205,7 @@ class SetterProfileService:
             data.append(_d)
         result: Dict = {
             "list": data,
-            "total": await self.xtb_request_curd.get_count(self.db, rtx_id),
+            "total": await self.xtb_request_curd.count(self.db, rtx_id),
             "page": params.get("page"),
             "pageSize": params.get("limit")
         }

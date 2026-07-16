@@ -127,7 +127,7 @@ class SystemConfigEnumVService:
         if response_ == "dict":
             __ev_value: Dict = {}
             for model in models:
-                if not model or not getattr(model, "key"): continue
+                if not model or not getattr(model, "key") or not getattr(model, "value"): continue
                 __key = int(getattr(model, "key")) if key_trans_int else getattr(model, "key")
                 __ev_value[__key] = getattr(model, "value")
         else:
