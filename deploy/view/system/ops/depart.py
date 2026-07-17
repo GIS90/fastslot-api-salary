@@ -56,21 +56,20 @@ async def tree(
     return await service.tree(rtx_id=token_rtx_id)
 
 
+@router.get('/depart.addEnum', summary="新增枚举值")
+async def add_enum(
+        md5: str = Query(..., min_length=1, max_length=289, description="数据MD5"),
+        token_rtx_id: str = Depends(depend_token_rtx),
+    service: SystemOpsDepartService = Depends(get_service)
+) -> Status:
+    return await service.add_enum(token_rtx_id, md5)
+
+
+
+
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-# >>>>> [DEPART]部门架构
-# @ops.get('/depart/tree', summary="[DEPART]部门架构TREE")
-# async def depart_tree(
-#         token_rtx_id: str = Depends(depend_token_rtx)
-# ) -> Status:
-#     return await ops_service.depart_tree(token_rtx_id)
-#
-#
-# @ops.get('/depart/init', summary="[DEPART]新增枚举")
-# async def depart_add_init(
-#         md5: str = Query(..., min_length=1, max_length=289, description="数据MD5"),
-#         token_rtx_id: str = Depends(depend_token_rtx)
-# ) -> Status:
-#     return await ops_service.depart_add_init(token_rtx_id, md5)
+
+
 #
 #
 # @ops.post('/depart', summary="[DEPART]新增")

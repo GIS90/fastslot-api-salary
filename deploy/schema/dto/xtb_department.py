@@ -28,11 +28,6 @@ python version:
 Enjoy the good life every day！！!
 Life is short, I use python.
 
-
-
- 'id', 'name', 'md5_id', 'description', 'pid', 'leaf', 'lock', 'level',)
-                               'dept_path', 'manage_rtx', 'order_id'
-
 ------------------------------------------------
 """
 from typing import List

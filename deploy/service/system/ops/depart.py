@@ -30,7 +30,7 @@ Life is short, I use python.
 
 ------------------------------------------------
 """
-from typing import Dict, List, Tuple, Literal, Any
+from typing import Dict, List, Tuple, Literal, Any, Union
 from sqlalchemy.ext.asyncio import AsyncSession
 from deploy.curd.xtb_department import XtbDepartmentCurd
 from deploy.schema.dao.xtb_department import XtbDepartmentModel
@@ -63,6 +63,30 @@ class SystemOpsDepartService:
     def __repr__(self):
         return self.__str__()
 
+    async def __valid_model_by_md5(
+            self,
+            md5_id: str,
+            status_check: bool = True,
+            response_type: Literal["dict", "model"] = "model",
+            fields: Union[List, None] = xtb_depart_tree_fields,
+            lock_check: bool = False
+    ) -> Tuple[bool, Any]:
+        if not md5_id:
+            return False, FailureStatus(
+                code=status_code.CODE_400_REQUEST_PARAMETER_MISS,
+                message="缺少md5参数")
+
+        model: XtbDepartmentModel = await self.xtb_department_curd.get_by_md5(db=self.db, md5=md5_id)
+        if not model:
+            return False, FailureStatus(code=status_code.CODE_501_DATA_NOT_EXIST)
+        if status_check and getattr(model, "status", None):
+            return False, FailureStatus(code=status_code.CODE_503_DATA_DELETE_NOT_EDIT)
+        if lock_check and getattr(model, "lock", None):
+            return False, FailureStatus(code=status_code.CODE_511_DATA_LOCKED_NOT_EDIT)
+
+        return (True, model if response_type == "model"
+                        else await model_converter_dict(model=model, fields=fields, default_value="****"))
+
     async def __depart_format(self, type_: Literal["flat", "tree"] = "tree"):
         models = await self.xtb_department_curd.get_all(db=self.db, root=True, filter_status=True)
         if not models:
@@ -79,10 +103,7 @@ class SystemOpsDepartService:
             # 默认展开根节点
             if model_dict.get("id") == DEPART_ROOT_ID: expand.append(model_dict.get("md5"))
 
-        print('-' * 100)
-        print(_res)
         tree = build_menu_tree_iterative(flat_menus=_res, root_id=DEPART_ROOT_PID, id_key="id", parent_key="pid", children_key="children")
-        print(tree)
         if type_ == "flat":
             tree = flatten_tree_recursive(tree_data=tree)
         return tree, expand, check
@@ -90,6 +111,21 @@ class SystemOpsDepartService:
 
     async def tree(self, rtx_id: str) -> Status:
         tree, expand, check = await self.__depart_format(type_="tree")
-        print("*" * 100)
-        print(tree, expand, check)
         return SuccessStatus(data={"data": tree, "expand": expand, "check": check})
+
+
+    async def add_enum(self, token_rtx_id: str, md5: str) -> Status:
+        __flag, data = await self.__valid_model_by_md5(
+            md5_id=md5,
+            status_check=True,
+            response_type="dict",
+            fields=xtb_depart_tree_fields,
+            lock_check=False
+        )
+        if not __flag: return data
+
+        _res = {
+            "data": data,
+            "user": await self.system_main_user_service.option(status_view=True)
+        }
+        return SuccessStatus(data=_res)
