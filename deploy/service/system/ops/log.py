@@ -63,7 +63,7 @@ class SystemOpsLogService:
         self.system_config_ev_service: SystemConfigEnumVService = SystemConfigEnumVService(db_connection=self.db)
 
     def __str__(self):
-        return "SystemMainRoleService class."
+        return "SystemOpsLogService class."
 
     def __repr__(self):
         return self.__str__()

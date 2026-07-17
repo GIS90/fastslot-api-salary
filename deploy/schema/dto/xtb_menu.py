@@ -30,10 +30,11 @@ Life is short, I use python.
 
 ------------------------------------------------
 """
+from typing import List
 from deploy.utils.enumeration import FieldTypeEnum as ft
 
 
-xtb_menu_list_fields = [
+xtb_menu_list_fields: List = [
     {"key": "id", "type": ft.INT, "name": "id", "null": False},
     {"key": "md5", "type": ft.STR, "name": "md5", "null": False},
     {"key": "name", "type": ft.STR, "name": "name", "null": False},
@@ -57,7 +58,7 @@ xtb_menu_list_fields = [
 ]
 
 
-xtb_tree_detail_fields = [
+xtb_tree_detail_fields: List = [
     {"key": "id", "type": ft.INT},
     {"key": "md5"},
     {"key": "name"},
@@ -79,7 +80,7 @@ xtb_tree_detail_fields = [
 ]
 
 
-xtb_menu_detail_fields = [
+xtb_menu_detail_fields: List = [
     {"key": "id", "type": ft.INT},
     {"key": "md5"},
     {"key": "name"},

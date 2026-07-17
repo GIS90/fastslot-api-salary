@@ -30,10 +30,11 @@ Life is short, I use python.
 
 ------------------------------------------------
 """
+from typing import List
 from deploy.utils.enumeration import FieldTypeEnum as ft
 
 
-xtb_user_list_fields = [
+xtb_user_list_fields: List = [
     {"key": "id", "type": ft.INT, "name": "id", "null": False},
     {"key": "rtx_id", "type": ft.STR, "name": "rtxId", "null": False},
     {"key": "md5", "type": ft.STR, "name": "md5", "null": False},
@@ -50,7 +51,7 @@ xtb_user_list_fields = [
 ]
 
 
-xtb_user_detail_fields = [
+xtb_user_detail_fields: List = [
     {"key": "id", "type": ft.INT},
     {"key": "rtx_id", "type": ft.STR, "name": "rtxId"},
     {"key": "name"},
@@ -68,7 +69,7 @@ xtb_user_detail_fields = [
 ]
 
 
-xtb_user_login_fields = [
+xtb_user_login_fields: List = [
     {"key": "rtx_id", "type": ft.STR, "name": "rtxId"},
     {"key": "password"},
     {"key": "name"},
@@ -82,7 +83,7 @@ xtb_user_login_fields = [
 ]
 
 
-xtb_user_download_fields = [
+xtb_user_download_fields: List = [
     {"key": "id", "type": ft.INT, "name": "序号", "null": True},
     {"key": "rtx_id", "type": ft.STR, "name": "账号", "null": True},
     {"key": "name", "type": ft.STR, "name": "用户昵称", "null": True},

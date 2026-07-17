@@ -30,10 +30,11 @@ Life is short, I use python.
 
 ------------------------------------------------
 """
+from typing import List
 from deploy.utils.enumeration import FieldTypeEnum as ft
 
 
-xtb_role_list_fields = [
+xtb_role_list_fields: List = [
     {"key": "md5", "type": ft.STR, "name": "md5", "null": False},
     {"key": "engname", "type": ft.STR, "name": "engname", "null": False},
     {"key": "chnname", "type": ft.STR, "name": "chnname", "null": False},
@@ -43,7 +44,7 @@ xtb_role_list_fields = [
 ]
 
 
-xtb_role_detail_fields = [
+xtb_role_detail_fields: List = [
     {"key": "md5"},
     {"key": "engname"},
     {"key": "chnname"},
@@ -55,13 +56,13 @@ xtb_role_detail_fields = [
 ]
 
 
-xtb_role_authority_fields = [
+xtb_role_authority_fields: List = [
     {"key": "md5"},
     {"key": "authority", "type": ft.SPLITLIST, "name": "authority", "null": True},
 ]
 
 
-xtb_role_download_fields = [
+xtb_role_download_fields: List = [
     {"key": "id", "type": ft.INT, "name": "序号", "null": True},
     {"key": "engname", "type": ft.STR, "name": "角色ID", "null": False},
     {"key": "chnname", "type": ft.STR, "name": "角色名称", "null": False},

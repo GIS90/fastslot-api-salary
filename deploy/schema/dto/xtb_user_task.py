@@ -30,10 +30,11 @@ Life is short, I use python.
 
 ------------------------------------------------
 """
+from typing import List
 from deploy.utils.enumeration import FieldTypeEnum as ft
 
 
-xtb_user_task_list_fields = [
+xtb_user_task_list_fields: List = [
     {"key": "rtx_id", "type": ft.STR, "name": "rtxId", "null": False},
     {"key": "md5", "type": ft.STR, "name": "md5", "null": False},
     {"key": "api", "type": ft.STR, "name": "api", "null": False},
@@ -48,7 +49,7 @@ xtb_user_task_list_fields = [
 ]
 
 
-xtb_user_task_detail_fields = [
+xtb_user_task_detail_fields: List = [
     {"key": "rtx_id", "name": "rtxId"},
     {"key": "md5"},
     {"key": "api"},
@@ -62,7 +63,7 @@ xtb_user_task_detail_fields = [
 ]
 
 
-xtb_user_task_download_fields = [
+xtb_user_task_download_fields: List = [
     {"key": "create_time", "type": ft.STR, "name": "创建时间"},
     {"key": "rtx_id", "type": ft.STR, "name": "系统用户"},
     {"key": "name", "type": ft.STR, "name": "文件名称"},

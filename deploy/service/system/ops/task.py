@@ -61,7 +61,7 @@ class SystemOpsTaskService:
         self.system_main_user_service: SystemMainUserService = SystemMainUserService(db_connection=self.db)
 
     def __str__(self):
-        return "SystemMainRoleService class."
+        return "SystemOpsTaskService class."
 
     def __repr__(self):
         return self.__str__()

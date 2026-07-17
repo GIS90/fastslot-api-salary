@@ -100,7 +100,11 @@ if not db_link:
     sys.exit(1)
 
 # menu
-menu_root: int = data["menu"].get("root") or 0
+menu_root: int = data["menu"].get("root") or 1
+
+# depart
+depart_root: int = data["depart"].get("root") or 1
+depart_root_pid: int = data["depart"].get("root_pid") or 0
 
 # redis
 redis_host: str = data["redis"].get("host")

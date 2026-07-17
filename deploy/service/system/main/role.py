@@ -142,7 +142,6 @@ class SystemMainRoleService:
         else:
             return _res
 
-
     async def role_select_option(self) -> List:
         models: List[XtbRoleModel] = await self.xtb_role_curd.get_all(
             db=self.db,

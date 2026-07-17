@@ -32,6 +32,11 @@ link = "mysql+asyncmy://salary:28aa838315633f0e44049ce88de36803@110.40.141.32:33
 [menu]
 root = 1
 
+# 部门
+[depart]
+root = 1
+root_pid = 0
+
 # Redis
 [redis]
 host = "110.40.141.32"

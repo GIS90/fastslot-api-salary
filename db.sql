@@ -421,10 +421,6 @@ insert into csb_enum_value(`name`, `md5`, `key`, `value`, `remark`, `lock`, `sta
 ('db-type', '358841380e96a757c6293278a1e76528', 'Memcache', 'Memcache', '数据库类型 > 非关系型数据库 > Memcache', 1, 'admin', 8),
 ('db-type', 'ae5816aea7485d94c4bf782e8f9fa2c7', 'MongoDb', 'MongoDb', '数据库类型 > 非关系型数据库 > MongoDb', 1, 'admin', 9),
 ('db-type', 'c9c0821ca988ca2fd7c8c10d9198058f', 'HBase', 'HBase', '数据库类型 > 非关系型数据库 > HBase', 1, 'admin', 10),
-
-
--- ----------------------------------------------------------------------------------------------
-
 -- = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
 -- xtb_user_task 系统表-用户任务表
 -- create table && index
@@ -447,9 +443,41 @@ CREATE TABLE `xtb_user_task`  (
     PRIMARY KEY (`id`),
     UNIQUE INDEX `xtb_user_task_md5_index`(`md5`) USING HASH COMMENT 'md5唯一索引'
 ) COMMENT='系统表-用户任务表';
+-- = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
+-- 系统表-用户部门表
+-- ----------------------------------------------------------------------------------------------
+-- create xtb_department
+DROP TABLES IF EXISTS `xtb_department`;
+CREATE TABLE `xtb_department`  (
+    `id` int NOT NULL AUTO_INCREMENT COMMENT '主键，自增ID',
+    `name` varchar(30) NOT NULL COMMENT '部门名称',
+    `md5` varchar(64) NOT NULL COMMENT '唯一标识：MD5-ID',
+    `description` text COMMENT '部门描述',
+    `pid` int NOT NULL DEFAULT 1 COMMENT '上级部门ID',
+    `leaf` boolean DEFAULT False COMMENT '是否为叶子节点，如果为True不允许有子节点，默认为False',
+    `lock` boolean DEFAULT False COMMENT '是否锁定，如果为True为锁定，默认为False',
+    `level` int NOT NULL DEFAULT 1 COMMENT '部门层级，默认为1级',
+    `dept_path` varchar(254) NULL COMMENT '部门名称全路径，用>进行分割',
+    `manage_rtx` varchar(254) COMMENT '部门主管rtx-id，多用户，用英文,分割',
+    `create_rtx` varchar(35) COMMENT '创建用户',
+    `create_time` timestamp not null default CURRENT_TIMESTAMP COMMENT '创建时间',
+    `update_rtx` varchar(35) COMMENT '最新更新用户',
+    `update_time` datetime COMMENT '最新更新时间',
+    `delete_rtx` varchar(35) COMMENT '删除用户',
+    `delete_time` datetime COMMENT '删除时间',
+    `status` bool default False COMMENT '数据状态：1删除；0正常（默认）',
+    `order_id` int COMMENT '排序ID',
+
+  PRIMARY KEY (`id`)
+) COMMENT='系统表-用户部门表';
+
+-- default value
+-- 根节点
+insert into
+xtb_department(`id`, `name`, `md5`, `description`, `pid`, `leaf`, `lock`, `level`, `dept_path`, `manage_rtx`, `create_rtx`, `status`, `order_id`)
+VALUES
+(1, '根节点', '63a9f0ea7bb98050796b649e85481845', '部门根节点', 0, True , False, 1, '根节点', 'admin', 'admin', False, 0);
 -- ----------------------------------------------------------------------------------------------
 
-
--- = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
 -- = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
 -- = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =

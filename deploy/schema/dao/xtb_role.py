@@ -54,7 +54,7 @@ class XtbRoleModel(baseModel, IDField, Md5Field, CUDField, StatusField):
 
     engname : Mapped[Optional[str]] = mapped_column(name="engname", type_=String(35), comment="角色唯一标识，英文+数字组成")
     chnname : Mapped[Optional[str]] = mapped_column(name="chnname", type_=String(35), comment="角色中文名称")
-    authority : Mapped[Optional[str]] = mapped_column(name="authority", type_=String(255), comment="角色权限ID集合，用英文；分割")
+    authority : Mapped[Optional[str]] = mapped_column(name="authority", type_=String(255), comment="角色权限ID集合，用英文,分割")
     introduction: Mapped[Optional[str]] = mapped_column(name="introduction", type_=Text, comment="描述")
 
     def __str__(self):

@@ -30,10 +30,11 @@ Life is short, I use python.
 
 ------------------------------------------------
 """
+from typing import List
 from deploy.utils.enumeration import FieldTypeEnum as ft
 
 
-xtb_xtcs_list_fields = [
+xtb_xtcs_list_fields: List = [
     {"key": "key", "type": ft.STR, "name": "key", "null": False},
     {"key": "md5", "type": ft.STR, "name": "md5", "null": False},
     {"key": "remark", "type": ft.STR, "name": "remark", "null": False},
@@ -43,7 +44,7 @@ xtb_xtcs_list_fields = [
 ]
 
 
-xtb_xtcs_detail_fields = [
+xtb_xtcs_detail_fields: List = [
     {"key": "key"},
     {"key": "md5"},
     {"key": "remark"},
@@ -52,7 +53,7 @@ xtb_xtcs_detail_fields = [
 ]
 
 
-xtb_xtcs_view_fields = [
+xtb_xtcs_view_fields: List = [
     {"key": "key"},
     {"key": "md5"},
     {"key": "remark"},
@@ -64,7 +65,7 @@ xtb_xtcs_view_fields = [
     {"key": "order_id", "type": ft.INT, "name": "orderId", "null": True}
 ]
 
-xtb_xtcs_download_fields =  [
+xtb_xtcs_download_fields: List =  [
     {"key": "key", "type": ft.STR, "name": "参数名称", "null": False},
     {"key": "remark", "type": ft.STR, "name": "参数说明", "null": False},
     {"key": "value", "type": ft.STR, "name": "参数值", "null": False},
