@@ -31,7 +31,7 @@ Life is short, I use python.
 ------------------------------------------------
 """
 from datetime import datetime
-from typing import Dict, List, Tuple, Literal, Any
+from typing import Dict, List, Tuple, Literal, Any, Union
 from sqlalchemy.ext.asyncio import AsyncSession
 from deploy.curd.xtb_xtcs import XtbXtcsCurd
 from deploy.schema.dao.xtb_xtcs import XtbXtcsModel
@@ -65,7 +65,7 @@ class SystemConfigXtcsService:
             status_check: bool = True,
             response_type: Literal["dict", "model"] = "model",
             query_type: Literal["md5", "key"] = "md5",
-            fields: List[Dict] = xtb_xtcs_detail_fields,
+            fields: Union[List, None] = xtb_xtcs_detail_fields,
             lock_check: bool = False
     ) -> Tuple[bool, Any]:
         if not query_id:

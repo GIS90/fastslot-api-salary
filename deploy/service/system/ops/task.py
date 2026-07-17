@@ -71,7 +71,7 @@ class SystemOpsTaskService:
             md5_id: str,
             status_check: bool = True,
             response_type: Literal["dict", "model"] = "model",
-            fields: List[Dict] = xtb_user_task_detail_fields
+            fields: List | None = xtb_user_task_detail_fields
     ) -> Tuple[bool, Any]:
         if not md5_id:
             return False, FailureStatus(
