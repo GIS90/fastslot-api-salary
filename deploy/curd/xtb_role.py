@@ -144,7 +144,10 @@ class XtbRoleCurd(BaseCurd):
         cls, db: AsyncSession, md5_list: List
     ) -> Optional[List]:
         try:
-            stmt = select(XtbRoleModel.engname).where(XtbRoleModel.md5.in_(md5_list))
+            stmt = select(XtbRoleModel.engname).where(
+                XtbRoleModel.md5.in_(md5_list),
+                XtbRoleModel.status != 1
+            )
             result = await db.execute(stmt)
             return result.scalars().all()
         except Exception as e:
@@ -155,7 +158,10 @@ class XtbRoleCurd(BaseCurd):
             cls, db: AsyncSession, engname_list: List
     ) -> Optional[List]:
         try:
-            stmt = select(XtbRoleModel).where(XtbRoleModel.engname.in_(engname_list))
+            stmt = select(XtbRoleModel).where(
+                XtbRoleModel.engname.in_(engname_list),
+                XtbRoleModel.status != 1
+            )
             result = await db.execute(stmt)
             return result.scalars().all()
         except Exception as e:

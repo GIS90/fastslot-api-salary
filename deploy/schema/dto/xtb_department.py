@@ -41,7 +41,7 @@ xtb_depart_tree_fields: List = [
     {"key": "description", "type": ft.STR, "name": "description", "null": True},
     {"key": "pid", "type": ft.INT, "name": "pid", "null": False},
     {"key": "leaf", "type": ft.BOOL, "name": "leaf", "null": True},
-    {"key": "lock", "type": ft.BOOL, "name": "lock", "null": True},
+    {"key": "lock", "type": ft.BOOL, "name": "disabled", "null": True},
     {"key": "level", "type": ft.INT, "name": "level", "null": True},
     {"key": "dept_path", "type": ft.STR, "name": "deptPath", "null": True},
     {"key": "manage_rtx", "type": ft.SPLITLIST, "name": "manageRtx", "null": True},

@@ -476,7 +476,10 @@ CREATE TABLE `xtb_department`  (
 insert into
 xtb_department(`id`, `name`, `md5`, `description`, `pid`, `leaf`, `lock`, `level`, `dept_path`, `manage_rtx`, `create_rtx`, `status`, `order_id`)
 VALUES
-(1, '根节点', '63a9f0ea7bb98050796b649e85481845', '部门根节点', 0, True , False, 1, '根节点', 'admin', 'admin', False, 0);
+(1, '根节点', '63a9f0ea7bb98050796b649e85481845', '部门根节点', 0, True , False, 1, '根节点', 'admin', 'admin', False, 1),
+(2, '基础研发部', 'f99199aa3e689f8d339b909734aabdcb', '基础研发部', 1, True , False, 2, '根节点>基础研发部', 'admin', 'admin', False, 2),
+(3, '推广销售部', 'b9639531758dcdb8d0e7494d6ed9b5ac', '推广销售部', 1, True , False, 2, '根节点>推广销售部', 'admin', 'admin', False, 3),
+(4, '人力资源部', '38d7f0998b7acaf8db182219c7fb202c', '人力资源部', 1, True , True, 2, '根节点>人力资源部', 'admin', 'admin', False, 4);
 -- ----------------------------------------------------------------------------------------------
 
 -- = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =

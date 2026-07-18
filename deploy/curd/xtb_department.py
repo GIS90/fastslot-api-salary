@@ -88,6 +88,60 @@ class XtbDepartmentCurd(BaseCurd):
         ...
 
     @classmethod
+    async def get_id_by_md5_list(
+        cls, db: AsyncSession, md5_list: List
+    ) -> Optional[List]:
+        try:
+            stmt = select(XtbDepartmentModel.id).where(
+                XtbDepartmentModel.md5.in_(md5_list),
+                XtbDepartmentModel.status != 1
+            )
+            result = await db.execute(stmt)
+            return result.scalars().all()
+        except Exception as e:
+            raise SQLDBHandleException(f"[{cls.__name__}*查询]{e}")
+
+    @classmethod
+    async def get_by_name_not_md5(cls, db: AsyncSession, name: str, md5: Optional[str]=None):
+        try:
+            stmt = select(XtbDepartmentModel).where(
+                XtbDepartmentModel.name == name,
+                XtbDepartmentModel.status != 1
+            )
+            if md5:
+                stmt = stmt.where(XtbDepartmentModel.md5 != md5)
+            result = await db.execute(stmt)
+            return result.scalars().all()
+        except Exception as e:
+            raise SQLDBHandleException(f"[{cls.__name__}*查询]{e}")
+
+    @classmethod
+    async def get_by_pid(
+            cls, db: AsyncSession, pid: int
+    ) -> Optional[List]:
+        try:
+            stmt = select(XtbDepartmentModel).where(
+                XtbDepartmentModel.pid == pid,
+                XtbDepartmentModel.status != 1
+            )
+            result = await db.execute(stmt)
+            return result.scalars().all()
+        except Exception as e:
+            raise SQLDBHandleException(f"[{cls.__name__}*查询]{e}")
+
+    @classmethod
+    async def get_models_by_dept_path(cls, db: AsyncSession, dept_path: str) -> Optional[List]:
+        try:
+            stmt = select(XtbDepartmentModel).where(
+                XtbDepartmentModel.dept_path.like(dept_path + ">%"),    # like前半部分
+                XtbDepartmentModel.status != 1
+            )
+            result = await db.execute(stmt)
+            return result.scalars().all()
+        except Exception as e:
+            raise SQLDBHandleException(f"[{cls.__name__}*查询]{e}")
+
+    @classmethod
     async def download(
             cls, db: AsyncSession, params: Dict, *args, **kwargs
     ) -> Optional[List]:
