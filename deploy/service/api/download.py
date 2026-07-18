@@ -45,6 +45,7 @@ from deploy.service.system.main.role import SystemMainRoleService
 from deploy.service.system.config.xtcs import SystemConfigXtcsService
 from deploy.service.system.ops.task import SystemOpsTaskService
 from deploy.service.system.ops.log import SystemOpsLogService
+from deploy.service.system.ops.depart import SystemOpsDepartService
 
 
 @unique
@@ -85,6 +86,7 @@ class ApiDownloadService(object):
         self.system_config_xtcs_service: SystemConfigXtcsService = SystemConfigXtcsService(db_connection=db_connection)
         self.system_ops_task_service: SystemOpsTaskService = SystemOpsTaskService(db_connection=db_connection)
         self.system_ops_log_service: SystemOpsLogService = SystemOpsLogService(db_connection=db_connection)
+        self.system_ops_depart_service: SystemOpsDepartService = SystemOpsDepartService(db_connection=db_connection)
 
 
     def __str__(self):
@@ -150,6 +152,9 @@ class ApiDownloadService(object):
             elif api == "SystemOpsTask":
                 # 系统>系统维护>任务中心
                 __res = await self.system_ops_task_service.download(params=new_params)
+            elif api == "SystemOpsDepart":
+                # 系统>系统维护>部门管理
+                __res = await self.system_ops_depart_service.download(params=new_params)
             else:
                 return FailureStatus(
                     code=status_code.CODE_404_REQUEST_PARAMETER_VALUE_ERROR.value,

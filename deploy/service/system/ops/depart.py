@@ -40,7 +40,7 @@ from deploy.utils.status import Status, SuccessStatus, FailureStatus
 from deploy.utils.status_value import (StatusCode as status_code,
                                        StatusMsg as status_msg)
 from deploy.utils.converter import model_converter_dict
-from deploy.schema.dto.xtb_department import xtb_depart_tree_fields
+from deploy.schema.dto.xtb_department import xtb_depart_tree_fields, xtb_depart_download_fields
 from deploy.utils.utils import md5 as md5_func, get_now, build_menu_tree_iterative, flatten_tree_recursive
 from deploy.config import depart_root as DEPART_ROOT_ID, depart_root_pid as DEPART_ROOT_PID
 
@@ -338,3 +338,14 @@ class SystemOpsDepartService:
         return SuccessStatus() if query_count == request_count \
             else FailureStatus(code=status_code.CODE_508_DATA_PART_DELETE,
                                message=f"总数{request_count}，成功删除{query_count}，查询失败{request_count - query_count}")
+
+    async def download(self, params: dict) -> List:
+        models = await self.xtb_department_curd.download(db=self.db, params=params)
+        data: List = list()
+        data.extend(
+            filter(
+                lambda x: x is not None and x is not {},
+                [await model_converter_dict(model=u, fields=xtb_depart_download_fields) for u in models if u]
+            )
+        )
+        return data

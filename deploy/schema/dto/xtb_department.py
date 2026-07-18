@@ -47,3 +47,21 @@ xtb_depart_tree_fields: List = [
     {"key": "manage_rtx", "type": ft.SPLITLIST, "name": "manageRtx", "null": True},
     {"key": "order_id", "type": ft.INT, "name": "orderId", "null": True},
 ]
+
+
+xtb_depart_download_fields: List = [
+    {"key": "id", "type": ft.INT, "name": "部门ID", "null": True},
+    {"key": "md5", "type": ft.STR, "name": "部门MD5", "null": True},
+    {"key": "name", "type": ft.STR, "name": "部门名称", "null": True},
+    {"key": "description", "type": ft.STR, "name": "部门描述", "null": True},
+    {"key": "pid", "type": ft.INT, "name": "上级PID", "null": False},
+    {"key": "leaf", "type": ft.BOOL_TEXT, "name": "是否叶子节点", "null": True},
+    {"key": "lock", "type": ft.LOCK_TEXT, "name": "状态", "null": True},
+    {"key": "level", "type": ft.INT, "name": "部门级别", "null": True},
+    {"key": "dept_path", "type": ft.STR, "name": "部门路径", "null": True},
+    {"key": "manage_rtx", "type": ft.SPLITLIST, "name": "管理员（RTX列表）", "null": True},
+    {"key": "order_id", "type": ft.INT, "name": "排序编号", "null": True},
+    {"key": "create_rtx", "type": ft.STR, "name": "创建人", "null": True},
+    {"key": "create_time", "type": ft.DATETIME, "name": "创建时间", "null": True},
+]
+
