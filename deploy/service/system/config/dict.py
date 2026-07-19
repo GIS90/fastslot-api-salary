@@ -4,16 +4,16 @@
 ------------------------------------------------
 
 describe: 
-    system>config>enum_value service
-
+    system>config>dict service
+    
 base_info:
     __author__ = PyGo
-    __time__ = 2026/6/6 22:07
+    __time__ = 2026/7/19 16:03
     __version__ = v.1.0.0
     __mail__ = gaoming971366@163.com
     __blog__ = www.pygo2.top
     __project__ = fastslot-api-salary
-    __file_name__ = enum_value.py
+    __file_name__ = dict.py
 
 usage:
     
@@ -45,11 +45,11 @@ from deploy.delib.redis_lib import RedisClientLib
 from deploy.utils.utils import format_redis_key
 
 
-class SystemConfigEnumVService:
+class SystemConfigDictService:
 
     def __init__(self, db_connection: AsyncSession):
         """
-        SystemConfigEnumVService class initialize
+        SystemConfigDictService class initialize
         """
         self.db: AsyncSession = db_connection
         self.redis_cli = RedisClientLib(host=redis_host, port=redis_port, db=redis_db, password=redis_password)
@@ -57,7 +57,7 @@ class SystemConfigEnumVService:
         self.system_config_xtcs_service: SystemConfigXtcsService = SystemConfigXtcsService(db_connection=db_connection)
 
     def __str__(self):
-        return "SystemConfigEnumVService class."
+        return "SystemConfigDictService class."
 
     def __repr__(self):
         return self.__str__()
@@ -86,12 +86,7 @@ class SystemConfigEnumVService:
         return (True, model if response_type == "model"
                         else await model_converter_dict(model=model, fields=fields, default_value="****"))
 
-    async def get_select_option_data(self, name: str, lock_view: bool = False) -> List:
-        if not name: return []
-        enum_v_model = await self.csb_ev_curd.get_list_by_name(db=self.db, name=name)
-        return [] if not enum_v_model else await option_converter_dict(enum_v_model, lock_view=lock_view)
-
-    async def enum_by_name_money(
+    async def dict_value_by_name_money(
             self,
             name: str,
             response_: Literal["option", "dict"] = "dict",

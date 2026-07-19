@@ -37,7 +37,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from deploy.curd.xtb_menu import XtbMenuCurd
 from deploy.curd.csb_enum_value import CsbEnumValueCurd
-from deploy.service.system.config.enum_value import SystemConfigEnumVService
+from deploy.service.system.config.dict import SystemConfigDictService
 from deploy.schema.dao.xtb_menu import XtbMenuModel
 from deploy.utils.status import Status, SuccessStatus, FailureStatus
 from deploy.utils.status_value import (StatusCode as status_code,
@@ -57,7 +57,7 @@ class SystemMainMenuService:
         self.db: AsyncSession = db_connection
         self.xtb_menu_curd: XtbMenuCurd = XtbMenuCurd()
         self.csb_ev_curd: CsbEnumValueCurd = CsbEnumValueCurd()
-        self.system_config_ev_service: SystemConfigEnumVService = SystemConfigEnumVService(db_connection=db_connection)
+        self.system_config_dict_service: SystemConfigDictService = SystemConfigDictService(db_connection=db_connection)
 
     def __str__(self):
         return "SystemMainMenuService class."
@@ -124,7 +124,7 @@ class SystemMainMenuService:
                 "group": _menu_d.get("level")
             })
         all_menu_group_list: List = []
-        __MENU_LEVEL_ENUM: Dict = await self.system_config_ev_service.enum_by_name_money(
+        __MENU_LEVEL_ENUM: Dict = await self.system_config_dict_service.dict_value_by_name_money(
             name=CsbEnumKEY.MENU_LEVEL.value,
             response_="dict",
             filter_lock=False,
@@ -153,10 +153,10 @@ class SystemMainMenuService:
         __res: Dict = {
                 "menu": data,
                 "menuOption": await self._get_menu_group_option(root=True),
-                "menuType": await self.system_config_ev_service.enum_by_name_money(
+                "menuType": await self.system_config_dict_service.dict_value_by_name_money(
                     name=CsbEnumKEY.MENU_TYPE.value, response_="option", filter_lock=False, key_trans_int=False
                 ),
-                "menuLevel": await self.system_config_ev_service.enum_by_name_money(
+                "menuLevel": await self.system_config_dict_service.dict_value_by_name_money(
                     name=CsbEnumKEY.MENU_LEVEL.value, response_="option", filter_lock=True, key_trans_int=True
                 )
             }
@@ -165,10 +165,10 @@ class SystemMainMenuService:
     async def add_enum(self, rtx_id: str) -> Status:
         data: Dict = {
             "menuOption": await self._get_menu_group_option(root=True),
-            "menuType": await self.system_config_ev_service.enum_by_name_money(
+            "menuType": await self.system_config_dict_service.dict_value_by_name_money(
                 name=CsbEnumKEY.MENU_TYPE.value, response_="option", filter_lock=False, key_trans_int=False
             ),
-            "menuLevel": await self.system_config_ev_service.enum_by_name_money(
+            "menuLevel": await self.system_config_dict_service.dict_value_by_name_money(
                 name=CsbEnumKEY.MENU_LEVEL.value, response_="option", filter_lock=True, key_trans_int=True
             )
         }

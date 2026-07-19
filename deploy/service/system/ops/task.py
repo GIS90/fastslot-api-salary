@@ -34,7 +34,7 @@ from typing import Dict, List, Tuple, Literal, Any
 from sqlalchemy.ext.asyncio import AsyncSession
 from deploy.curd.xtb_user_task import XtbUserTaskCurd
 from deploy.schema.dao.xtb_user_task import XtbUserTaskModel
-from deploy.service.system.config.enum_value import SystemConfigEnumVService
+from deploy.service.system.config.dict import SystemConfigDictService
 from deploy.service.system.main.user import SystemMainUserService
 from deploy.utils.status import Status, SuccessStatus, FailureStatus
 from deploy.utils.status_value import (StatusCode as status_code,
@@ -57,7 +57,7 @@ class SystemOpsTaskService:
         """
         self.db: AsyncSession = db_connection
         self.xtb_user_task_curd: XtbUserTaskCurd = XtbUserTaskCurd()
-        self.system_config_ev_service: SystemConfigEnumVService = SystemConfigEnumVService(db_connection=self.db)
+        self.system_config_dict_service: SystemConfigDictService = SystemConfigDictService(db_connection=self.db)
         self.system_main_user_service: SystemMainUserService = SystemMainUserService(db_connection=self.db)
 
     def __str__(self):
@@ -128,10 +128,10 @@ class SystemOpsTaskService:
 
     async def filter_(self, rtx_id: str) -> Status:
         data = {
-            "status": await self.system_config_ev_service.enum_by_name_money(
+            "status": await self.system_config_dict_service.dict_value_by_name_money(
                 name=CsbEnumKEY.TASK_STATUS.value, response_="option", filter_lock=True, key_trans_int=False
             ),
-            "ds": await self.system_config_ev_service.enum_by_name_money(
+            "ds": await self.system_config_dict_service.dict_value_by_name_money(
                 name=CsbEnumKEY.DOWNLOAD_SELECT.value, response_="option", filter_lock=True,  key_trans_int=False
             ),
             "user": await self.system_main_user_service.option(status_view=True)

@@ -34,7 +34,7 @@ from typing import List, Dict, Optional
 from datetime import datetime
 from sqlalchemy.ext.asyncio import AsyncSession
 from deploy.utils.status import Status, SuccessStatus, FailureStatus
-from deploy.service.system.config.enum_value import SystemConfigEnumVService
+from deploy.service.system.config.dict import SystemConfigDictService
 from deploy.utils.enumeration import CsbEnumKEY
 from deploy.utils.status_value import StatusCode as status_code
 from deploy.utils.utils import md5 as md5_func, get_now
@@ -80,7 +80,7 @@ class ApiDownloadService(object):
         """
         self.db: AsyncSession = db_connection
         self.xtb_user_task_curd: XtbUserTaskCurd = XtbUserTaskCurd()
-        self.system_config_csb_enum_v_service: SystemConfigEnumVService = SystemConfigEnumVService(db_connection=db_connection)
+        self.system_config_csb_enum_v_service: SystemConfigDictService = SystemConfigDictService(db_connection=db_connection)
         self.system_main_user_service: SystemMainUserService = SystemMainUserService(db_connection=db_connection)
         self.system_main_role_service: SystemMainRoleService = SystemMainRoleService(db_connection=db_connection)
         self.system_config_xtcs_service: SystemConfigXtcsService = SystemConfigXtcsService(db_connection=db_connection)
@@ -97,10 +97,10 @@ class ApiDownloadService(object):
 
     async def download_enum(self, rtx_id: str) -> Status:
         __res: Dict = {
-            "typeList": await self.system_config_csb_enum_v_service.enum_by_name_money(
+            "typeList": await self.system_config_csb_enum_v_service.dict_value_by_name_money(
                 name=CsbEnumKEY.DOWNLOAD_SELECT.value, response_="option", filter_lock=True, key_trans_int=False
             ),
-            "formatList": await self.system_config_csb_enum_v_service.enum_by_name_money(
+            "formatList": await self.system_config_csb_enum_v_service.dict_value_by_name_money(
                 name=CsbEnumKEY.DOWNLOAD_FORMAT.value, response_="option", filter_lock=True, key_trans_int=False
             )
         }

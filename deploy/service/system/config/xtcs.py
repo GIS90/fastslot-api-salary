@@ -158,7 +158,7 @@ class SystemConfigXtcsService:
     async def get_xtcs_redis_expire(self):
         """获取系统参数设置的Rides缓存有效期"""
         # redis
-        redis_key = self.__redis_key(key=XtbXtcsKEY.REDIS_CACHE_EXPIRE.value)
+        redis_key = await self.__redis_key(key=XtbXtcsKEY.REDIS_CACHE_EXPIRE.value)
         if self.redis_cli.connection:
             redis_value = self.redis_cli.get_key(key=redis_key)
             if redis_value: return int(redis_value)

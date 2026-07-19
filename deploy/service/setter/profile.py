@@ -36,7 +36,7 @@ from deploy.curd.xtb_user import XtbUserCurd
 from deploy.curd.xtb_request import XtbRequestCurd
 from deploy.curd.csb_enum_value import CsbEnumValueCurd
 from deploy.schema.dao.xtb_user import XtbUserModel
-from deploy.service.system.config.enum_value import SystemConfigEnumVService
+from deploy.service.system.config.dict import SystemConfigDictService
 from deploy.service.system.ops.log import SystemOpsLogService
 from deploy.utils.status import Status, SuccessStatus, FailureStatus
 from deploy.utils.status_value import (StatusCode as status_code,
@@ -62,7 +62,7 @@ class SetterProfileService:
         self.xtb_user_curd: XtbUserCurd = XtbUserCurd()
         self.xtb_request_curd: XtbRequestCurd = XtbRequestCurd()
         self.csb_enum_v_curd: CsbEnumValueCurd = CsbEnumValueCurd()
-        self.csb_enum_v_service: SystemConfigEnumVService = SystemConfigEnumVService(db_connection=db_connection)
+        self.csb_enum_v_service: SystemConfigDictService = SystemConfigDictService(db_connection=db_connection)
         self.system_ops_log_service: SystemOpsLogService = SystemOpsLogService(db_connection=db_connection)
         self.image_lib: ImageLib = ImageLib()
         self.qiniu_store_lib: QiNiuStoreLib = QiNiuStoreLib(
@@ -116,7 +116,7 @@ class SetterProfileService:
         }
         data = {
             "user": user,
-            "sexEnum": await self.csb_enum_v_service.enum_by_name_money(
+            "sexEnum": await self.csb_enum_v_service.dict_value_by_name_money(
                 name=CsbEnumKEY.SEX_TYPE.value, response_="option", filter_lock=True, key_trans_int=False)
         }
         return SuccessStatus(data=data)

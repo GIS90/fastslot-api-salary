@@ -37,7 +37,7 @@ from deploy.curd.xtb_user import XtbUserCurd
 from deploy.curd.xtb_xtcs import XtbXtcsCurd
 from deploy.schema.dao.xtb_user import XtbUserModel
 from deploy.schema.dao.xtb_xtcs import XtbXtcsModel
-from deploy.service.system.config.enum_value import SystemConfigEnumVService
+from deploy.service.system.config.dict import SystemConfigDictService
 from deploy.service.system.main.role import SystemMainRoleService
 from deploy.utils.status import Status, SuccessStatus, FailureStatus
 from deploy.utils.status_value import (StatusCode as status_code,
@@ -64,7 +64,7 @@ class SystemMainUserService:
         self.db: AsyncSession = db_connection
         self.xtb_user_curd: XtbUserCurd = XtbUserCurd()
         self.xtb_xtcs_curd: XtbXtcsCurd = XtbXtcsCurd()
-        self.system_config_ev_service: SystemConfigEnumVService = SystemConfigEnumVService(db_connection=db_connection)
+        self.system_config_dict_service: SystemConfigDictService = SystemConfigDictService(db_connection=db_connection)
         self.system_main_role_service: SystemMainRoleService = SystemMainRoleService(db_connection=db_connection)
 
     def __str__(self):
@@ -149,7 +149,7 @@ class SystemMainUserService:
 
         _d = {
             "user": data,
-            "sexEnum": await self.system_config_ev_service.enum_by_name_money(
+            "sexEnum": await self.system_config_dict_service.dict_value_by_name_money(
                 name=CsbEnumKEY.SEX_TYPE.value, response_="option", filter_lock=True, key_trans_int=False
             ),
             "roleList": await self.system_main_role_service.role_select_option()
@@ -204,7 +204,7 @@ class SystemMainUserService:
     async def add_enum(self, rtx_id: str) -> Status:
         _d = {
             "roleList": await self.system_main_role_service.role_select_option(),
-            "sexEnum": await self.system_config_ev_service.enum_by_name_money(
+            "sexEnum": await self.system_config_dict_service.dict_value_by_name_money(
                 name=CsbEnumKEY.SEX_TYPE.value, response_="option", filter_lock=True, key_trans_int=False
             )
         }

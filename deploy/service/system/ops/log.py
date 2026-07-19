@@ -35,7 +35,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from deploy.curd.xtb_request import XtbRequestCurd
 from deploy.curd.csb_enum_value import CsbEnumValueCurd
 from deploy.schema.dao.xtb_request import XtbRequestModel
-from deploy.service.system.config.enum_value import SystemConfigEnumVService
+from deploy.service.system.config.dict import SystemConfigDictService
 from deploy.service.system.main.user import SystemMainUserService
 from deploy.utils.status import Status, SuccessStatus, FailureStatus
 from deploy.utils.status_value import (StatusCode as status_code,
@@ -60,7 +60,7 @@ class SystemOpsLogService:
         self.xtb_request_curd: XtbRequestCurd = XtbRequestCurd()
         self.csb_ev_curd: CsbEnumValueCurd = CsbEnumValueCurd()
         self.system_main_user_service: SystemMainUserService = SystemMainUserService(db_connection=self.db)
-        self.system_config_ev_service: SystemConfigEnumVService = SystemConfigEnumVService(db_connection=self.db)
+        self.system_config_dict_service: SystemConfigDictService = SystemConfigDictService(db_connection=self.db)
 
     def __str__(self):
         return "SystemOpsLogService class."
