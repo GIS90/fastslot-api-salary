@@ -72,21 +72,14 @@ class CsbEnumKeyCurd(BaseCurd):
         except Exception as e:
             raise SQLDBHandleException(f"[{self.__class__.__name__}*查询One]{e}")
 
-    async def get_by_id(
-            self,
-            db: AsyncSession,
-            _id: int,
-            filter_lock: bool = False
-    ) -> Optional[CsbEnumKeyModel]:
+    async def get_by_id(self, db: AsyncSession, _id: int, filter_lock: bool = False) -> Optional[CsbEnumKeyModel]:
         return await self._get_model_by_field(db, CsbEnumKeyModel.id, _id, filter_lock)
 
-    async def get_by_md5(
-            self,
-            db: AsyncSession,
-            md5: str,
-            filter_lock: bool = False
-    ) -> Optional[CsbEnumKeyModel]:
+    async def get_by_md5(self, db: AsyncSession, md5: str, filter_lock: bool = False) -> Optional[CsbEnumKeyModel]:
         return await self._get_model_by_field(db, CsbEnumKeyModel.md5, md5, filter_lock)
+
+    async def get_by_key(self, db: AsyncSession, key: str, filter_lock: bool = False) -> Optional[CsbEnumKeyModel]:
+        return await self._get_model_by_field(db, CsbEnumKeyModel.key, key, filter_lock)
 
     @classmethod
     async def count(cls, db: AsyncSession) -> int:

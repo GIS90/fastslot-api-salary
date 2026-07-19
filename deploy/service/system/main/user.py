@@ -149,7 +149,9 @@ class SystemMainUserService:
 
         _d = {
             "user": data,
-            "sexEnum": await self.system_config_ev_service.get_select_option_data(name=CsbEnumKEY.SEX_TYPE.value, lock_view=False),
+            "sexEnum": await self.system_config_ev_service.enum_by_name_money(
+                name=CsbEnumKEY.SEX_TYPE.value, response_="option", filter_lock=True, key_trans_int=False
+            )
             "roleList": await self.system_main_role_service.role_select_option()
         }
         return SuccessStatus(data=_d)

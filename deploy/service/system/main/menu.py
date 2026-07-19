@@ -126,9 +126,9 @@ class SystemMainMenuService:
         all_menu_group_list: List = []
         __MENU_LEVEL_ENUM: Dict = await self.system_config_ev_service.enum_by_name_money(
             name=CsbEnumKEY.MENU_LEVEL.value,
-            key_trans_int=False,
             response_="dict",
-            filter_lock=False
+            filter_lock=False,
+            key_trans_int=False
         )
         if all_menu_list:
             all_menu_list_sorted = sorted(all_menu_list, key=lambda x: x.get("group"))
@@ -139,21 +139,6 @@ class SystemMainMenuService:
                 })
         # ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
         return all_menu_group_list
-
-    async def _get_csb_enum_option(
-            self,
-            key: str,
-            key_trans_int: bool = False,
-            filter_lock: bool = True,
-            lock_view: bool = False
-    ):
-        """
-        用户性别枚举值
-        :return: list
-        """
-        if not key:return []
-        _res = await self.csb_ev_curd.get_list_by_name(db=self.db, name=key, filter_lock=filter_lock)
-        return await option_converter_dict(models=_res, key_trans_int=key_trans_int, lock_view=lock_view) if _res else []
 
     async def one_by_md5(self, rtx_id: str, md5: str) -> Status:
         __flag, data = await self.__valid_model_by_md5(

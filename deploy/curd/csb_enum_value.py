@@ -72,20 +72,10 @@ class CsbEnumValueCurd(BaseCurd):
         except Exception as e:
             raise SQLDBHandleException(f"[{self.__class__.__name__}*查询One]{e}")
 
-    async def get_by_id(
-            self,
-            db: AsyncSession,
-            _id: int,
-            filter_lock: bool = False
-    ) -> Optional[CsbEnumValueModel]:
+    async def get_by_id(self, db: AsyncSession, _id: int, filter_lock: bool = False) -> Optional[CsbEnumValueModel]:
         return await self._get_model_by_field(db, CsbEnumValueModel.id, _id, filter_lock)
 
-    async def get_by_md5(
-            self,
-            db: AsyncSession,
-            md5: str,
-            filter_lock: bool = False
-    ) -> Optional[CsbEnumValueModel]:
+    async def get_by_md5(self, db: AsyncSession, md5: str,filter_lock: bool = False) -> Optional[CsbEnumValueModel]:
         return await self._get_model_by_field(db, CsbEnumValueModel.md5, md5, filter_lock)
 
     @classmethod
