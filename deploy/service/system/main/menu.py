@@ -124,7 +124,7 @@ class SystemMainMenuService:
                 "group": _menu_d.get("level")
             })
         all_menu_group_list: List = []
-        __MENU_LEVEL_ENUM: Dict = await self.system_config_ev_service.enum_by_name(
+        __MENU_LEVEL_ENUM: Dict = await self.system_config_ev_service.enum_by_name_money(
             name=CsbEnumKEY.MENU_LEVEL.value,
             key_trans_int=False,
             response_="dict",
@@ -168,10 +168,10 @@ class SystemMainMenuService:
         __res: Dict = {
                 "menu": data,
                 "menuOption": await self._get_menu_group_option(root=True),
-                "menuType": await self.system_config_ev_service.enum_by_name(
+                "menuType": await self.system_config_ev_service.enum_by_name_money(
                     name=CsbEnumKEY.MENU_TYPE.value, response_="option", filter_lock=False, key_trans_int=False
                 ),
-                "menuLevel": await self.system_config_ev_service.enum_by_name(
+                "menuLevel": await self.system_config_ev_service.enum_by_name_money(
                     name=CsbEnumKEY.MENU_LEVEL.value, response_="option", filter_lock=True, key_trans_int=True
                 )
             }
@@ -180,10 +180,10 @@ class SystemMainMenuService:
     async def add_enum(self, rtx_id: str) -> Status:
         data: Dict = {
             "menuOption": await self._get_menu_group_option(root=True),
-            "menuType": await self.system_config_ev_service.enum_by_name(
+            "menuType": await self.system_config_ev_service.enum_by_name_money(
                 name=CsbEnumKEY.MENU_TYPE.value, response_="option", filter_lock=False, key_trans_int=False
             ),
-            "menuLevel": await self.system_config_ev_service.enum_by_name(
+            "menuLevel": await self.system_config_ev_service.enum_by_name_money(
                 name=CsbEnumKEY.MENU_LEVEL.value, response_="option", filter_lock=True, key_trans_int=True
             )
         }

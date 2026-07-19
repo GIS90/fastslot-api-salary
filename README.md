@@ -36,6 +36,12 @@
 **强调一点**：测试环境http，线上环境https。.toml格式的配置文件是有deploy/config.py进行解析的，如果在config.toml配置文件中添加配置信息，需要在此文件进行解析添加。  
 另外，supervisor_XXXX.conf是项目进程管理的配置信息，部署到线上。
 
+### 数据库
+详情见db.sql。
+
+
+> ## 架构
+
 ### 项目目录
 - deploy：项目源码
   - app：脚手架FSWebAppClass类的配置，包含exception、middleware
@@ -123,8 +129,9 @@
 - xlwt、xlrd: 表格行数限制65535
 只好，根据操作Excel数据文件的格式进行判断，去执行指定的方法，如果操作的数据文件包含一个.xls文件，就用xlwt、xlrd去处理，否则就用openpyxl。
 
-### 数据库
-详情见db.sql。
+### 枚举值缓存接口
+文件：deploy/service/system/config/enum_value.py -> enum_by_name_money
+对于系统功能使用到的枚举值，采用Redis进行缓存，获取机制采用：Redis->数据库
 
 
 > ## 其他
@@ -172,41 +179,3 @@ _config = {
 
 
 Enjoy the good life every day！！！
-
-
-
-支持多个动态条件
-async def pagination(
-    cls, db: AsyncSession, offset: int = 0, limit: int = 15, 
-    filters: Optional[dict] = None, *args, **kwargs
-) -> Optional[List]:
-    try:
-        stmt = select(XtbRequestModel).where(XtbRequestModel.status != 1)
-        
-        # 动态添加过滤条件
-        if filters:
-            for field, value in filters.items():
-                if value is not None and hasattr(XtbRequestModel, field):
-                    stmt = stmt.where(getattr(XtbRequestModel, field) == value)
-        
-        stmt = (stmt
-                .order_by(desc(XtbRequestModel.id))
-                .offset(offset)
-                .limit(limit))
-        
-        result = await db.execute(stmt)
-        return result.scalars().all()
-    except Exception as e:
-        raise SQLDBHandleException(f"[{cls.__name__}*查询All]{e}")
-
-# 调用方式
-await pagination(db, offset=0, limit=15, filters={'user_id': 123})
-
-filter格式化数据
-data: List = list()
-    data.extend(
-        filter(
-            lambda x: x is not None and x is not {},
-            [await model_converter_dict(model=u, fields=xtb_user_list_fields) for u in models if u]
-        )
-    )

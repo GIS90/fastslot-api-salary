@@ -128,10 +128,10 @@ class SystemOpsTaskService:
 
     async def filter_(self, rtx_id: str) -> Status:
         data = {
-            "status": await self.system_config_ev_service.enum_by_name(
+            "status": await self.system_config_ev_service.enum_by_name_money(
                 name=CsbEnumKEY.TASK_STATUS.value, response_="option", filter_lock=True, key_trans_int=False
             ),
-            "ds": await self.system_config_ev_service.enum_by_name(
+            "ds": await self.system_config_ev_service.enum_by_name_money(
                 name=CsbEnumKEY.DOWNLOAD_SELECT.value, response_="option", filter_lock=True,  key_trans_int=False
             ),
             "user": await self.system_main_user_service.option(status_view=True)

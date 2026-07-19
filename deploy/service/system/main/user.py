@@ -202,7 +202,7 @@ class SystemMainUserService:
     async def add_enum(self, rtx_id: str) -> Status:
         _d = {
             "roleList": await self.system_main_role_service.role_select_option(),
-            "sexEnum": await self.system_config_ev_service.enum_by_name(
+            "sexEnum": await self.system_config_ev_service.enum_by_name_money(
                 name=CsbEnumKEY.SEX_TYPE.value, response_="option", filter_lock=True, key_trans_int=False
             )
         }
