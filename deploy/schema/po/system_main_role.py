@@ -57,7 +57,7 @@ class XtbRoleAddModel(__XtbRoleBaseModel):
     engname: str = Field(...,
                          min_length=1,
                          max_length=35,
-                         description="角色唯一标识，英文+数字组成",
+                         description="角色唯一标识（允许字母、数字、连字符(-)和点(.)的组合）",
                          alias="engname",
                          validate_default=True)
 

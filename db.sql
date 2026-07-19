@@ -291,7 +291,7 @@ CREATE TABLE `csb_enum_key`  (
     `id` int NOT NULL AUTO_INCREMENT COMMENT '主键，自增ID',
     `key` varchar(35) NOT NULL COMMENT '枚举KEY值RTX-ID',
     `md5` varchar(64) NOT NULL UNIQUE COMMENT '数据唯一标识：MD5-ID',
-    `remark` varchar(35) COMMENT '说明',
+    `remark` varchar(35) COMMENT '枚举说明',
     `create_rtx` varchar(35) COMMENT '创建用户RTX-ID',
     `create_time` datetime default CURRENT_TIMESTAMP COMMENT '创建时间',
     `update_rtx` varchar(35) COMMENT '更新用户RTX-ID',

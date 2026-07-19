@@ -31,18 +31,22 @@ Life is short, I use python.
 ------------------------------------------------
 """
 import json
+from datetime import datetime
 from typing import Dict, List, Tuple, Literal, Any, Optional, Union
 from sqlalchemy.ext.asyncio import AsyncSession
+from deploy.curd.csb_enum_key import CsbEnumKeyCurd
 from deploy.curd.csb_enum_value import CsbEnumValueCurd
 from deploy.service.system.config.xtcs import SystemConfigXtcsService
+from deploy.schema.dao.csb_enum_key import CsbEnumKeyModel
 from deploy.schema.dao.csb_enum_value import CsbEnumValueModel
 from deploy.utils.status import Status, SuccessStatus, FailureStatus
 from deploy.utils.status_value import (StatusCode as status_code,
                                        StatusMsg as status_msg)
 from deploy.utils.converter import model_converter_dict, option_converter_dict
+from deploy.schema.dto.csb_enum_key import csb_ek_list_fields, csb_ek_detail_fields
 from deploy.config import (redis_host, redis_port, redis_password, redis_db)
 from deploy.delib.redis_lib import RedisClientLib
-from deploy.utils.utils import format_redis_key
+from deploy.utils.utils import format_redis_key, get_now, md5 as generator_md5
 
 
 class SystemConfigDictService:
@@ -53,6 +57,7 @@ class SystemConfigDictService:
         """
         self.db: AsyncSession = db_connection
         self.redis_cli = RedisClientLib(host=redis_host, port=redis_port, db=redis_db, password=redis_password)
+        self.csb_ek_curd: CsbEnumKeyCurd = CsbEnumKeyCurd()
         self.csb_ev_curd: CsbEnumValueCurd = CsbEnumValueCurd()
         self.system_config_xtcs_service: SystemConfigXtcsService = SystemConfigXtcsService(db_connection=db_connection)
 
@@ -62,20 +67,22 @@ class SystemConfigDictService:
     def __repr__(self):
         return self.__str__()
 
-    async def __valid_model_by_md5(
+    async def __dk_valid_model_by_md5_or_key(
             self,
-            md5_id: str,
+            query_id: str,
             status_check: bool = True,
             response_type: Literal["dict", "model"] = "model",
-            fields: List[Dict] = '',
+            query_type: Literal["md5", "key"] = "md5",
+            fields: Union[List, None] = csb_ek_detail_fields,
             lock_check: bool = False
     ) -> Tuple[bool, Any]:
-        if not md5_id:
+        if not query_id:
             return False, FailureStatus(
                 code=status_code.CODE_400_REQUEST_PARAMETER_MISS,
-                message="缺少md5参数")
+                message="缺少md5参数" if query_type == "md5" else "缺少key参数")
 
-        model: CsbEnumValueModel = await self.csb_ev_curd.get_by_md5(db=self.db, md5=md5_id, filter_lock=False)
+        model: CsbEnumKeyModel = await self.csb_ek_curd.get_by_md5(db=self.db, md5=query_id, filter_lock=False) if query_type == "md5" \
+            else await self.csb_ek_curd.get_by_key(db=self.db, key=query_id, filter_lock=False)
         if not model:
             return False, FailureStatus(code=status_code.CODE_501_DATA_NOT_EXIST)
         if status_check and getattr(model, "status", None):
@@ -100,6 +107,8 @@ class SystemConfigDictService:
         :param response_: 枚举值返回类型 option|dict
         :param filter_lock: 是否过滤锁
         :param key_trans_int: 是否将key转为int
+
+        更新的时候删除 "option", "dict 缓存
         """
         if response_ not in ["option", "dict"]:
             return None
@@ -128,5 +137,82 @@ class SystemConfigDictService:
             )
         return __ev_value
 
+    async def dk_pagination(self, rtx_id: str) -> Status:
+        models: List[Dict] = await self.csb_ek_curd.all_(db=self.db, filter_lock=False)
+        if not models:
+            return FailureStatus(code=status_code.CODE_101_SUCCESS_NO_DATA)
+        __data: List[Dict] = []
+        __data.extend(filter(
+            lambda model: model is not None and model != {},
+            [await model_converter_dict(model=model, fields=csb_ek_list_fields) for model in models]
+        ))
+        return SuccessStatus(data=__data)
 
-    # 更新的时候删除 "option", "dict 缓存
+    async def dk_one_by_md5(self, rtx_id: str, md5: str) -> Status:
+        __flag, data = await self.__dk_valid_model_by_md5_or_key(
+            query_id=md5,
+            status_check=False,
+            response_type="dict",
+            query_type="md5",
+            fields=csb_ek_detail_fields,
+            lock_check=False
+        )
+        return SuccessStatus(data=data) if __flag else data
+
+    async def dk_status(self, rtx_id: str, params: Dict) -> Status:
+        __flag, data = await self.__dk_valid_model_by_md5_or_key(
+            query_id=params.get("md5"), status_check=True, response_type="model", query_type="md5", lock_check=False
+        )
+        if not __flag: return data
+
+        setattr(data, "lock", params.get("value"))
+        await self.csb_ek_curd.update(db=self.db, model=data)
+        return SuccessStatus()
+
+    async def dk_add(self, rtx_id: str, model: Dict) -> Status:
+        db_model: CsbEnumKeyModel = await self.csb_ek_curd.get_by_key(
+            db=self.db,
+            key=model.get("key"))
+        if db_model:
+            return FailureStatus(code=status_code.CODE_502_DATA_EXIST_NOT_ADD,
+                                 message="数据字典分类KEY已存在，请更换")
+
+        new_model: CsbEnumKeyModel = await self.csb_ek_curd.new_model()
+        __now = get_now
+        new_model.md5 = generator_md5(v=f"{model.get('key')}-{__now}-{rtx_id}")
+        new_model.create_time = datetime.now()
+        new_model.create_rtx = rtx_id
+        new_model.lock = False
+        new_model.status = False
+        for k, v in model.items():
+            setattr(new_model, k, v)
+        await self.csb_ek_curd.add(db=self.db, model=new_model)
+        return SuccessStatus()
+
+    async def dk_update(self, rtx_id: str, model: Dict) -> Status:
+        _md5: str = model.get("md5")
+        __flag, data = await self.__dk_valid_model_by_md5_or_key(
+            query_id=_md5, status_check=True, response_type="model", query_type="md5", lock_check=True
+        )
+        if not __flag: return data
+
+        del model["md5"]
+        if model.get("key"): del model["key"]
+        model["update_rtx"] = rtx_id
+        model["update_time"] = get_now()
+        for k, v in model.items():
+            setattr(data, k, v)
+        await self.csb_ek_curd.update(db=self.db, model=data)
+        return SuccessStatus()
+
+    async def dk_delete(self, rtx_id: str, md5: str) -> Status:
+        __flag, data = await self.__dk_valid_model_by_md5_or_key(
+            query_id=md5, status_check=True, response_type="model", query_type="md5", lock_check=False
+        )
+        if not __flag: return data
+
+        setattr(data, "status", True)
+        setattr(data, "delete_rtx", rtx_id)
+        setattr(data, "delete_time", get_now())
+        await self.csb_ek_curd.update(db=self.db, model=data)
+        return SuccessStatus()

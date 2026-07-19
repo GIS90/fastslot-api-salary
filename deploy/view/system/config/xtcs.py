@@ -66,6 +66,7 @@ async def one(
 ) -> Status:
     return await service.one_by_md5(rtx_id=token_rtx_id, md5=md5)
 
+
 @router.put('/xtcs.status', summary="状态")
 async def status(
     params: Annotated[RequestMd5StatusModel, Body()],

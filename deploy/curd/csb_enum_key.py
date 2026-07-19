@@ -95,12 +95,15 @@ class CsbEnumKeyCurd(BaseCurd):
     async def pagination(
         cls, db: AsyncSession, offset: int = 0, limit: int = 15
     ) -> Optional[List]:
+        ...
+
+    @classmethod
+    async def all_(cls, db: AsyncSession, filter_lock: bool = False) -> Optional[List]:
         try:
-            stmt = (select(CsbEnumKeyModel)
-                    .where(CsbEnumKeyModel.status != 1)
-                    .order_by(asc(CsbEnumKeyModel.order_id), desc(CsbEnumKeyModel.id))
-                    .offset(offset)
-                    .limit(limit))
+            stmt = select(CsbEnumKeyModel).where(CsbEnumKeyModel.status != 1)
+            if filter_lock:
+                stmt = stmt.where(CsbEnumKeyModel.lock != True)
+            stmt = stmt.order_by(asc(CsbEnumKeyModel.order_id), desc(CsbEnumKeyModel.id))
             result = await db.execute(stmt)
             return result.scalars().all()
         except Exception as e:

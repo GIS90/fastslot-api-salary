@@ -202,7 +202,6 @@ class SystemConfigXtcsService:
         if not __flag: return data
 
         del model["md5"]
-        __key: str = model.get("key")
         if model.get("key"): del model["key"]
         model["update_rtx"] = rtx_id
         model["update_time"] = get_now()
