@@ -48,6 +48,5 @@ csb_ek_detail_fields: List = [
     {"key": "md5"},
     {"key": "key"},
     {"key": "remark"},
-    {"key": "introduction"},
     {"key": "order_id", "type": ft.INT, "name": "orderId", "null": True}
 ]

@@ -78,6 +78,9 @@ class CsbEnumValueCurd(BaseCurd):
     async def get_by_md5(self, db: AsyncSession, md5: str,filter_lock: bool = False) -> Optional[CsbEnumValueModel]:
         return await self._get_model_by_field(db, CsbEnumValueModel.md5, md5, filter_lock)
 
+    async def get_by_key(self, db: AsyncSession, key: str,filter_lock: bool = False) -> Optional[CsbEnumValueModel]:
+        return await self._get_model_by_field(db, CsbEnumValueModel.key, key, filter_lock)
+
     @classmethod
     async def get_list_by_name(
             cls,
@@ -117,29 +120,50 @@ class CsbEnumValueCurd(BaseCurd):
             raise SQLDBHandleException(f"[{cls.__name__}*查询Many]{e}")
 
     @classmethod
-    async def count(cls, db: AsyncSession) -> int:
+    async def count(cls, db: AsyncSession, name: str = None) -> int:
         try:
-            result = await db.execute(
-                select(func.count(CsbEnumValueModel.id)).where(CsbEnumValueModel.status != 1)
-            )
+            stmt = select(func.count(CsbEnumValueModel.id)).where(CsbEnumValueModel.status != 1)
+            if name:
+                stmt = stmt.where(CsbEnumValueModel.name == name)
+            result = await db.execute(stmt)
             return result.scalar()
         except Exception as e:
             raise SQLDBHandleException(f"[{cls.__name__}*总数]{e}")
 
     @classmethod
     async def pagination(
-        cls, db: AsyncSession, offset: int = 0, limit: int = 15
+        cls,
+        db: AsyncSession,
+        offset: int = 0,
+        limit: int = 15,
+        name: str = None,
+        filter_lock: bool = False
     ) -> Optional[List]:
         try:
-            stmt = (select(CsbEnumValueModel)
-                    .where(CsbEnumValueModel.status != 1)
-                    .order_by(asc(CsbEnumValueModel.order_id), desc(CsbEnumValueModel.id))
-                    .offset(offset)
-                    .limit(limit))
+            stmt = select(CsbEnumValueModel).where(CsbEnumValueModel.status != 1)
+            if name:
+                stmt = stmt.where(CsbEnumValueModel.name == name)
+            stmt = stmt.order_by(
+                asc(CsbEnumValueModel.order_id),
+                desc(CsbEnumValueModel.id)
+            ).offset(offset).limit(limit)
             result = await db.execute(stmt)
             return result.scalars().all()
         except Exception as e:
             raise SQLDBHandleException(f"[{cls.__name__}*查询All]{e}")
+
+    @classmethod
+    async def count_by_md5_list(cls, db: AsyncSession, md5_list: List[str]) -> int:
+        try:
+            result = await db.execute(
+                select(func.count(CsbEnumValueModel.id)).where(
+                    CsbEnumValueModel.status != 1,
+                    CsbEnumValueModel.md5.in_(md5_list)
+                )
+            )
+            return result.scalar()
+        except Exception as e:
+            raise SQLDBHandleException(f"[{cls.__name__}*查询总数]{e}")
 
     @classmethod
     async def download(

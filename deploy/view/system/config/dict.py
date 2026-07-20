@@ -37,8 +37,9 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from deploy.curd.database import get_session
 from deploy.service.system.config.dict import SystemConfigDictService
 from deploy.utils.status import Status
-from deploy.utils.depend import pageable_like_params, depend_token_rtx
-from deploy.schema.po.system_config_dict import CsbEnumKeyAddModel, CsbEnumKeyUpdateModel
+from deploy.utils.depend import pageable_query_params, depend_token_rtx
+from deploy.schema.po.system_config_dict import (CsbEnumKeyAddModel, CsbEnumKeyUpdateModel,
+                                                 CsbEnumValueAddModel, CsbEnumValueUpdateModel)
 from deploy.schema.po.x import RequestMd5StatusModel, RequestMd5Models
 
 
@@ -102,70 +103,72 @@ async def dk_one(
     return await service.dk_one_by_md5(token_rtx_id, md5)
 
 
+@router.get("/dict/de.list", summary="DE>数据列表")
+async def de_pagination(
+    params: dict = Depends(pageable_query_params),
+    token_rtx_id: str = Depends(depend_token_rtx),
+    service: SystemConfigDictService = Depends(get_service)
+) -> Status:
+    return await service.de_pagination(rtx_id=token_rtx_id, params=params)
 
 
+@router.delete("/dict/de.delete", summary="DE>单条软删除")
+async def de_delete(
+    md5: str = Query(..., description="数据Md5-Id"),
+    token_rtx_id: str = Depends(depend_token_rtx),
+    service: SystemConfigDictService = Depends(get_service)
+) -> Status:
+    return await service.de_delete(rtx_id=token_rtx_id, md5=md5)
 
 
-#
-# @ops.get('/dict/enum/list', summary="[DICT]Enum.列表")
-# async def dict_enum_list(
-#         params: dict = Depends(pageable_query_params),
-#         token_rtx_id: str = Depends(depend_token_rtx)
-# ) -> Status:
-#     return await ops_service.dict_enum_list(token_rtx_id, params)
-#
-#
-# @ops.delete('/dict/enum/delete', summary="[DICT]Enum.单条删除")
-# async def dict_enum_delete(
-#         md5: str = Query(..., min_length=1, max_length=289, description="数据MD5"),
-#         token_rtx_id: str = Depends(depend_token_rtx)
-# ) -> Status:
-#     return await ops_service.dict_enum_delete(token_rtx_id, md5)
-#
-#
-# @ops.put('/dict/enum/delete', summary="[DICT]Enum.批量删除")
-# async def dict_enums_delete(
-#         params: RequestMd5Models,
-#         token_rtx_id: str = Depends(depend_token_rtx)
-# ) -> Status:
-#     return await ops_service.dict_enums_delete(token_rtx_id, params.model_dump().get("md5"))
-#
-#
-# @ops.delete('/dict/enum/status', summary="[DICT]Enum.启用/注销")
-# async def dict_enum_status(
-#         md5: str = Query(..., min_length=1, max_length=289, description="数据MD5"),
-#         value: bool = Query(..., description="状态"),
-#         token_rtx_id: str = Depends(depend_token_rtx)
-# ) -> Status:
-#     return await ops_service.dict_enum_status(token_rtx_id, md5, value)
-#
-#
-# @ops.get('/dict/enum/init', summary="[DICT]Enum.新增枚举")
-# async def dict_enum_add_init(
-#         token_rtx_id: str = Depends(depend_token_rtx)
-# ) -> Status:
-#     return await ops_service.dict_enum_add_init(token_rtx_id)
-#
-#
-# @ops.post('/dict/enum', summary="[DICT]Enum.新增")
-# async def dict_enum_add(
-#         data: DictEnumBaseModel,
-#         token_rtx_id: str = Depends(depend_token_rtx)
-# ) -> Status:
-#     return await ops_service.dict_enum_add(token_rtx_id, data.model_dump())
-#
-#
-# @ops.get('/dict/enum', summary="[DICT]Enum.详情")
-# async def dict_enum_detail(
-#         md5: str = Query(..., min_length=1, max_length=289, description="数据MD5"),
-#         token_rtx_id: str = Depends(depend_token_rtx)
-# ) -> Status:
-#     return await ops_service.dict_enum_detail(token_rtx_id, md5)
-#
-#
-# @ops.put('/dict/enum', summary="[DICT]Enum.更新")
-# async def dict_enum_update(
-#         data: DictEnumUpdateModel,
-#         token_rtx_id: str = Depends(depend_token_rtx)
-# ) -> Status:
-#     return await ops_service.dict_enum_update(token_rtx_id, data.model_dump())
+@router.put("/dict/de.batch.delete", summary="批量软删除")
+async def de_batch_delete(
+    params: Annotated[RequestMd5Models, Body()],
+    token_rtx_id: str = Depends(depend_token_rtx),
+    service: SystemConfigDictService = Depends(get_service)
+) -> Status:
+    return await service.de_batch_delete(rtx_id=token_rtx_id, md5_list=params.model_dump().get("md5"))
+
+
+@router.put('/dict/de.status', summary="DE>锁定/解锁")
+async def de_status(
+    params: Annotated[RequestMd5StatusModel, Body()],
+    token_rtx_id: str = Depends(depend_token_rtx),
+    service: SystemConfigDictService = Depends(get_service)
+) -> Status:
+    return await service.de_status(token_rtx_id, params=params.model_dump())
+
+
+@router.post("/dict/de.addInit", summary="DE>新增")
+async def de_add_init(
+    token_rtx_id: str = Depends(depend_token_rtx),
+    service: SystemConfigDictService = Depends(get_service)
+) -> Status:
+    return await service.de_add_init(rtx_id=token_rtx_id)
+
+
+@router.post("/dict/de", summary="DE>新增")
+async def de_add(
+    params: Annotated[CsbEnumValueAddModel, Body()],
+    token_rtx_id: str = Depends(depend_token_rtx),
+    service: SystemConfigDictService = Depends(get_service)
+) -> Status:
+    return await service.de_add(rtx_id=token_rtx_id, model=params.model_dump())
+
+
+@router.put("/dict/de", summary="DE>更新")
+async def de_update(
+    params: Annotated[CsbEnumValueUpdateModel, Body()],
+    token_rtx_id: str = Depends(depend_token_rtx),
+    service: SystemConfigDictService = Depends(get_service)
+) -> Status:
+    return await service.de_update(rtx_id=token_rtx_id, model=params.model_dump())
+
+
+@router.get('/dict/de', summary="DE>通过Md5-Id获取单条数据")
+async def de_one(
+    md5: str = Query(..., description="数据Md5-Id"),
+    token_rtx_id: str = Depends(depend_token_rtx),
+    service: SystemConfigDictService = Depends(get_service)
+) -> Status:
+    return await service.de_one_by_md5(token_rtx_id, md5)

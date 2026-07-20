@@ -34,3 +34,22 @@ from typing import List
 from deploy.utils.enumeration import FieldTypeEnum as ft
 
 
+csb_ev_list_fields: List = [
+    {"key": "name", "type": ft.STR, "name": "name", "null": False},
+    {"key": "md5", "type": ft.STR, "name": "md5", "null": False},
+    {"key": "key", "type": ft.STR, "name": "key", "null": False},
+    {"key": "value", "type": ft.STR, "name": "value", "null": False},
+    {"key": "remark", "type": ft.STR, "name": "remark", "null": False},
+    {"key": "lock", "type": ft.BOOL, "name": "status", "null": True},
+    {"key": "order_id", "type": ft.INT, "name": "orderId", "null": True}
+]
+
+
+csb_ev_detail_fields: List = [
+    {"key": "name"},
+    {"key": "md5"},
+    {"key": "key"},
+    {"key": "value"},
+    {"key": "remark"},
+    {"key": "order_id", "type": ft.INT, "name": "orderId", "null": True}
+]

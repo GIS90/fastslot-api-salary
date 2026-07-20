@@ -110,7 +110,10 @@ class XtbXtcsCurd(BaseCurd):
     async def count_by_md5_list(cls, db: AsyncSession, md5_list: List[str]) -> int:
         try:
             result = await db.execute(
-                select(func.count(XtbXtcsModel.id)).where(XtbXtcsModel.status != 1, XtbXtcsModel.md5.in_(md5_list))
+                select(func.count(XtbXtcsModel.id)).where(
+                    XtbXtcsModel.status != 1,
+                    XtbXtcsModel.md5.in_(md5_list)
+                )
             )
             return result.scalar()
         except Exception as e:

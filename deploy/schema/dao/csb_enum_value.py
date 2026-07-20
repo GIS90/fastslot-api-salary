@@ -51,10 +51,10 @@ class CsbEnumValueModel(baseModel, IDField, Md5Field, CUDField, LockField, Statu
     __tablename__ = 'csb_enum_value'
     __table_args__ = ({'comment': '参数表-枚举Value表'})
 
-    name: Mapped[str] = mapped_column(name="name", type_=String(35), comment="枚举子集对应的key（csb_enum_key）")
-    key: Mapped[str] = mapped_column(name="key", type_=String(35), comment="枚举VALUE值RTX-ID")
-    value: Mapped[str] = mapped_column(name="value", type_=String(35), comment="枚举子集对应的value")
-    remark: Mapped[str] = mapped_column(name="remark", type_=Text, comment="枚举子集对应的value说明")
+    name: Mapped[str] = mapped_column(name="name", type_=String(35), comment="字典枚举子集对应的key（csb_enum_key）")
+    key: Mapped[str] = mapped_column(name="key", type_=String(35), comment="字典枚举VALUE值RTX-ID")
+    value: Mapped[str] = mapped_column(name="value", type_=String(35), comment="字典枚举子集对应的value")
+    remark: Mapped[str] = mapped_column(name="remark", type_=Text, comment="字典枚举子集对应的value说明")
 
     def __str__(self):
         return f"CsbEnumValueModel Class[DB table: {self.__tablename__}], key: {self.key}, name: {self.name}, value: {self.value}."
