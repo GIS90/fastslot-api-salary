@@ -45,13 +45,13 @@ __all__ = [
 
 
 class __CsbEnumKeyBaseModel(baseModel):
-    remark: str = Field(..., min_length=1, max_length=35, description="字典分类说明", alias="remark")
+    value: str = Field(..., min_length=1, max_length=35, description="数据字典分类说明", alias="value")
     order_id: int = Field(..., description="排序编号", alias="orderId")
 
     model_config = {
         "json_schema_extra": {
             "example": {
-                "remark": "哈哈哈哈哈",
+                "value": "哈哈哈哈哈",
                 "order_id": 1
             }
         }
@@ -59,13 +59,13 @@ class __CsbEnumKeyBaseModel(baseModel):
 
 
 class CsbEnumKeyAddModel(__CsbEnumKeyBaseModel):
-    key: str = Field(..., min_length=1, max_length=35, description="字典分类KEY值（允许字母、数字、连字符(-)和点(.)的组合）", alias="key")
+    key: str = Field(..., min_length=1, max_length=35, description="数据字典分类标识（允许字母、数字、连字符(-)和点(.)的组合）", alias="key")
 
     model_config = {
         "json_schema_extra": {
             "example": {
                 "key": "ABCD-EFG",
-                "remark": "说明",
+                "value": "说明",
                 "order_id": 1
             }
         }
@@ -77,7 +77,7 @@ class CsbEnumKeyAddModel(__CsbEnumKeyBaseModel):
     """
     @field_validator("key")
     def field_is_key(cls, value: str) -> str:
-        return alphanumeric_only(value=value, field="字典分类KEY值")
+        return alphanumeric_only(value=value, field="[数据字典分类标识]")
     # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 
@@ -88,7 +88,7 @@ class CsbEnumKeyUpdateModel(__CsbEnumKeyBaseModel):
             "json_schema_extra": {
                 "example": {
                     "md5": "AAAAAAAAAA",
-                    "remark": "哈哈哈哈哈",
+                    "value": "哈哈哈哈哈",
                     "order_id": 1
                 }
             }
@@ -99,8 +99,8 @@ class CsbEnumKeyUpdateModel(__CsbEnumKeyBaseModel):
 
 
 class __CsbEnumValueBaseModel(baseModel):
-    value: str = Field(..., min_length=1, max_length=35, description="字典枚举值", alias="value")
-    remark: str = Field(..., max_length=255, description="字典枚举描述")
+    value: str = Field(..., min_length=1, max_length=35, description="数据字典枚举名称", alias="value")
+    remark: str = Field(..., max_length=255, description="数据字典枚举描述")
     order_id: int = Field(..., description="排序编号", alias="orderId")
 
     model_config = {
@@ -115,8 +115,8 @@ class __CsbEnumValueBaseModel(baseModel):
 
 
 class CsbEnumValueAddModel(__CsbEnumValueBaseModel):
-    name: str = Field(..., min_length=1, max_length=35, description="字典分类KEY值（允许字母、数字、连字符(-)和点(.)的组合）", alias="key")
-    key: str = Field(..., min_length=1, max_length=35, description="字典枚举KEY值（允许字母、数字、连字符(-)和点(.)的组合）", alias="key")
+    name: str = Field(..., min_length=1, max_length=35, description="数据字典分类标识（允许字母、数字、连字符(-)和点(.)的组合）", alias="name")
+    key: str = Field(..., min_length=1, max_length=35, description="数据字典枚举标识（允许字母、数字、连字符(-)和点(.)的组合）", alias="key")
 
     model_config = {
         "json_schema_extra": {
@@ -136,7 +136,7 @@ class CsbEnumValueAddModel(__CsbEnumValueBaseModel):
     """
     @field_validator("key")
     def field_is_key(cls, value: str) -> str:
-        return alphanumeric_only(value=value, field="字典枚举KEY值")
+        return alphanumeric_only(value=value, field="[数据字典枚举标识]")
     # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 

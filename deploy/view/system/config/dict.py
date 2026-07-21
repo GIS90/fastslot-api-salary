@@ -139,7 +139,7 @@ async def de_status(
     return await service.de_status(token_rtx_id, params=params.model_dump())
 
 
-@router.post("/dict/de.addInit", summary="DE>新增")
+@router.get("/dict/de.addInit", summary="DE>新增初始化")
 async def de_add_init(
     token_rtx_id: str = Depends(depend_token_rtx),
     service: SystemConfigDictService = Depends(get_service)

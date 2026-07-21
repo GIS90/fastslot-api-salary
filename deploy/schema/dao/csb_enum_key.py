@@ -52,10 +52,10 @@ class CsbEnumKeyModel(baseModel, IDField, Md5Field, CUDField, LockField, StatusF
     __table_args__ = ({'comment': '参数表-枚举Key表'})
 
     key: Mapped[str] = mapped_column(name="key", type_=String(35), comment="字典分类KEY值RTX-ID")
-    remark: Mapped[str] = mapped_column(name="remark", type_=String(35), comment="字典分类说明")
+    value: Mapped[str] = mapped_column(name="value", type_=String(35), comment="字典分类说明")
 
     def __str__(self):
-        return f"CsbEnumKeyModel Class[DB table: {self.__tablename__}], key: {self.key}, remark: {self.remark}."
+        return f"CsbEnumKeyModel Class[DB table: {self.__tablename__}], key: {self.key}, value: {self.value}."
 
     def __repr__(self):
         return self.__str__()

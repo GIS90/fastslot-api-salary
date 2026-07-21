@@ -93,22 +93,20 @@ class SystemConfigDictService:
         return (True, model if response_type == "model"
                         else await model_converter_dict(model=model, fields=fields, default_value="****"))
 
-    async def __de_valid_model_by_md5_or_key(
+    async def __de_valid_model_by_md5(
             self,
-            query_id: str,
+            md5_id: str,
             status_check: bool = True,
             response_type: Literal["dict", "model"] = "model",
-            query_type: Literal["md5", "key"] = "md5",
             fields: Union[List, None] = csb_ev_detail_fields,
             lock_check: bool = False
     ) -> Tuple[bool, Any]:
-        if not query_id:
+        if not md5_id:
             return False, FailureStatus(
                 code=status_code.CODE_400_REQUEST_PARAMETER_MISS,
-                message="缺少md5参数" if query_type == "md5" else "缺少key参数")
+                message="缺少md5参数")
 
-        model: CsbEnumValueModel = await self.csb_ev_curd.get_by_md5(db=self.db, md5=query_id, filter_lock=False) if query_type == "md5" \
-            else await self.csb_ev_curd.get_by_key(db=self.db, key=query_id, filter_lock=False)
+        model: CsbEnumValueModel = await self.csb_ev_curd.get_by_md5(db=self.db, md5=md5_id, filter_lock=False)
         if not model:
             return False, FailureStatus(code=status_code.CODE_501_DATA_NOT_EXIST)
         if status_check and getattr(model, "status", None):
@@ -201,7 +199,7 @@ class SystemConfigDictService:
             key=model.get("key"))
         if db_model:
             return FailureStatus(code=status_code.CODE_502_DATA_EXIST_NOT_ADD,
-                                 message="数据字典分类KEY已存在，请更换")
+                                 message="数据字典分类标识已存在，请更换")
 
         new_model: CsbEnumKeyModel = await self.csb_ek_curd.new_model()
         __now = get_now()
@@ -276,19 +274,18 @@ class SystemConfigDictService:
         return SuccessStatus(data=result)
 
     async def de_one_by_md5(self, rtx_id: str, md5: str) -> Status:
-        __flag, data = await self.__de_valid_model_by_md5_or_key(
-            query_id=md5,
+        __flag, data = await self.__de_valid_model_by_md5(
+            md5_id=md5,
             status_check=False,
             response_type="dict",
-            query_type="md5",
             fields=csb_ev_detail_fields,
             lock_check=False
         )
         return SuccessStatus(data=data) if __flag else data
 
     async def de_status(self, rtx_id: str, params: Dict) -> Status:
-        __flag, data = await self.__de_valid_model_by_md5_or_key(
-            query_id=params.get("md5"), status_check=True, response_type="model", query_type="md5", lock_check=False
+        __flag, data = await self.__de_valid_model_by_md5(
+            md5_id=params.get("md5"), status_check=True, response_type="model", lock_check=False
         )
         if not __flag: return data
 
@@ -297,15 +294,20 @@ class SystemConfigDictService:
         return SuccessStatus()
 
     async def de_add_init(self, rtx_id: str,) -> Status:
-        return SuccessStatus()
+        models: List[Dict] = await self.csb_ek_curd.all_(db=self.db, filter_lock=False)
+        if not models:
+            return FailureStatus(code=status_code.CODE_101_SUCCESS_NO_DATA)
+        __data: List[Dict] = await option_converter_dict(models=models, lock_view=False)
+        return SuccessStatus(data=__data)
 
     async def de_add(self, rtx_id: str, model: Dict) -> Status:
-        db_model: CsbEnumValueModel = await self.csb_ev_curd.get_by_key(
+        db_model: CsbEnumValueModel = await self.csb_ev_curd.get_by_key_name(
             db=self.db,
-            key=model.get("key"))
+            key=model.get("key"),
+            name=model.get("name"))
         if db_model:
             return FailureStatus(code=status_code.CODE_502_DATA_EXIST_NOT_ADD,
-                                 message="数据字典枚举KEY已存在，请更换")
+                                 message="数据字典枚举标识已存在，请更换")
 
         new_model: CsbEnumValueModel = await self.csb_ev_curd.new_model()
         __now = get_now()
@@ -314,6 +316,8 @@ class SystemConfigDictService:
         new_model.create_rtx = rtx_id
         new_model.lock = False
         new_model.status = False
+        print("*" * 100)
+        print(model)
         for k, v in model.items():
             setattr(new_model, k, v)
         await self.csb_ev_curd.add(db=self.db, model=new_model)
@@ -321,8 +325,8 @@ class SystemConfigDictService:
 
     async def de_update(self, rtx_id: str, model: Dict) -> Status:
         _md5: str = model.get("md5")
-        __flag, data = await self.__de_valid_model_by_md5_or_key(
-            query_id=_md5, status_check=True, response_type="model", query_type="md5", lock_check=True
+        __flag, data = await self.__de_valid_model_by_md5(
+            md5_id=_md5, status_check=True, response_type="model", lock_check=True
         )
         if not __flag: return data
 
@@ -337,8 +341,8 @@ class SystemConfigDictService:
         return SuccessStatus()
 
     async def de_delete(self, rtx_id: str, md5: str) -> Status:
-        __flag, data = await self.__de_valid_model_by_md5_or_key(
-            query_id=md5, status_check=True, response_type="model", query_type="md5", lock_check=False
+        __flag, data = await self.__de_valid_model_by_md5(
+            md5_id=md5, status_check=True, response_type="model", lock_check=False
         )
         if not __flag: return data
 

@@ -38,7 +38,7 @@ csb_ek_list_fields: List = [
     {"key": "id", "type": ft.INT, "name": "id", "null": False},
     {"key": "md5", "type": ft.STR, "name": "md5", "null": False},
     {"key": "key", "type": ft.STR, "name": "key", "null": False},
-    {"key": "remark", "type": ft.STR, "name": "remark", "null": False},
+    {"key": "value", "type": ft.STR, "name": "value", "null": False},
     {"key": "lock", "type": ft.BOOL, "name": "status", "null": True},
     {"key": "order_id", "type": ft.INT, "name": "orderId", "null": True}
 ]
@@ -47,6 +47,6 @@ csb_ek_list_fields: List = [
 csb_ek_detail_fields: List = [
     {"key": "md5"},
     {"key": "key"},
-    {"key": "remark"},
+    {"key": "value"},
     {"key": "order_id", "type": ft.INT, "name": "orderId", "null": True}
 ]

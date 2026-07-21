@@ -235,3 +235,10 @@ API_TYPE_DICT: Dict[str, str] =  {
     "DELETE": "danger",
 }
 
+
+# 数据字典全部常量
+class DICT_KEY_ALL:
+    id = 0
+    md5 = "ALL"
+    key = "ALL"
+    remark = "全部"

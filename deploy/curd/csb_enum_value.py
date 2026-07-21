@@ -78,8 +78,16 @@ class CsbEnumValueCurd(BaseCurd):
     async def get_by_md5(self, db: AsyncSession, md5: str,filter_lock: bool = False) -> Optional[CsbEnumValueModel]:
         return await self._get_model_by_field(db, CsbEnumValueModel.md5, md5, filter_lock)
 
-    async def get_by_key(self, db: AsyncSession, key: str,filter_lock: bool = False) -> Optional[CsbEnumValueModel]:
-        return await self._get_model_by_field(db, CsbEnumValueModel.key, key, filter_lock)
+    async def get_by_key_name(self, db: AsyncSession, key: str, name: str) -> Optional[CsbEnumValueModel]:
+        try:
+            stmt = select(CsbEnumValueModel).where(
+                CsbEnumValueModel.name == name,
+                CsbEnumValueModel.key == key,
+                CsbEnumValueModel.status != 1)
+            result = await db.execute(stmt)
+            return result.scalar_one_or_none()
+        except Exception as e:
+            raise SQLDBHandleException(f"[{self.__class__.__name__}*查询One]{e}")
 
     @classmethod
     async def get_list_by_name(
@@ -95,7 +103,6 @@ class CsbEnumValueCurd(BaseCurd):
             if filter_lock:
                 stmt = stmt.where(CsbEnumValueModel.lock != True)
             result = await db.execute(stmt)
-
             return result.scalars().all()
         except Exception as e:
             raise SQLDBHandleException(f"[{cls.__name__}*查询Many]{e}")
@@ -114,7 +121,6 @@ class CsbEnumValueCurd(BaseCurd):
             if filter_lock:
                 stmt = stmt.where(CsbEnumValueModel.lock != True)
             result = await db.execute(stmt)
-
             return result.scalars().all()
         except Exception as e:
             raise SQLDBHandleException(f"[{cls.__name__}*查询Many]{e}")
