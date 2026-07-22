@@ -118,8 +118,7 @@ class XtbUserCurd(BaseCurd):
             ).outerjoin(
                 CsbEnumValueModel,
                 XtbUserModel.sex == CsbEnumValueModel.key
-            )
-            stmt = stmt.where(CsbEnumValueModel.name == CsbEnumKEY.SEX_TYPE.value)
+            ).where(CsbEnumValueModel.name == CsbEnumKEY.SEX_TYPE.value)
             if content:
                 stmt = stmt.where(
                     or_(

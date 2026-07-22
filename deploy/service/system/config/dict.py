@@ -269,7 +269,7 @@ class SystemConfigDictService:
             "list": data,
             "page": params.get("page"),
             "pageSize": params.get("limit"),
-            "total": await self.csb_ev_curd.count(self.db, name=params.get("content"))
+            "total": await self.csb_ev_curd.count(db=self.db, name=params.get("content"), filter_lock=False)
         }
         return SuccessStatus(data=result)
 

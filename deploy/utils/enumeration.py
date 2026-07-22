@@ -47,6 +47,7 @@ __all__ = [
     'CsbEnumKEY',
     'DownloadExcelFormat',
     'API_TYPE_DICT',
+    'DICT_KEY_ALL',
 ]
 
 
@@ -241,4 +242,4 @@ class DICT_KEY_ALL:
     id = 0
     md5 = "ALL"
     key = "ALL"
-    remark = "全部"
+    value = "全部"
