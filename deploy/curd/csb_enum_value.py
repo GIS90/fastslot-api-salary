@@ -155,6 +155,7 @@ class CsbEnumValueCurd(BaseCurd):
             if filter_lock:
                 stmt = stmt.where(CsbEnumValueModel.lock != 1)
             stmt = stmt.order_by(
+                asc(CsbEnumValueModel.name),
                 asc(CsbEnumValueModel.order_id),
                 desc(CsbEnumValueModel.id)
             ).offset(offset).limit(limit)
