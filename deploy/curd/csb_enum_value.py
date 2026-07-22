@@ -37,6 +37,7 @@ from sqlalchemy.orm.attributes import InstrumentedAttribute
 from sqlalchemy import func
 
 from deploy.curd.base_curd import BaseCurd
+from deploy.schema.dao.csb_enum_key import CsbEnumKeyModel
 from deploy.schema.dao.csb_enum_value import CsbEnumValueModel
 from deploy.utils.exception import SQLDBHandleException
 from deploy.utils.enumeration import DICT_KEY_ALL
@@ -149,13 +150,16 @@ class CsbEnumValueCurd(BaseCurd):
         filter_lock: bool = False
     ) -> Optional[List]:
         try:
-            stmt = select(CsbEnumValueModel).where(CsbEnumValueModel.status != 1)
+            stmt = select(CsbEnumValueModel).join(
+                CsbEnumKeyModel,
+                CsbEnumValueModel.name == CsbEnumKeyModel.key
+            ).where(CsbEnumValueModel.status != 1)
             if name and name != DICT_KEY_ALL.key:
                 stmt = stmt.where(CsbEnumValueModel.name == name)
             if filter_lock:
                 stmt = stmt.where(CsbEnumValueModel.lock != 1)
             stmt = stmt.order_by(
-                asc(CsbEnumValueModel.name),
+                asc(CsbEnumKeyModel.order_id),
                 asc(CsbEnumValueModel.order_id),
                 desc(CsbEnumValueModel.id)
             ).offset(offset).limit(limit)
