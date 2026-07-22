@@ -67,7 +67,7 @@ class XtbUserAddModel(__XtbUserBaseModel):
     rtx_id: str = Field(...,
                         min_length=1,
                         max_length=35,
-                        description="用户RTX-ID（唯一标识，允许字母、数字、连字符(-)和点(.)的组合）",
+                        description="用户RTX-ID（唯一标识，允许大小写英文字母、数字、连字符(-)和点(.)的组合）",
                         alias="rtxId",
                         validate_default=True)
 

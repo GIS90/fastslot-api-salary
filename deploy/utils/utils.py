@@ -659,13 +659,13 @@ def get_all_parent_ids_iterative(
 """ - - - - - - - - - - - - - - - - - 请求数据模型校验类 - - - - - - - - - - - - - - - - -"""
 def alphanumeric_only(value: str, field: str) -> str:
     if not re.match(r'^[a-zA-Z0-9\-\.]+$', value):
-        raise RequestValidationError(f"{field}字段只允许包含字母、数字、连字符(-)和点(.)")
+        raise RequestValidationError(f"{field}字段只允许包含大小写英文字母、数字、连字符(-)和点(.)")
     return value
 
 
 def letters_only(value: str, field: str) -> str:
     if not re.match(r'^[a-zA-Z]+$', value):
-        raise RequestValidationError(f"{field}字段只允许包含字母")
+        raise RequestValidationError(f"{field}字段只允许包含大小写英文字母")
     return value
 
 
