@@ -30,13 +30,14 @@ Life is short, I use python.
 
 ------------------------------------------------
 """
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, Query
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from deploy.curd.database import get_session
 from deploy.service.api.api import ApiOpenService
 from deploy.service.api.user import ApiUserService
 from deploy.service.api.download import ApiDownloadService
+from deploy.service.system.config.xtcs import SystemConfigXtcsService
 from deploy.utils.status import Status
 from deploy.utils.depend import depend_token_rtx
 from deploy.utils.decorator import watch_except
@@ -51,18 +52,30 @@ def get_user_service(db: AsyncSession = Depends(get_session)) -> ApiUserService:
     return ApiUserService(db_connection=db)
 def get_download_service(db: AsyncSession = Depends(get_session)) -> ApiDownloadService:
     return ApiDownloadService(db_connection=db)
+def get_xtcs_service(db: AsyncSession = Depends(get_session)) -> SystemConfigXtcsService:
+    return SystemConfigXtcsService(db_connection=db)
+
 
 # - - - - - - - - - - - - - - - - - - - - Open Api - - - - - - - - - - - - - - - - - - - -
 @router.get('/open/m1.case',
             summary="[M1模块]CASE",
             description="[M1模块]测试用例")
 @watch_except
-async def m1_case() -> dict:
+async def m1_case() -> Status:
     """
     [M1模块]CASE
     :return: json
     """
     return await api_service.m1_case()
+
+
+@router.get('/open/system.info', summary="[系统]基础信息")
+@watch_except
+async def system_info(
+    name: str = Query(..., description="数据KEY"),
+    xtcs_service: SystemConfigXtcsService = Depends(get_xtcs_service)
+) -> Status:
+    return await xtcs_service.system_info_openapi(system_name=name)
 
 
 # - - - - - - - - - - - - - - - - - - - - 文件下载 - - - - - - - - - - - - - - - - - - - -

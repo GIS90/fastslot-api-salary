@@ -140,6 +140,22 @@ class XtbXtcsCurd(BaseCurd):
             raise SQLDBHandleException(f"[{cls.__name__}*查询All]{e}")
 
     @classmethod
+    async def list_by_keys(
+            cls, db: AsyncSession, key_list: List[str], filter_lock: bool = False
+    ) -> Optional[List]:
+        try:
+            stmt = select(XtbXtcsModel).where(
+                XtbXtcsModel.status != 1,
+                XtbXtcsModel.key.in_(key_list)
+            )
+            if filter_lock:
+                stmt = stmt.where(XtbXtcsModel.lock != True)
+            result = await db.execute(stmt)
+            return result.scalars().all()
+        except Exception as e:
+            raise SQLDBHandleException(f"[{cls.__name__}*查询List]{e}")
+
+    @classmethod
     async def download(
             cls, db: AsyncSession, params: Dict, *args, **kwargs
     ) -> Optional[List]:

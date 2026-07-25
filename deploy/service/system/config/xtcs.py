@@ -265,3 +265,27 @@ class SystemConfigXtcsService:
             lock_check=False
         )
         return SuccessStatus(data=data) if __flag else data
+
+    async def system_info_openapi(self, system_name: str) -> Status:
+        _key_list: List = [
+            XtbXtcsKEY.SYSTEM_TITLE.value,
+            XtbXtcsKEY.SYSTEM_VERSION.value,
+            XtbXtcsKEY.SYSTEM_FEATURE.value,
+            XtbXtcsKEY.SYSTEM_SUMMARY.value
+        ]
+        models = await self.xtb_xtcs_curd.list_by_keys(db=self.db, key_list=_key_list)
+        if not models:
+            return FailureStatus(code=status_code.CODE_101_SUCCESS_NO_DATA)
+        _d: Dict = {}
+        for model in models:
+            if not model: continue
+            if getattr(model, "key") == XtbXtcsKEY.SYSTEM_TITLE.value:
+                _d["title"] = getattr(model, "value")
+            elif getattr(model, "key") == XtbXtcsKEY.SYSTEM_VERSION.value:
+                _d["version"] = getattr(model, "value")
+            elif getattr(model, "key") == XtbXtcsKEY.SYSTEM_FEATURE.value:
+                _d["feature"] = getattr(model, "value")
+            elif getattr(model, "key") == XtbXtcsKEY.SYSTEM_SUMMARY.value:
+                _d["summary"] = getattr(model, "value")
+        else:
+            return SuccessStatus(data=_d)

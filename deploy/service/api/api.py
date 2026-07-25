@@ -30,6 +30,8 @@ Life is short, I use python.
 
 ------------------------------------------------
 """
+from deploy.utils.status import Status, SuccessStatus, FailureStatus
+
 
 class ApiOpenService:
     """
@@ -54,11 +56,12 @@ class ApiOpenService:
     def __repr__(self):
         return self.__str__()
 
-    async def m1_case(self) -> dict:
-        return {
+    async def m1_case(self) -> Status:
+        _data: dict = {
             "route": "api",
             "module": "M1",
             "name": "m1>case",
             "data": self.COLOR_ENUM
         }
+        return SuccessStatus(data=_data)
 
