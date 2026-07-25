@@ -274,14 +274,15 @@ insert into xtb_xtcs(`key`, `md5`, `remark`, `value`, `create_rtx`, `lock`, `sta
 ('REDIS-CACHE-EXPIRE', '4b8edc2094cb917ecb179453e9e472d7', 'Redis数据缓存时间，单位为秒，默认为4小时', '14400', 'admin', False, False, 2),
 ('USER-DEFAULT-PASSWORD', '2560983a81db89c5f8ac7bc59ceec23e', '用户默认密码', 'abcd1234@', 'admin', False, False, 3),
 ('USER-DEFAULT-AVATAR', 'ef2cee999bde28a0f2b2485127d8a389', '用户默认头像', 'http://2lstore.pygo.space/avatars/default.png', 'admin', False, False, 4),
-('SYSTEM-TITLE', '1700a58b93fe99d9edf8eec318737f1e', '系统登录页信息展示：系统标题', '智行工具平台', 'admin', False, False, 5),
-('SYSTEM-VERSION', '7bf8a92528d9e53f020bb24d80bfb967', '系统登录页信息展示：系统版本', '1.1.2', 'admin', False, False, 6),
-('SYSTEM-FEATURE', 'c827459d2ee5da92adfd826355588039', '系统登录页信息展示：系统特色', '定制化 / 高性能 / 精优雅', 'admin', False, False, 7),
-('SYSTEM-SUMMARY', 'b48ef16d13363753454a38b1ccf255a4', '系统登录页信息展示：系统简述', '践行践远，智慧前行，总有一款工具让工作变得更加轻松，助你提质增效。', 'admin', False, False, 8),
-('HOME-TIP-MORNING', '16d037c51df631d8c4260f04bdbee199', '系统登录温馨提示：凌晨6点～中午12点', '希望您有一个元气满满的早晨，充满动力地开始新的一天，加油哦！', 'admin', False, False, 9),
-('HOME-TIP-NOON', 'a6856a3069a3fcb0201dd43a8cc382f0', '系统登录温馨提示：中午12点～下午14点', '忙碌了一上午，确实应该适当休息一下，记得按时吃午饭，补充能量才能更好地完成下午的工作！', 'admin', False, False, 10),
-('HOME-TIP-AFTERNOON', 'a262837654996d535aa3f3790a6eba4f', '系统登录温馨提示：下午14点～下午18点', '下午是继续推进各项任务的好时间，保持专注和效率，希望您能够保持良好的状态，顺利完成每一天的目标！', 'admin', False, False, 11),
-('HOME-TIP-NIGHT', '2cb3bb4adb5d010267204a7effd2c8da', '系统登录温馨提示：下午18点～凌晨6点', '一天的努力即将结束，回顾今天的成就，为明天做好准备。别忘了放松一下自己，享受美好的夜晚时光，睡觉要有好梦。', 'admin', False, False, 12);
+('UPLOAD-FILE-MAX', '19a7fd901645cd10a0de9b495d1f6088', '文件上传最大文件数量', '15', 'admin', False, False, 5),
+('SYSTEM-TITLE', '1700a58b93fe99d9edf8eec318737f1e', '系统登录页信息展示：系统标题', '智行工具平台', 'admin', False, False, 6),
+('SYSTEM-VERSION', '7bf8a92528d9e53f020bb24d80bfb967', '系统登录页信息展示：系统版本', '1.1.2', 'admin', False, False, 7),
+('SYSTEM-FEATURE', 'c827459d2ee5da92adfd826355588039', '系统登录页信息展示：系统特色', '定制化 / 高性能 / 精优雅', 'admin', False, False, 8),
+('SYSTEM-SUMMARY', 'b48ef16d13363753454a38b1ccf255a4', '系统登录页信息展示：系统简述', '践行践远，智慧前行，总有一款工具让工作变得更加轻松，助你提质增效。', 'admin', False, False, 9),
+('HOME-TIP-MORNING', '16d037c51df631d8c4260f04bdbee199', '系统登录温馨提示：凌晨6点～中午12点', '希望您有一个元气满满的早晨，充满动力地开始新的一天，加油哦！', 'admin', False, False, 10),
+('HOME-TIP-NOON', 'a6856a3069a3fcb0201dd43a8cc382f0', '系统登录温馨提示：中午12点～下午14点', '忙碌了一上午，确实应该适当休息一下，记得按时吃午饭，补充能量才能更好地完成下午的工作！', 'admin', False, False, 11),
+('HOME-TIP-AFTERNOON', 'a262837654996d535aa3f3790a6eba4f', '系统登录温馨提示：下午14点～下午18点', '下午是继续推进各项任务的好时间，保持专注和效率，希望您能够保持良好的状态，顺利完成每一天的目标！', 'admin', False, False, 12),
+('HOME-TIP-NIGHT', '2cb3bb4adb5d010267204a7effd2c8da', '系统登录温馨提示：下午18点～凌晨6点', '一天的努力即将结束，回顾今天的成就，为明天做好准备。别忘了放松一下自己，享受美好的夜晚时光，睡觉要有好梦。', 'admin', False, False, 13);
 -- = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
 -- CSB_ENUM_EKY 枚举Key表
 -- create table && index

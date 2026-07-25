@@ -59,7 +59,7 @@ async def pagination(
 
 
 @router.get("/xtcs", summary="通过Md5-Id获取单条数据")
-async def one(
+async def one_by_md5(
     md5: str = Query(..., description="数据Md5-Id"),
     token_rtx_id: str = Depends(depend_token_rtx),
     service: SystemConfigXtcsService = Depends(get_service)
@@ -119,3 +119,12 @@ async def view(
     service: SystemConfigXtcsService = Depends(get_service)
 ) -> Status:
     return await service.view(rtx_id=token_rtx_id, md5=md5)
+
+
+@router.get("/xtcs.key", summary="通过KEY获取单条数据")
+async def one_by_key(
+    key: str = Query(..., description="数据KEY"),
+    token_rtx_id: str = Depends(depend_token_rtx),
+    service: SystemConfigXtcsService = Depends(get_service)
+) -> Status:
+    return await service.one_by_key(rtx_id=token_rtx_id, key=key)

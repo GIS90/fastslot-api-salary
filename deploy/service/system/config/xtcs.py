@@ -254,3 +254,14 @@ class SystemConfigXtcsService:
             _id +=  1
             data.append(_d)
         return data
+
+    async def one_by_key(self, rtx_id: str, key: str) -> Status:
+        __flag, data = await self.__valid_model_by_md5_or_key(
+            query_id=key,
+            status_check=False,
+            response_type="dict",
+            query_type="key",
+            fields=xtb_xtcs_detail_fields,
+            lock_check=False
+        )
+        return SuccessStatus(data=data) if __flag else data
