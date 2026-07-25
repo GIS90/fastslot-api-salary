@@ -38,8 +38,6 @@ from deploy.service.system.ops.task import SystemOpsTaskService
 from deploy.utils.status import Status, SuccessStatus, FailureStatus
 from deploy.utils.status_value import (StatusCode as status_code,
                                        StatusMsg as status_msg)
-from deploy.utils.converter import model_converter_dict
-from deploy.schema.dto.xtb_menu import xtb_tree_detail_fields
 from deploy.utils.utils import get_all_parent_ids_iterative, build_menu_tree_iterative, build_menu_tree_fci
 from deploy.config import (server_user as SERVER_USER_ADMIN,
                            server_role as SERVER_ROLE_ADMIN,

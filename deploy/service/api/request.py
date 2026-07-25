@@ -39,6 +39,9 @@ from deploy.utils.utils import md5 as md5_func
 
 
 class ApiRequestService:
+    """
+    ApiRequestService Service
+    """
 
     def __init__(self, db_connection: AsyncSession):
         """

@@ -284,6 +284,19 @@ def get_rtx_id(request) -> str:
 
 """ - - - - - - - - - - - - - - - - - 文件、目录 - - - - - - - - - - - - - - - - -"""
 
+def remove_file(file_: Path) -> bool:
+    """
+    删除文件
+
+    :param file_: 文件
+    :return: bool
+    """
+    if Path.exists(file_):
+        os.remove(file_)
+        return True
+    else:
+        return False
+
 
 def mk_dirs(path: str) -> str:
     """
@@ -337,6 +350,9 @@ def get_root_folder() -> Optional[Path]:
 
     return get_deploy_folder().parent
 
+
+def get_static_folder() -> Optional[Path]:
+    return Path.joinpath(get_deploy_folder(), 'static')
 
 """ - - - - - - - - - - - - - - - - - 参数校验类 - - - - - - - - - - - - - - - - -"""
 

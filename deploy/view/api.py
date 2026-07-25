@@ -30,13 +30,15 @@ Life is short, I use python.
 
 ------------------------------------------------
 """
-from fastapi import APIRouter, Depends, Query
+from typing import List
+from fastapi import APIRouter, Depends, Query, File, UploadFile, Form
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from deploy.curd.database import get_session
 from deploy.service.api.api import ApiOpenService
 from deploy.service.api.user import ApiUserService
 from deploy.service.api.download import ApiDownloadService
+from deploy.service.api.upload import ApiUploadService
 from deploy.service.system.config.xtcs import SystemConfigXtcsService
 from deploy.utils.status import Status
 from deploy.utils.depend import depend_token_rtx
@@ -52,12 +54,14 @@ def get_user_service(db: AsyncSession = Depends(get_session)) -> ApiUserService:
     return ApiUserService(db_connection=db)
 def get_download_service(db: AsyncSession = Depends(get_session)) -> ApiDownloadService:
     return ApiDownloadService(db_connection=db)
+def get_upload_service(db: AsyncSession = Depends(get_session)) -> ApiUploadService:
+    return ApiUploadService(db_connection=db)
 def get_xtcs_service(db: AsyncSession = Depends(get_session)) -> SystemConfigXtcsService:
     return SystemConfigXtcsService(db_connection=db)
 
 
 # - - - - - - - - - - - - - - - - - - - - Open Api - - - - - - - - - - - - - - - - - - - -
-@router.get('/open/m1.case',
+@router.get("/open/m1.case",
             summary="[M1模块]CASE",
             description="[M1模块]测试用例")
 @watch_except
@@ -69,7 +73,7 @@ async def m1_case() -> Status:
     return await api_service.m1_case()
 
 
-@router.get('/open/system.info', summary="[系统]基础信息")
+@router.get("/open/system.info", summary="[系统]基础信息")
 @watch_except
 async def system_info(
     name: str = Query(..., description="数据KEY"),
@@ -79,7 +83,7 @@ async def system_info(
 
 
 # - - - - - - - - - - - - - - - - - - - - 文件下载 - - - - - - - - - - - - - - - - - - - -
-@router.get('/download.enum', summary="[下载]枚举")
+@router.get("/download.enum", summary="[下载]枚举参数")
 async def download_enum(
     token_rtx_id: str = Depends(depend_token_rtx),
     download_service: ApiDownloadService = Depends(get_download_service)
@@ -87,7 +91,7 @@ async def download_enum(
     return await download_service.download_enum(token_rtx_id)
 
 
-@router.post('/download', summary="[下载]下载")
+@router.post("/download", summary="[下载]下载")
 async def download(
     params: dict = Depends(download_params),
     token_rtx_id: str = Depends(depend_token_rtx),
@@ -96,8 +100,33 @@ async def download(
     return await download_service.download(rtx_id=token_rtx_id, params=params)
 
 
+# - - - - - - - - - - - - - - - - - - - - 文件上传 - - - - - - - - - - - - - - - - - - - -
+@router.post("/upload",
+             summary="[上传]UploadFile模式单个大文件上传",
+             description="单个大文件上传，UploadFile对象可以获取文件属性，具体参数请查看UploadFile源码，推荐使用")
+async def upload(
+    upload_type: str = Form(..., description="上传类型"),
+    file: UploadFile = File(...),
+    token_rtx_id: str = Depends(depend_token_rtx),
+    upload_service: ApiUploadService = Depends(get_upload_service)
+) -> Status:
+    return await upload_service.upload(rtx_id=token_rtx_id, upload_type=upload_type, file_=file)
+
+
+@router.post("/uploads",
+             summary="[上传]UploadFile模式多个大文件上传",
+             description="多个大文件上传，UploadFile对象可以获取文件属性，具体参数请查看UploadFile源码，推荐使用")
+async def uploads(
+    upload_type: str = Form(..., description="上传类型"),
+    files: List[UploadFile] = File(...),
+    token_rtx_id: str = Depends(depend_token_rtx),
+    upload_service: ApiUploadService = Depends(get_upload_service)
+) -> Status:
+    return await upload_service.uploads(rtx_id=token_rtx_id, upload_type=upload_type, files_=files)
+
+
 # - - - - - - - - - - - - - - - - - - - - 用户系统权限 - - - - - - - - - - - - - - - - - - - -
-@router.get("/auth", summary="用户菜单权限，用于系统登录后获取用户权限菜单树")
+@router.get("/auth", summary="[系统权限]用户菜单权限，用于系统登录后获取用户权限菜单树")
 async def auth(
     token_rtx_id: str = Depends(depend_token_rtx),
     user_service: ApiUserService = Depends(get_user_service)
@@ -105,7 +134,7 @@ async def auth(
     return await user_service.auth(token_rtx_id)
 
 
-@router.get('/dashboard', summary="[USER]用户Dashboard")
+@router.get("/dashboard", summary="[系统权限]用户Dashboard")
 async def dashboard(
     token_rtx_id: str = Depends(depend_token_rtx),
     user_service: ApiUserService = Depends(get_user_service)
@@ -113,7 +142,7 @@ async def dashboard(
     return await user_service.dashboard(token_rtx_id)
 
 
-@router.get('/task', summary="[USER]用户Task列表")
+@router.get("/task", summary="[系统权限]用户Task列表")
 async def task(
     params: dict = Depends(pageable_params),
     token_rtx_id: str = Depends(depend_token_rtx),

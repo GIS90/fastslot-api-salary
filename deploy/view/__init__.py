@@ -33,7 +33,6 @@ Life is short, I use python.
 from deploy.view.root import router as root_router
 from deploy.view.access import router as access_router
 from deploy.view.api import router as api_router
-from deploy.view.upload import router as upload_router
 
 from deploy.view.system.main.user import router as system_main_user_router
 from deploy.view.system.main.role import router as system_mian_role_router
@@ -50,8 +49,7 @@ from deploy.view.setter.profile import router as setter_profile_router
 View根据系统设计的api进行模块划分，其中有3个比较特殊（不为系统模块设计API）
 - root：路径为/，系统首页
 - access：系统登录、退出API，采用JWT Token系统验证 [不走token验证]
-- api：系统正常运行的API集合，包含用户权限相关、对外开发的API [不走token验证]
-- upload：文件上传模块 [File UploadFile]
+- api：系统正常运行的API集合，包含用户权限相关、通用接口、对外开发的API [不走token验证]
 
 功能模块
   系统
@@ -69,7 +67,6 @@ add_routers = [
     root_router,
     access_router,
     api_router,
-    upload_router,
     system_main_user_router,
     system_mian_role_router,
     system_mian_menu_router,

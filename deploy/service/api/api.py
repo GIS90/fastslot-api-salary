@@ -35,8 +35,9 @@ from deploy.utils.status import Status, SuccessStatus, FailureStatus
 
 class ApiOpenService:
     """
-    API Service
+    ApiOpenService Service
     """
+
     COLOR_ENUM = [
         'red'.upper(),
         'yellow'.lower(),
@@ -46,7 +47,7 @@ class ApiOpenService:
 
     def __init__(self):
         """
-        ApiService class initialize
+        ApiOpenService class initialize
         """
         super(ApiOpenService, self).__init__()
 

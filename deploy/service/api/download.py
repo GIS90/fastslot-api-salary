@@ -76,7 +76,7 @@ class ApiDownloadService(object):
 
     def __init__(self, db_connection: AsyncSession):
         """
-        ApiRequestService class initialize
+        ApiDownloadService class initialize
         """
         self.db: AsyncSession = db_connection
         self.xtb_user_task_curd: XtbUserTaskCurd = XtbUserTaskCurd()
@@ -87,7 +87,6 @@ class ApiDownloadService(object):
         self.system_ops_task_service: SystemOpsTaskService = SystemOpsTaskService(db_connection=db_connection)
         self.system_ops_log_service: SystemOpsLogService = SystemOpsLogService(db_connection=db_connection)
         self.system_ops_depart_service: SystemOpsDepartService = SystemOpsDepartService(db_connection=db_connection)
-
 
     def __str__(self):
         return "ApiDownloadService class."
