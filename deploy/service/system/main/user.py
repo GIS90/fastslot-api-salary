@@ -30,9 +30,12 @@ Life is short, I use python.
 
 ------------------------------------------------
 """
+import re
 from datetime import datetime
+from fastapi import UploadFile
 from typing import Dict, List, Tuple, Literal, Any, Union
 from sqlalchemy.ext.asyncio import AsyncSession
+
 from deploy.curd.xtb_user import XtbUserCurd
 from deploy.curd.xtb_xtcs import XtbXtcsCurd
 from deploy.schema.dao.xtb_user import XtbUserModel
@@ -44,10 +47,13 @@ from deploy.utils.status_value import (StatusCode as status_code,
                                        StatusMsg as status_msg)
 from deploy.utils.converter import model_converter_dict
 from deploy.schema.dto.xtb_user import (xtb_user_list_fields, xtb_user_detail_fields,
-                                        xtb_user_login_fields, xtb_user_download_fields)
+                                        xtb_user_login_fields, xtb_user_download_fields,
+                                        xtb_user_import_fields)
 from deploy.utils.utils import get_now, random_string, md5 as generator_md5, d2s
 from deploy.config import server_user, server_password, server_avatar
-from deploy.utils.enumeration import XtbXtcsKEY, CsbEnumKEY
+from deploy.utils.enumeration import XtbXtcsKEY, CsbEnumKEY, FileTypeEnum
+from deploy.utils.upload import uploadUtils
+from deploy.delib.excel_lib import ExcelLib
 
 
 _SERVER_USER_ADMIN: str = server_user
@@ -66,6 +72,8 @@ class SystemMainUserService:
         self.xtb_xtcs_curd: XtbXtcsCurd = XtbXtcsCurd()
         self.system_config_dict_service: SystemConfigDictService = SystemConfigDictService(db_connection=db_connection)
         self.system_main_role_service: SystemMainRoleService = SystemMainRoleService(db_connection=db_connection)
+        self.upload_utils: uploadUtils = uploadUtils()
+        self.excel_lib: ExcelLib = ExcelLib()
 
     def __str__(self):
         return "SystemMainUserService class."
@@ -331,3 +339,96 @@ class SystemMainUserService:
             })
         else:
             return option_list
+
+    @staticmethod
+    async def validate_rtx_id(rtx_id: str) -> bool:
+        """
+        校验 rtxId 格式
+        允许：大小写英文字母、数字、连字符(-)和点(.)
+        不允许：空格、标点等特殊字符
+        """
+        pattern = r'^[a-zA-Z0-9\-\.]+$'
+        return bool(re.match(pattern, rtx_id))
+
+
+    async def preview(self, rtx_id: str, file_: UploadFile) -> Status:
+        upload_result: Status = await self.upload_utils.upload(
+            rtx_id=rtx_id,
+            upload_type=FileTypeEnum.USER_IMPORT.value,
+            file_=file_)
+        if upload_result.dict().get("code") != 100:
+            return upload_result
+
+        file_local: str = upload_result.dict().get("data").get("local")
+        excel_result: Dict = await self.excel_lib.read_by_cell(
+            read_file=file_local,
+            sheet=0,
+            request_title=True,
+            response_title=False)
+        if excel_result.get("code") != 100:
+            return FailureStatus(
+                code=excel_result.get("code"),
+                message=excel_result.get("message"))
+        excel_data: List = excel_result.get("data").get("data")
+        if not excel_data:
+            return FailureStatus(
+                code=status_code.CODE_101_SUCCESS_NO_DATA,
+                message="上传的文件不包含有效数据，请重新上传")
+        # 格式化数据
+        __data: List = []
+        __upload_rtx_id_list: List = []
+        for d in excel_data:
+            if not d: continue
+            __status: bool = False
+            __message: str = ""
+            # 校验一：是否存在rtx-id
+            if not d[1]:
+                __status: bool = True; __message: str = "账户不允许为空"
+            # 校验二：表格人员重复
+            if d[1] in __upload_rtx_id_list:
+                __status: bool = True; __message: str = "用户在表格中重复"
+            else:
+                __upload_rtx_id_list.append(d[1])
+            # 校验三：数据库人员重复
+            if not __status:
+                db_model: XtbUserModel = await self.xtb_user_curd.get_by_rtx_id(db=self.db, rtx_id=d[1])
+                if db_model: __status = True; __message="平台已存在用户账号"
+            # 校验四：账户规则校验
+            if not __status:
+                __res = await self.validate_rtx_id(rtx_id=d[1])
+                if not __res: __status = True; __message: str = "账户格式不正确"
+            # 校验五：账户长度
+            if not __status:
+                if len(d[1]) > 35: __status = True; __message: str = "账户长度必须在35个字符以内"
+
+            __d: Dict = {
+                "id": d[0],
+                "rtxId": d[1],
+                "name": d[2],
+                "sex": d[3],
+                "email": d[4],
+                "phone": d[5],
+                "introduction": d[6],
+                "role": d[7],
+                "status": __status,
+                "message": __message
+            }
+            # status标识是否有效数据，判断依据rtx-id是否唯一
+            __data.append(__d)
+        if len(__data) > 200:
+            return SuccessStatus(code=status_code.CODE_453_REQUEST_FILE_EXCEED_MAX_ROW.value,
+                                 message="单次导入最大数据量为200，请分批上传")
+        return SuccessStatus(data=__data)
+
+    async def import_(self, rtx_id: str, data: List) -> Status:
+        _success: int = 0
+        for _d in data:
+            if not _d: continue
+            result = await self.add(rtx_id=rtx_id, model=dict(_d))  # _d为XtbUserImportModel
+            if result.dict().get("code") == 100: _success += 1
+        _data: Dict = {
+            "total": len(data),
+            "success": _success,
+            "failed": len(data) - _success
+        }
+        return SuccessStatus(data=_data)

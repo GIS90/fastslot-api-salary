@@ -38,6 +38,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from deploy.utils.status_value import StatusCode as status_code
 from deploy.utils.status import Status, SuccessStatus, FailureStatus
 from deploy.utils.utils import get_now, get_store_folder, default_file_suffix
+from deploy.utils.upload import uploadUtils
 from deploy.delib.store_lib import QiNiuStoreLib
 from deploy.config import store_yun_access, store_yun_secret, store_yun_base, store_yun_space
 
@@ -51,6 +52,7 @@ class ApiUploadService:
         ApiUploadService class initialize
         """
         self.db: AsyncSession = db_connection
+        self.upload_utils: uploadUtils = uploadUtils()
         # 定义文件读取默认大小
         self.READ_SIZE = 1024 * 1024  # 1024 = 1KB  1024 * 1024 = 1MB
         # 云存储
@@ -73,46 +75,15 @@ class ApiUploadService:
             upload_type: str,
             file_: UploadFile
             # response_type: Literal["status", "dict"] = "status",
-    ) -> Union[Status, Dict]:
-        # - - - - - - - - - - - - - 数据质量检查 - - - - - - - - - - - - -
-        if not file_:
-            return FailureStatus(code=status_code.CODE_450_REQUEST_FILE_NO_UPLOAD)
-        file_name = getattr(file_, 'filename')  # use getattr method to get file name
-        if not file_name:
-            file_name = f"{rtx_id}-{get_now(format_="%Y-%m-%d-%H-%M-%S")}{default_file_suffix(upload_type)}"
-        real_file = f"{get_store_folder(add_date=True)}/{file_name}"
-        if pathlib_path(real_file).exists():
-            # 文件已存在，重命名文件，同时保留多份文件
-            __file_names = os.path.splitext(real_file)
-            real_file = f"{__file_names[0]}-{get_now(format_='%Y-%m-%d-%H-%M-%S')}{__file_names[1]}"
-        # - - - - - - - - - - - - - 本地缓存写入 - - - - - - - - - - - - -
-        try:
-            with open(real_file, "wb") as f:
-                while content := await file_.read(self.READ_SIZE):
-                    f.write(content)
-        except Exception as e:
-            return FailureStatus(
-                code=status_code.CODE_456_REQUEST_FILE_LOCAL_STORE_FAILURE.value,
-                message=f"文件本地存储失败：{str(e)}")
-        # - - - - - - - - - - - - - 云存储 - - - - - - - - - - - - -
-        _store_name: str = f"{get_now(format_='%Y%m%d')}/{file_name}"    # 加入上传日期
-        qn_result = await self.qn_store.upload(store_name=_store_name, local_file=real_file)
-        if qn_result.get("code") != 100:
-            return FailureStatus(
-                code=status_code.CODE_457_REQUEST_FILE_YUN_STORE_FAILURE.value,
-                message=qn_result.get("message") or "文件云存储上传失败")
-        __data: Dict = {
-            "name": file_name,
-            "url": qn_result.get("data").get("url")
-        }
-        return SuccessStatus(data=__data)
+    ) -> Status:
+        return await self.upload_utils.upload(rtx_id=rtx_id, upload_type=upload_type, file_=file_)
 
     async def uploads(self, rtx_id: str, upload_type: str, files_: List[UploadFile]) -> Status:
         __request_len: int = len(files_)
         __success_list: int = 0
         for f in files_:
             if not f: continue
-            result = await self.upload(rtx_id=rtx_id, upload_type=upload_type, file_=f)
+            result = await self.upload_utils.upload(rtx_id=rtx_id, upload_type=upload_type, file_=f)
             if result.dict().get("code") == 100: __success_list += 1
         __data: Dict = {
             "total": __request_len,

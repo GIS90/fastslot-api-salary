@@ -33,10 +33,10 @@ Life is short, I use python.
 from deploy.schema._po_base_model import baseModel
 from deploy.utils.utils import alphanumeric_only
 from pydantic import Field, field_validator
-from typing import Optional
+from typing import Optional, Union
 
 
-__all__ = ["XtbUserAddModel", "XtbUserUpdateModel"]
+__all__ = ["XtbUserAddModel", "XtbUserUpdateModel", "XtbUserImportModel"]
 
 
 class __XtbUserBaseModel(baseModel):
@@ -103,6 +103,31 @@ class XtbUserUpdateModel(__XtbUserBaseModel):
         "json_schema_extra": {
             "example": {
                 "md5": "AAAAAAAAAA",
+                "name": "adc",
+                "sex": "M",
+                "email": "gaoming971366@163.com",
+                "phone": "13051355646",
+                "introduction": "哈哈哈哈哈",
+                "department": "研发部",
+                "role": ["admin", "hr"]
+            }
+        }
+    }
+
+
+class XtbUserImportModel(__XtbUserBaseModel):
+    rtx_id: str = Field(..., min_length=1, max_length=35, alias="rtxId")
+    name: str = Field(..., min_length=1, max_length=30, description="昵称")
+    sex: str = Field(..., min_length=1, max_length=2, description="性别")
+    email: str = Field(..., min_length=1, max_length=80, description="邮箱")
+    phone: Union[str, int] = Field(..., description="电话")
+    introduction: Union[str, int, None] = Field(..., description="个性签名")
+    role: Optional[str] = Field(..., max_length=255, description="用户权限")
+
+    model_config = {
+        "json_schema_extra": {
+            "example": {
+                "rtxId": "ADC",
                 "name": "adc",
                 "sex": "M",
                 "email": "gaoming971366@163.com",

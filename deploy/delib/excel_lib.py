@@ -215,7 +215,7 @@ class ExcelLib:
 
         return real_store_dir
 
-    def merge_openpyxl(self, new_name: str, file_list: list, **kwargs) -> Dict:
+    async def merge_openpyxl(self, new_name: str, file_list: list, **kwargs) -> Dict:
         """
         使用openpyxl库合并Excel文件，适用于.xlsx格式的文件。
         支持按行或单元格两种方式进行数据写入，并可设置合并后的工作表之间的空白行数。
@@ -313,7 +313,7 @@ class ExcelLib:
             return self.visual_value(
                 999, str(error), {})
 
-    def merge_xlrw(self, new_name: str, file_list: list, **kwargs) ->Dict:
+    async def merge_xlrw(self, new_name: str, file_list: list, **kwargs) ->Dict:
         """
         xlwt、xlrd:
             .xls表格行数限制65535
@@ -386,7 +386,7 @@ class ExcelLib:
             return self.visual_value(
                 999, str(error), {})
 
-    def merge_new(self, new_name: str, file_list: list, **kwargs) -> Dict:
+    async def merge_new(self, new_name: str, file_list: list, **kwargs) -> Dict:
         """
         采取xlrd、openpyxl综合操作表格合并：
             - 读取：xlrd
@@ -488,7 +488,8 @@ class ExcelLib:
             return self.visual_value(
                 999, str(error), {})
 
-    def compress_zip(self, files, zip_name) -> Optional[bool, str]:
+    @staticmethod
+    async def compress_zip(files, zip_name) -> Optional[bool]:
         """
         buildin function
         to use compress file
@@ -509,7 +510,7 @@ class ExcelLib:
         zp.close()
         return zip_name
 
-    def split_xlrw(self, file: str, **kwargs) -> Dict:
+    async def split_xlrw(self, file: str, **kwargs) -> Dict:
         """
         Use xlrd xlwt 处理.xls、.xlsx文件
         :param file: file path，包含项目路径，为存储的绝对路径
@@ -724,7 +725,7 @@ class ExcelLib:
                     464, '文件存储目录不存在', {})
             try:
                 zip_files = [os.path.join(real_dir, x) for x in os.listdir(real_dir)]
-                is_ok = self.compress_zip(files=zip_files,
+                is_ok = await self.compress_zip(files=zip_files,
                                           zip_name=os.path.join(real_dir, compress_name))
                 if is_ok:
                     return self.visual_value(
@@ -739,7 +740,14 @@ class ExcelLib:
         return self.visual_value(
             999, '暂无其他处理方式', {})
 
-    def read(self, read_file: str, sheet: int = 0, rows: list = [], columns: list = [], **kwargs) -> Dict:
+    async def read_by_cell(
+            self,
+            read_file: str,
+            sheet: int = 0,
+            rows: List[int] = [],
+            columns: List[int] = [],
+            **kwargs
+    ) -> Dict:
         """
         read excel data
         :param read_file: excel文件abs全路径
@@ -752,71 +760,36 @@ class ExcelLib:
 
         :return: dict result
         """
-        # ================== parameters check ==================
+        # ================== 检查 ==================
         if (not read_file
                 or not os.path.exists(read_file)
                 or not os.path.isfile(read_file)):
-            return self.visual_value(
-                451, '读取的excel数据不存在', {})
-
-        request_title: bool = False if kwargs.get('request_title') is False else True
+            return self.visual_value(451, '读取的Excel数据不存在', {})
+        request_title: bool = True if kwargs.get('request_title') else False
         # 数据读取开始的行数
-        start_row: int = 1 if request_title else 0
-        response_title: bool = False if kwargs.get('response_title') is False else True
-        excel_object = xlrd.open_workbook(filename=read_file)   # xlrd可以读取xls、xlsx
-        excel_sheet_names = excel_object.sheet_names()
-        # 添加无sheet index，默认读取首页
-        if not str(sheet):
-            sheet = 0
-        # 添加sheet为整型处理
-        try:
-            if not isinstance(sheet, int):
-                sheet = int(sheet)
-        except:
-            sheet = 0
+        start_row: int = 2 if request_title else 1
+        response_title: bool = True if kwargs.get('response_title') else False
+
+        excel_object = openpyxl.load_workbook(filename=read_file, data_only=True)
+        excel_sheet_names = excel_object.sheetnames
         if sheet > len(excel_sheet_names) or sheet < 0:
-            return self.visual_value(
-                452, '读取的sheet页不存在', {})
-
-        excel_sheet = excel_object.sheet_by_index(sheet)
+            return self.visual_value(452, '读取的sheet页不存在', {})
+        excel_sheet = excel_object.worksheets[sheet]
         # 读取指定行
-        new_rows = list()
-        if rows:
-            for r in rows:
-                try:
-                    new_rows.append(int(r))
-                except:
-                    pass
+        read_rows: List[int] = [int(r) for r in rows] if rows else range(start_row, excel_sheet.max_row + 1, 1)
         # 读取指定列
-        new_cols = list()
-        if columns:
-            for c in columns:
-                try:
-                    new_cols.append(int(c))
-                except:
-                    pass
-
-        read_rows = new_rows if new_rows else range(start_row, excel_sheet.nrows, 1)
-        read_cols = new_cols if new_cols else range(0, excel_sheet.ncols, 1)
+        read_cols: List[int] = [int(c) for c in columns] if columns else range(1, excel_sheet.max_column+1, 1)
         # 读取表头
-        resp_header = list()
+        resp_header: List = []
         if response_title and request_title:
             for col in read_cols:
-                if col < 0: continue
-                # TODO 是否添加空标题、重复标题等标题判断
-                # 目前，定位空活着列值重复均可以
-                # if not excel_sheet.cell_value(0, col) or excel_sheet.cell_value(0, col) in resp_header:
-                #     return self.visual_value(
-                #         452, '读取的第%s列值为空' % col, {})
-                resp_header.append(excel_sheet.cell_value(0, col))
+                resp_header.append(excel_sheet.cell(row=1, column=col).value)
         # 读取表数据
-        resp_data = list()
+        resp_data: List = []
         for row in read_rows:
             if not row: continue
-            _d = list()
-            for col in read_cols:
-                if col < 0: continue
-                _d.append(excel_sheet.cell_value(row, col))
+            _d: List = []
+            for col in read_cols: _d.append(excel_sheet.cell(row=row, column=col).value)
             if _d: resp_data.append(_d)
         return self.visual_value(
             100, 'success', {'header': resp_header, 'data': resp_data})

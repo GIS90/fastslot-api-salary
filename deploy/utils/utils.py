@@ -378,7 +378,12 @@ def get_store_folder(add_date: bool = True) -> Union[Path, str]:
 
 
 def default_file_suffix(upload_type: str):
-    if upload_type in [FileTypeEnum.EXCEL_MERGE, FileTypeEnum.EXCEL_SPLIT, FileTypeEnum.DINGTALK]:
+    if upload_type in [
+        FileTypeEnum.EXCEL_MERGE,
+        FileTypeEnum.EXCEL_SPLIT,
+        FileTypeEnum.DINGTALK,
+        FileTypeEnum.USER_IMPORT
+    ]:
         return ".xlsx"
     elif upload_type in [FileTypeEnum.PDF]:
         return ".pdf"

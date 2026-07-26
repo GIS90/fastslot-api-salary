@@ -30,15 +30,15 @@ Life is short, I use python.
 
 ------------------------------------------------
 """
-from typing import Annotated, Dict
-from fastapi import APIRouter, Depends, Query, Body
+from typing import Annotated, Dict, List
+from fastapi import APIRouter, Depends, Query, Body, File, UploadFile
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from deploy.curd.database import get_session
 from deploy.service.system.main.user import SystemMainUserService
 from deploy.utils.status import Status
 from deploy.utils.depend import pageable_like_params, depend_token_rtx, md5_params, md5_list_params
-from deploy.schema.po.system_main_user import XtbUserAddModel, XtbUserUpdateModel
+from deploy.schema.po.system_main_user import XtbUserAddModel, XtbUserUpdateModel, XtbUserImportModel
 from deploy.schema.po.x import RequestMd5Models, RequestMd5StatusModel
 
 
@@ -154,3 +154,20 @@ async def batch_delete_soft(
 ) -> Status:
     return await service.batch_delete_soft(rtx_id=token_rtx_id, md5_list=params.model_dump().get("md5"))
 
+
+@router.post("/user.preview", summary="上传文件，并返回预览数据")
+async def preview(
+    file: UploadFile = File(...),
+    token_rtx_id: str = Depends(depend_token_rtx),
+    service: SystemMainUserService = Depends(get_service)
+) -> Status:
+    return await service.preview(rtx_id=token_rtx_id, file_=file)
+
+
+@router.post("/user.import", summary="导入")
+async def import_(
+    data: List[XtbUserImportModel] = Body(...),
+    token_rtx_id: str = Depends(depend_token_rtx),
+    service: SystemMainUserService = Depends(get_service)
+) -> Status:
+    return await service.import_(rtx_id=token_rtx_id, data=data)

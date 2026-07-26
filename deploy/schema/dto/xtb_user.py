@@ -98,3 +98,7 @@ xtb_user_download_fields: List = [
     {"key": "status", "type": ft.USER_STATUS_TEXT, "name": "状态", "null": True},
 ]
 
+
+xtb_user_import_fields: List = [
+    "id", "rtxId", "name", "sex", "email", "phone", "introduction"
+]

@@ -157,6 +157,7 @@ class FileTypeEnum(IntEnum):
     EXCEL_SPLIT = 2
     PDF = 3
     DINGTALK = 4
+    USER_IMPORT = 5
     AVATAR = 100
 
 
