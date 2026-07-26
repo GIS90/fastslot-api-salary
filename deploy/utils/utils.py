@@ -44,6 +44,8 @@ from typing import List, Tuple, Set, Dict, Union, Optional, Any, Literal
 from datetime import datetime, timedelta
 from pathlib import Path, PurePath
 from fastapi.exceptions import RequestValidationError
+from deploy.utils.enumeration import FileTypeEnum
+from deploy.config import store_cache as STORE_CACHE
 
 """ - - - - - - - - - - - - - - - - - 加密类 - - - - - - - - - - - - - - - - -"""
 
@@ -182,13 +184,13 @@ def get_now_date():
     return datetime.now().date()
 
 
-def get_now(format="%Y-%m-%d %H:%M:%S") -> str:
+def get_now(format_="%Y-%m-%d %H:%M:%S") -> str:
     """
     获取当前时间，字符串类型
 
     :return: to return the now of string type
     """
-    return d2s(datetime.now(), format)
+    return d2s(datetime.now(), fmt=format_)
 
 
 def get_week_day(date) -> str:
@@ -352,7 +354,38 @@ def get_root_folder() -> Optional[Path]:
 
 
 def get_static_folder() -> Optional[Path]:
-    return Path.joinpath(get_deploy_folder(), 'static')
+    """
+    获取项目static目录
+
+    :return: project static directory
+    """
+    __static = Path.joinpath(get_deploy_folder(), 'static')
+    if not Path(__static).exists():
+        os.makedirs(__static, exist_ok=True)
+    return __static
+
+
+def get_store_folder(add_date: bool = True) -> Union[Path, str]:
+    """
+    文件store缓存目录
+
+    :return: file store cache folder
+    """
+    __path = Path(STORE_CACHE).joinpath(get_now(format_='%Y%m%d')) if add_date else STORE_CACHE
+    if not Path(__path).exists():
+        os.makedirs(__path, exist_ok=True)
+    return __path
+
+
+def default_file_suffix(upload_type: str):
+    if upload_type in [FileTypeEnum.EXCEL_MERGE, FileTypeEnum.EXCEL_SPLIT, FileTypeEnum.DINGTALK]:
+        return ".xlsx"
+    elif upload_type in [FileTypeEnum.PDF]:
+        return ".pdf"
+    elif upload_type in [FileTypeEnum.AVATAR]:
+        return ".png"
+    else:
+        return ".未知"
 
 """ - - - - - - - - - - - - - - - - - 参数校验类 - - - - - - - - - - - - - - - - -"""
 

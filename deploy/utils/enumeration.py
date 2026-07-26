@@ -155,14 +155,9 @@ class FileTypeEnum(IntEnum):
     """
     EXCEL_MERGE = 1
     EXCEL_SPLIT = 2
-    WORD = 3
-    PPT = 4
-    TEXT = 5
-    PDF = 6
-    DINGTALK = 7
-    AVATAR = 8
-    AVATAR_CROP = 9
-    OTHER = 99
+    PDF = 3
+    DINGTALK = 4
+    AVATAR = 100
 
 
 @unique

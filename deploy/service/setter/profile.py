@@ -184,7 +184,7 @@ class SetterProfileService:
                 message=local_res.get('message') or '服务器本地存储失败')
         local_image_file = local_res.get('data').get('file')
         # ============= 4、cloud store =============
-        cloud_image_name = '%s/%s' % (get_now(format="%Y%m%d"), local_res.get('data').get('name'))
+        cloud_image_name = '%s/%s' % (get_now(format_="%Y%m%d"), local_res.get('data').get('name'))
         cloud_res = await self.qiniu_store_lib.upload(store_name=cloud_image_name, local_file=local_image_file)
         if cloud_res.get('code') != 100:
             return FailureStatus(

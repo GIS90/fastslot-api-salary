@@ -99,11 +99,18 @@ class QiNiuStoreLib:
     单密钥
     多空间
     """
-    def __init__(self, space_url: Optional[str], space_name: Optional[str]) -> None:
-        self.access_key: str = _YUN_ACCESS_KEY
-        self.secret_key: str = _YUN_SECRET_KEY
+    def __init__(
+            self,
+            space_url: Optional[str],
+            space_name: Optional[str],
+            access_key: Optional[str],
+            secret_key: Optional[str],
+    ) -> None:
+
         self.space_url: str = space_url or _YUN_BASE
         self.space_name: str = space_name or _YUN_SPACE
+        self.access_key: str = access_key or _YUN_ACCESS_KEY
+        self.secret_key: str = secret_key or _YUN_SECRET_KEY
         self.conn = self.__init_auth() or False
         self.manager = self.__init_bucket_manager() or False
 
@@ -117,7 +124,7 @@ class QiNiuStoreLib:
     def visual_value(code: int, message: str, data: Union[List, Dict, None]) -> Dict:
         """
         方法请求结果格式化
-        status_id: code id
+        code: code id
         message: message
         data: data
         """

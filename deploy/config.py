@@ -139,7 +139,10 @@ qywx_upload_api: str = data["qywx"].get("upload_api")
 qywx_temp_api: str = data["qywx"].get("temp_api")
 
 # store
-store_cache: str = data["store"].get("cache")
+store_cache: str = data["store"].get("cache")   # 绝对路径
+if not Path(store_cache).is_absolute():
+    store_cache = f"{root_folder}{store_cache}" if store_cache.startswith("/") \
+        else f"{root_folder}/{store_cache}"
 store_yun_access: str = data["store"].get("yun_access")
 store_yun_secret: str = data["store"].get("yun_secret")
 store_yun_base: str = data["store"].get("yun_base")

@@ -113,7 +113,7 @@ class FileLib:
     def visual_value(code: int, message: str, data: Union[List, Dict, None]) -> Dict:
         """
         方法请求结果格式化
-        status_id: code id
+        code: code id
         message: message
         data: data
         """
@@ -177,7 +177,7 @@ class FileLib:
             return self.visual_value(code=450, message='缺少上传文件')
 
         # 文件存储初始化
-        now_date = get_now(format="%Y%m%d")
+        now_date = get_now(format_="%Y%m%d")
         real_store_dir = os.path.join(self.default_store_cache, now_date)
         if not os.path.exists(real_store_dir):
             mk_dirs(real_store_dir)
@@ -194,7 +194,7 @@ class FileLib:
             if os.path.exists(_real_file):
                 file_names = os.path.splitext(file_name)
                 suffix = (file_names[1]).lower() if len(file_names) > 1 else ''
-                new_file_name = '%s-%s%s' % (file_names[0], get_now(format="%Y-%m-%d-%H-%M-%S"), suffix)
+                new_file_name = '%s-%s%s' % (file_names[0], get_now(format_="%Y-%m-%d-%H-%M-%S"), suffix)
                 _real_file = os.path.join(real_store_dir, new_file_name)
                 file_name = new_file_name
             file.save(_real_file)
@@ -265,7 +265,7 @@ class FileLib:
             word_name = pdf_names[0] + self.default_doc_prefix
 
         # 文件存储初始化
-        now_date = get_now(format="%Y%m%d")
+        now_date = get_now(format_="%Y%m%d")
         real_store_dir = os.path.join(self.default_store_cache, now_date)
         if not os.path.exists(real_store_dir):  # dir is not exist, to make dir
             mk_dirs(real_store_dir)
@@ -325,7 +325,7 @@ class FileLib:
 
         return data structure:
         {
-            status_id: int,
+            code: int,
             message: str,
             data: list
         }
@@ -346,10 +346,10 @@ class FileLib:
                                   pdf_file=value.get('pdf'), word_name=value.get('word'),
                                   start=start, end=end, pages=pages)
             _v = {
-                'ok': True if _res.get('status_id') == 100 else False,
+                'ok': True if _res.get('code') == 100 else False,
                 'message': _res.get('message')
             }
-            if _res.get('status_id') == 100:
+            if _res.get('code') == 100:
                 _v['word'] = _res.get('data').get('word')
                 _v['name'] = _res.get('data').get('name')
             results[key] = _v
@@ -388,10 +388,10 @@ class FileLib:
             if not _r: continue
             key = _r_v.get('data').get('md5')
             _d = {
-                'ok': True if _r_v.get('status_id') == 100 else False,
+                'ok': True if _r_v.get('code') == 100 else False,
                 'message': _r_v.get('message')
             }
-            if _r_v.get('status_id') == 100:
+            if _r_v.get('code') == 100:
                 _d['word'] = _r_v.get('data').get('word')
                 _d['name'] = _r_v.get('data').get('name')
             if key in pdf_list.keys():
@@ -437,7 +437,7 @@ class FileLib:
 
         return data structure:
         {
-            status_id: int,
+            code: int,
             message: str,
             data: list
         }

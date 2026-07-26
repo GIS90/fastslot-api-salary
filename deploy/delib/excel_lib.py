@@ -87,7 +87,7 @@ class ExcelLib:
     def visual_value(code: int, message: str, data: Union[List, Dict, None]) -> Dict:
         """
         方法请求结果格式化
-        status_id: code id
+        code: code id
         message: message
         data: data
         """
@@ -177,7 +177,7 @@ class ExcelLib:
         if (not _type
                 or _type not in [1, 2]):    # 默认xls
             _type = 1
-        now_date: str = get_now(format="%Y%m%d")     # 按date存储
+        now_date: str = get_now(format_="%Y%m%d")     # 按date存储
         real_store_dir: str = os.path.join(_STORE_CACHE, now_date)    # 文件存储目录
         if not os.path.exists(real_store_dir):  # not exist to create
             mk_dirs(real_store_dir)
@@ -188,7 +188,7 @@ class ExcelLib:
             suffix = (file_names[-1]).lower() if len(file_names) > 1 else ''     # 文件格式后缀
             if not suffix:
                 suffix = self.DEFAULT_OLD_V_PREFIX if _type == 1 else self.DEFAULT_NEW_V_PREFIX
-            new_file_name = '%s-%s%s' % (file_names[0], get_now(format="%Y-%m-%d-%H-%M-%S"), suffix)
+            new_file_name = '%s-%s%s' % (file_names[0], get_now(format_="%Y-%m-%d-%H-%M-%S"), suffix)
             _real_file = os.path.join(real_store_dir, new_file_name)
             file_name = new_file_name
         return _real_file, file_name
@@ -202,11 +202,11 @@ class ExcelLib:
         :return: tuple
         result is contain real path
         """
-        now_date_str: str = get_now(format="%Y%m%d")
+        now_date_str: str = get_now(format_="%Y%m%d")
         split_dir: str = '%s/%s' % (now_date_str, dir_name)
         real_store_dir: str = os.path.join(_STORE_CACHE, split_dir)
         if os.path.exists(real_store_dir):
-            split_dir: str = '%s/%s_%s' % (now_date_str, dir_name, get_now(format="%Y-%m-%d-%H-%M-%S"))
+            split_dir: str = '%s/%s_%s' % (now_date_str, dir_name, get_now(format_="%Y-%m-%d-%H-%M-%S"))
             real_store_dir: str = os.path.join(_STORE_CACHE, split_dir)
             if not os.path.exists(real_store_dir):
                 mk_dirs(real_store_dir)
@@ -233,7 +233,7 @@ class ExcelLib:
             - blank: excel file to merge add some blank
             - *** extra parameters ***
         :return: json object
-            status_id: result id, except status_id is 1 is success, others is failure
+            code: result id, except code is 1 is success, others is failure
             message: the result message
             data:
                 path: the new excel path + name, real path
@@ -242,7 +242,7 @@ class ExcelLib:
         # no new excel file name, auto rename by timestamp
         # new excel file format openpyxl: xlsx
         if not new_name:
-            new_name = 'MERGE-%s%s' % (get_now(format="%Y-%m-%d-%H-%M-%S"), self.DEFAULT_NEW_V_PREFIX)
+            new_name = 'MERGE-%s%s' % (get_now(format_="%Y-%m-%d-%H-%M-%S"), self.DEFAULT_NEW_V_PREFIX)
         if not file_list:
             return self.visual_value(
                 400, '合并文件列表参数不存在', {})
@@ -330,7 +330,7 @@ class ExcelLib:
             - blank: excel file to merge add some blank
             - *** extra parameters ***
         :return: json object
-            status_id: result id, except status_id is 1 is success, others is failure
+            code: result id, except code is 1 is success, others is failure
             message: the result message
             data:
                 path: the new excel path + name, real path
@@ -339,7 +339,7 @@ class ExcelLib:
         # no new excel file name, auto rename by timestamp
         # new excel file format xlrd xlwt: xls
         if not new_name:
-            new_name = 'MERGE-%s%s' % (get_now(format="%Y-%m-%d-%H-%M-%S"), self.DEFAULT_OLD_V_PREFIX)
+            new_name = 'MERGE-%s%s' % (get_now(format_="%Y-%m-%d-%H-%M-%S"), self.DEFAULT_OLD_V_PREFIX)
         if not file_list:
             return self.visual_value(
                 400, '合并文件列表参数不存在', {})
@@ -406,7 +406,7 @@ class ExcelLib:
             - blank: excel file to merge add some blank
             - *** extra parameters ***
         :return: json object
-            status_id: result id, except status_id is 1 is success, others is failure
+            code: result id, except code is 1 is success, others is failure
             message: the result message
             data:
                 path: the new excel path + name, real path
@@ -423,7 +423,7 @@ class ExcelLib:
         # new excel file format openpyxl: xlsx
         """openpyxl写入用.xlsx格式"""
         if not new_name:
-            new_name = 'MERGE-%s%s' % (get_now(format="%Y-%m-%d-%H-%M-%S"), self.DEFAULT_NEW_V_PREFIX)
+            new_name = 'MERGE-%s%s' % (get_now(format_="%Y-%m-%d-%H-%M-%S"), self.DEFAULT_NEW_V_PREFIX)
         if not file_list:
             return self.visual_value(
                 400, '合并文件列表参数不存在', {})
@@ -534,7 +534,7 @@ class ExcelLib:
 
         name = kwargs.get('name')
         if not name:
-            name = 'SPLIT-%s' % get_now(format="%Y-%m-%d-%H-%M-%S")
+            name = 'SPLIT-%s' % get_now(format_="%Y-%m-%d-%H-%M-%S")
         sheet: int = int(kwargs.get('sheet')) \
             if kwargs.get('sheet') else 0    # default is 0
         num: int = int(kwargs.get('num')) \

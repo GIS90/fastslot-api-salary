@@ -179,7 +179,7 @@ async def download_params(params: DownloadFileModel) -> Dict:
     file_name = params.name
     # 直接是.xlsx、.xls格式，名称则自动加上时间戳
     if file_name in [DEF.XLSX.value, DEF.XLS.value]:
-        file_name = "%s%s" % (get_now(format="%Y-%m-%d-%H-%M-%S"), file_name)
+        file_name = "%s%s" % (get_now(format_="%Y-%m-%d-%H-%M-%S"), file_name)
     # 文件名称不包含扩展名，则自动加上扩展名
     file_names = os_path_splitext(file_name)
     if not file_names[1]:

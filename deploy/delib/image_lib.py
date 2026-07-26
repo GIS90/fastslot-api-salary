@@ -77,7 +77,7 @@ class ImageLib:
     def visual_value(code: int, message: str, data: Union[List, Dict, None]) -> Dict:
         """
         方法请求结果格式化
-        status_id: code id
+        code: code id
         message: message
         data: data
         """
@@ -131,7 +131,7 @@ class ImageLib:
 
         try:
             # ================= 文件存储初始化 =================
-            now_date = get_now(format="%Y%m%d")
+            now_date = get_now(format_="%Y%m%d")
             real_store_dir = os.path.join(self.cache, now_date)
             if not os.path.exists(real_store_dir):
                 mk_dirs(real_store_dir)
