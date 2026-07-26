@@ -95,7 +95,7 @@ class ApiUploadService:
                 code=status_code.CODE_456_REQUEST_FILE_LOCAL_STORE_FAILURE.value,
                 message=f"文件本地存储失败：{str(e)}")
         # - - - - - - - - - - - - - 云存储 - - - - - - - - - - - - -
-        _store_name = f"{get_now(format_='%Y%m%d')}/{file_name}"
+        _store_name: str = f"{get_now(format_='%Y%m%d')}/{file_name}"    # 加入上传日期
         qn_result = await self.qn_store.upload(store_name=_store_name, local_file=real_file)
         if qn_result.get("code") != 100:
             return FailureStatus(
