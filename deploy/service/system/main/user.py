@@ -374,6 +374,10 @@ class SystemMainUserService:
             return FailureStatus(
                 code=status_code.CODE_101_SUCCESS_NO_DATA,
                 message="上传的文件不包含有效数据，请重新上传")
+        if len(excel_data[0]) != 7:
+            return FailureStatus(
+                code=status_code.CODE_466_REQUEST_FILE_TEMPLATE_ERROR.value,
+                message="上传的文件模板有误，请点击模板下载并重新上传")
         # 格式化数据
         __data: List = []
         __upload_rtx_id_list: List = []
@@ -381,25 +385,37 @@ class SystemMainUserService:
             if not d: continue
             __status: bool = False
             __message: str = ""
-            # 校验一：是否存在rtx-id
-            if not d[1]:
-                __status: bool = True; __message: str = "账户不允许为空"
-            # 校验二：表格人员重复
+            # 校验一：rtx-id表格人员重复
             if d[1] in __upload_rtx_id_list:
                 __status: bool = True; __message: str = "用户在表格中重复"
             else:
                 __upload_rtx_id_list.append(d[1])
-            # 校验三：数据库人员重复
+            # 校验二：是否存在rtx-id
+            if not __status and not d[1]:
+                __status: bool = True; __message: str = "账户不允许为空"
+            # 校验三：rtx-id数据库人员重复
             if not __status:
                 db_model: XtbUserModel = await self.xtb_user_curd.get_by_rtx_id(db=self.db, rtx_id=d[1])
                 if db_model: __status = True; __message="平台已存在用户账号"
-            # 校验四：账户规则校验
+            # 校验四：rtx-id规则校验
             if not __status:
                 __res = await self.validate_rtx_id(rtx_id=d[1])
                 if not __res: __status = True; __message: str = "账户格式不正确"
-            # 校验五：账户长度
+            # 校验五：rtx-id长度
             if not __status:
                 if len(d[1]) > 35: __status = True; __message: str = "账户长度必须在35个字符以内"
+            # 校验六：email长度
+            if not __status and d[4]:
+                if len(d[4]) > 80: __status = True; __message: str = "邮箱长度必须在80个字符以内"
+            # # 校验七：phone账户长度
+            if not __status and d[5]:
+                if len(d[5]) > 11: __status = True; __message: str = "电话长度必须在11个字符以内"
+            # 校验八：introduction账户长度
+            if not __status and d[6]:
+                if len(d[6]) > 255: __status = True; __message: str = "个性签名长度必须在255个字符以内"
+            # 校验九：role账户长度
+            if not __status and d[7]:
+                if len(d[7]) > 255: __status = True; __message: str = "角色长度必须在255个字符以内"
 
             __d: Dict = {
                 "id": d[0],

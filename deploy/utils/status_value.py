@@ -95,6 +95,7 @@ StatusMsg = {
     463: "文件超出操作的SHEET索引",
     464: "文件存储目录不存在",
     465: "文件压缩有误",
+    466: "文件模板不匹配",
 
     # ** data **
     500: "管理员用户数据，不允许操作",
@@ -188,6 +189,7 @@ class StatusCode(IntEnum):
     CODE_463_REQUEST_FILE_EXCEED_SHEET_INDEX = 463
     CODE_464_REQUEST_FILE_STORE_FOLDER = 464
     CODE_465_REQUEST_FILE_COMPRESS_ERROR = 465
+    CODE_466_REQUEST_FILE_TEMPLATE_ERROR = 466
 
     # ** data **
     CODE_500_DATA_ADMIN_NOT = 500
