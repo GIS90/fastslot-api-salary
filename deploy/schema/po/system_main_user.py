@@ -118,6 +118,7 @@ class XtbUserUpdateModel(__XtbUserBaseModel):
 class XtbUserImportModel(__XtbUserBaseModel):
     rtx_id: str = Field(..., min_length=1, max_length=35, alias="rtxId", validate_default=True)
     role: Optional[str] = Field(..., max_length=255, description="用户权限")
+    status: bool = Field(..., description="数据状态")
 
     model_config = {
         "json_schema_extra": {

@@ -390,10 +390,18 @@ class SystemMainUserService:
             if not d: continue
             __status: bool = False
             __message: str = ""
-            # 校验一：是否存在rtx-id
+            # 校验一：字段不允许为空
             if not d[0]:
                 __status: bool = True; __message: str = "账户不允许为空"
-            # 校验一：rtx-id表格人员重复
+            if not d[1]:
+                __status: bool = True; __message: str = "昵称不允许为空"
+            if not d[2]:
+                __status: bool = True; __message: str = "性别不允许为空"
+            if not d[3]:
+                __status: bool = True; __message: str = "邮箱不允许为空"
+            if not d[4]:
+                __status: bool = True; __message: str = "电话不允许为空"
+            # 校验二：rtx-id表格人员重复
             if not __status and d[0] in __upload_rtx_id_list:
                 __status: bool = True; __message: str = "用户在表格中重复"
             if d[0] not in __upload_rtx_id_list: __upload_rtx_id_list.append(d[0])
@@ -403,25 +411,19 @@ class SystemMainUserService:
             # 校验四：rtx-id规则校验
             if not __status and not await self.validate_rtx_id(rtx_id=d[0]):
                 __status = True; __message: str = "账户格式不正确"
-            # 校验五：rtx-id长度
-            if not __status and d[0]:
+            # 校验五：长度校验
+            if not __status:
                 if len(d[0]) > 35: __status = True; __message: str = "账户长度必须在35个字符以内"
-            # 校验六：name长度
-            if not __status and d[1]:
+            if not __status:
                 if len(d[1]) > 30: __status = True; __message: str = "昵称长度必须在30个字符以内"
-            # 校验六：sex长度
-            if not __status and d[2]:
+            if not __status:
                 if len(d[2]) > 2: __status = True; __message: str = "性别长度必须在2个字符以内"
-            # 校验六：email长度
-            if not __status and d[3]:
+            if not __status:
                 if len(d[3]) > 80: __status = True; __message: str = "邮箱长度必须在80个字符以内"
-            # # 校验七：phone账户长度
-            if not __status and d[4]:
+            if not __status:
                 if len(d[4]) != 11: __status = True; __message: str = "电话长度必须符合11位"
-            # 校验八：introduction账户长度
             if not __status and d[5]:
                 if len(d[5]) > 255: __status = True; __message: str = "个性签名长度必须在255个字符以内"
-            # 校验九：role账户长度
             if not __status and d[6]:
                 if len(d[6]) > 255: __status = True; __message: str = "角色长度必须在255个字符以内"
 
