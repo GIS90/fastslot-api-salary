@@ -352,13 +352,14 @@ class SystemMainUserService:
 
 
     async def preview(self, rtx_id: str, file_: UploadFile) -> Status:
+        # 存储
         upload_result: Status = await self.upload_utils.upload(
             rtx_id=rtx_id,
             upload_type=FileTypeEnum.USER_IMPORT.value,
             file_=file_)
         if upload_result.dict().get("code") != 100:
             return upload_result
-
+        # 读取数据
         file_local: str = upload_result.dict().get("data").get("local")
         excel_result: Dict = await self.excel_lib.read_by_cell(
             read_file=file_local,
@@ -378,68 +379,72 @@ class SystemMainUserService:
             return FailureStatus(
                 code=status_code.CODE_466_REQUEST_FILE_TEMPLATE_ERROR.value,
                 message="上传的文件模板有误，请点击模板下载并重新上传")
+        if len(excel_data) > 200:
+            return SuccessStatus(code=status_code.CODE_453_REQUEST_FILE_EXCEED_MAX_ROW.value,
+                                 message="单次导入最大数据量为200，请分批上传")
         # 格式化数据
         __data: List = []
         __upload_rtx_id_list: List = []
+        index: int = 1
         for d in excel_data:
             if not d: continue
             __status: bool = False
             __message: str = ""
-            # 校验一：rtx-id表格人员重复
-            if d[1] in __upload_rtx_id_list:
-                __status: bool = True; __message: str = "用户在表格中重复"
-            else:
-                __upload_rtx_id_list.append(d[1])
-            # 校验二：是否存在rtx-id
-            if not __status and not d[1]:
+            # 校验一：是否存在rtx-id
+            if not d[0]:
                 __status: bool = True; __message: str = "账户不允许为空"
+            # 校验一：rtx-id表格人员重复
+            if not __status and d[0] in __upload_rtx_id_list:
+                __status: bool = True; __message: str = "用户在表格中重复"
+            if d[0] not in __upload_rtx_id_list: __upload_rtx_id_list.append(d[0])
             # 校验三：rtx-id数据库人员重复
-            if not __status:
-                db_model: XtbUserModel = await self.xtb_user_curd.get_by_rtx_id(db=self.db, rtx_id=d[1])
-                if db_model: __status = True; __message="平台已存在用户账号"
+            if not __status and await self.xtb_user_curd.get_by_rtx_id(db=self.db, rtx_id=d[0]):
+                __status = True; __message="平台已存在用户账号"
             # 校验四：rtx-id规则校验
-            if not __status:
-                __res = await self.validate_rtx_id(rtx_id=d[1])
-                if not __res: __status = True; __message: str = "账户格式不正确"
+            if not __status and not await self.validate_rtx_id(rtx_id=d[0]):
+                __status = True; __message: str = "账户格式不正确"
             # 校验五：rtx-id长度
-            if not __status:
-                if len(d[1]) > 35: __status = True; __message: str = "账户长度必须在35个字符以内"
+            if not __status and d[0]:
+                if len(d[0]) > 35: __status = True; __message: str = "账户长度必须在35个字符以内"
+            # 校验六：name长度
+            if not __status and d[1]:
+                if len(d[1]) > 30: __status = True; __message: str = "昵称长度必须在30个字符以内"
+            # 校验六：sex长度
+            if not __status and d[2]:
+                if len(d[2]) > 2: __status = True; __message: str = "性别长度必须在2个字符以内"
             # 校验六：email长度
-            if not __status and d[4]:
-                if len(d[4]) > 80: __status = True; __message: str = "邮箱长度必须在80个字符以内"
+            if not __status and d[3]:
+                if len(d[3]) > 80: __status = True; __message: str = "邮箱长度必须在80个字符以内"
             # # 校验七：phone账户长度
-            if not __status and d[5]:
-                if len(d[5]) > 11: __status = True; __message: str = "电话长度必须在11个字符以内"
+            if not __status and d[4]:
+                if len(d[4]) != 11: __status = True; __message: str = "电话长度必须符合11位"
             # 校验八：introduction账户长度
-            if not __status and d[6]:
-                if len(d[6]) > 255: __status = True; __message: str = "个性签名长度必须在255个字符以内"
+            if not __status and d[5]:
+                if len(d[5]) > 255: __status = True; __message: str = "个性签名长度必须在255个字符以内"
             # 校验九：role账户长度
-            if not __status and d[7]:
-                if len(d[7]) > 255: __status = True; __message: str = "角色长度必须在255个字符以内"
+            if not __status and d[6]:
+                if len(d[6]) > 255: __status = True; __message: str = "角色长度必须在255个字符以内"
 
             __d: Dict = {
-                "id": d[0],
-                "rtxId": d[1],
-                "name": d[2],
-                "sex": d[3],
-                "email": d[4],
-                "phone": d[5],
-                "introduction": d[6],
-                "role": d[7],
+                "id": index,
+                "rtxId": d[0],
+                "name": d[1],
+                "sex": d[2],
+                "email": d[3],
+                "phone": d[4],
+                "introduction": d[5],
+                "role": d[6],
                 "status": __status,
                 "message": __message
             }
-            # status标识是否有效数据，判断依据rtx-id是否唯一
             __data.append(__d)
-        if len(__data) > 200:
-            return SuccessStatus(code=status_code.CODE_453_REQUEST_FILE_EXCEED_MAX_ROW.value,
-                                 message="单次导入最大数据量为200，请分批上传")
+            index += 1
         return SuccessStatus(data=__data)
 
     async def import_(self, rtx_id: str, data: List) -> Status:
         _success: int = 0
         for _d in data:
-            if not _d: continue
+            if not _d or getattr(_d, "status"): continue
             result = await self.add(rtx_id=rtx_id, model=dict(_d))  # _d为XtbUserImportModel
             if result.dict().get("code") == 100: _success += 1
         _data: Dict = {

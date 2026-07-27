@@ -33,7 +33,7 @@ Life is short, I use python.
 from deploy.schema._po_base_model import baseModel
 from deploy.utils.utils import alphanumeric_only
 from pydantic import Field, field_validator
-from typing import Optional, Union
+from typing import Optional, Union, List
 
 
 __all__ = ["XtbUserAddModel", "XtbUserUpdateModel", "XtbUserImportModel"]
@@ -46,7 +46,6 @@ class __XtbUserBaseModel(baseModel):
     phone: str = Field(..., min_length=11, max_length=11, description="电话")
     introduction: Optional[str] = Field(..., max_length=255, description="个性签名")
     # department: Optional[str] = Field(..., max_length=64, description="用户部门")
-    role: Optional[list] = Field(..., description="用户权限")
 
     model_config = {
         "json_schema_extra": {
@@ -56,8 +55,7 @@ class __XtbUserBaseModel(baseModel):
                 "email": "gaoming971366@163.com",
                 "phone": "13051355646",
                 "introduction": "哈哈哈哈哈",
-                "department": "研发部",
-                "role": ["admin", "hr"]
+                "department": "研发部"
             }
         }
     }
@@ -70,6 +68,7 @@ class XtbUserAddModel(__XtbUserBaseModel):
                         description="用户RTX-ID（唯一标识，允许大小写英文字母、数字、连字符(-)和点(.)的组合）",
                         alias="rtxId",
                         validate_default=True)
+    role: Optional[List] = Field(..., description="用户权限")
 
     model_config = {
         "json_schema_extra": {
@@ -98,6 +97,7 @@ class XtbUserAddModel(__XtbUserBaseModel):
 
 class XtbUserUpdateModel(__XtbUserBaseModel):
     md5: str = Field(..., min_length=1, max_length=64, description="数据Md5-Id", alias="md5")
+    role: Optional[List] = Field(..., description="用户权限")
 
     model_config = {
         "json_schema_extra": {
@@ -116,12 +116,7 @@ class XtbUserUpdateModel(__XtbUserBaseModel):
 
 
 class XtbUserImportModel(__XtbUserBaseModel):
-    rtx_id: str = Field(..., min_length=1, max_length=35, alias="rtxId")
-    name: str = Field(..., min_length=1, max_length=30, description="昵称")
-    sex: str = Field(..., min_length=1, max_length=2, description="性别")
-    email: str = Field(..., min_length=1, max_length=80, description="邮箱")
-    phone: Union[str, int] = Field(..., description="电话")
-    introduction: Union[str, int, None] = Field(..., description="个性签名")
+    rtx_id: str = Field(..., min_length=1, max_length=35, alias="rtxId", validate_default=True)
     role: Optional[str] = Field(..., max_length=255, description="用户权限")
 
     model_config = {
@@ -134,7 +129,16 @@ class XtbUserImportModel(__XtbUserBaseModel):
                 "phone": "13051355646",
                 "introduction": "哈哈哈哈哈",
                 "department": "研发部",
-                "role": ["admin", "hr"]
+                "role": "admin,hr"
             }
         }
     }
+
+    # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+    """
+    字段特殊验证：字母+数字
+    """
+    @field_validator("rtx_id")
+    def field_is_rtx_id(cls, value: str) -> str:
+        return alphanumeric_only(value=value, field="用户账户")
+    # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
