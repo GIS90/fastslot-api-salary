@@ -48,7 +48,7 @@ from deploy.utils.utils import get_now, md5 as generator_md5
 from deploy.config import server_user as SERVER_USER_ADMIN
 from deploy.delib.image_lib import ImageLib
 from deploy.delib.store_lib import QiNiuStoreLib
-from deploy.config import store_yun_base, store_yun_space
+from deploy.config import store_yun_access, store_yun_secret, store_yun_base, store_yun_space
 from deploy.utils.enumeration import CsbEnumKEY
 
 
@@ -67,7 +67,9 @@ class SetterProfileService:
         self.image_lib: ImageLib = ImageLib()
         self.qiniu_store_lib: QiNiuStoreLib = QiNiuStoreLib(
             space_url=store_yun_base,
-            space_name=store_yun_space
+            space_name=store_yun_space,
+            access_key=store_yun_access,
+            secret_key=store_yun_secret
         )
 
     def __str__(self):

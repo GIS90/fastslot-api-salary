@@ -30,14 +30,12 @@ Life is short, I use python.
 ------------------------------------------------
 """
 import os
-from typing import Union, List, Dict, Literal
+from typing import List, Dict
 from fastapi import UploadFile
-from pathlib import Path as pathlib_path
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from deploy.utils.status_value import StatusCode as status_code
 from deploy.utils.status import Status, SuccessStatus, FailureStatus
-from deploy.utils.utils import get_now, get_store_folder, default_file_suffix
 from deploy.utils.upload import uploadUtils
 from deploy.delib.store_lib import QiNiuStoreLib
 from deploy.config import store_yun_access, store_yun_secret, store_yun_base, store_yun_space
@@ -54,9 +52,9 @@ class ApiUploadService:
         self.db: AsyncSession = db_connection
         self.upload_utils: uploadUtils = uploadUtils()
         # 定义文件读取默认大小
-        self.READ_SIZE = 1024 * 1024  # 1024 = 1KB  1024 * 1024 = 1MB
+        self.READ_SIZE: int = 1024 * 1024  # 1024 = 1KB  1024 * 1024 = 1MB
         # 云存储
-        self.qn_store = QiNiuStoreLib(
+        self.qn_store: QiNiuStoreLib = QiNiuStoreLib(
             space_url=store_yun_base,
             space_name=store_yun_space,
             access_key=store_yun_access,
