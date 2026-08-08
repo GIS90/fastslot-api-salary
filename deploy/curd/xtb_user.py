@@ -131,7 +131,7 @@ class XtbUserCurd(BaseCurd):
                 )
             stmt = stmt.order_by(desc(XtbUserModel.create_time)).offset(offset).limit(limit)
             result = await db.execute(stmt)
-            return result.all()
+            return result.mappings().all()
         except Exception as e:
             raise SQLDBHandleException(f"[{cls.__name__}*查询All]{e}")
 
@@ -163,7 +163,7 @@ class XtbUserCurd(BaseCurd):
                 stmt = stmt.where(XtbUserModel.md5.in_(params.get("list")))
             stmt = stmt.order_by(asc(XtbUserModel.create_time))
             result = await db.execute(stmt)
-            return result.all()
+            return result.mappings().all()
         except Exception as e:
             raise SQLDBHandleException(f"[{cls.__name__}*下载]{e}")
 
