@@ -41,7 +41,7 @@ from deploy.schema.dao.tool_office_pdf import ToolOfficePdfModel
 from deploy.utils.exception import SQLDBHandleException
 
 
-class XtbXtcsCurd(BaseCurd):
+class ToolOfficePdfCurd(BaseCurd):
 
     @staticmethod
     async def new_model():
@@ -86,11 +86,12 @@ class XtbXtcsCurd(BaseCurd):
         return await self._get_model_by_field(db, ToolOfficePdfModel.md5, md5, filter_lock)
 
     @classmethod
-    async def count(cls, db: AsyncSession) -> int:
+    async def count(cls, db: AsyncSession, rtx_id: str = None) -> int:
         try:
-            result = await db.execute(
-                select(func.count(ToolOfficePdfModel.id)).where(ToolOfficePdfModel.status != 1)
-            )
+            stmt = select(func.count(ToolOfficePdfModel.id)).where(ToolOfficePdfModel.status != 1)
+            if rtx_id:
+                stmt = stmt.where(ToolOfficePdfModel.rtx_id == rtx_id)
+            result = await db.execute(stmt)
             return result.scalar()
         except Exception as e:
             raise SQLDBHandleException(f"[{cls.__name__}*总数]{e}")
