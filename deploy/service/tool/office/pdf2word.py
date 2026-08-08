@@ -99,6 +99,7 @@ class ToolOfficePdf2WordService:
             db=self.db,
             offset=params.get("offset"),
             limit=params.get("limit"),
+            rtx_id=rtx_id,
             content=params.get("content")
         )
         if not models:

@@ -100,11 +100,20 @@ async def auth_token_rtx(
     # if token_rtx_id == SERVER_ADMIN:
     #     return None
     # 管理员数据权限
+    __redis_key_authority: str = format_redis_key(
+        key=XtbXtcsKEY.ADMIN_DATA_AUTHORITY.value,
+        type_="xtcs",
+        xtcs_response="str"
+    )
+    is_redis_have: bool = False   # redis 缓存
     try:
         if redis_cli.connection:
-            redis_admin_auth_list: str = redis_cli.get_key(key=XtbXtcsKEY.ADMIN_DATA_AUTHORITY)
-            return None if redis_admin_auth_list and token_rtx_id in redis_admin_auth_list.split(',') \
-                else token_rtx_id
+            redis_admin_auth_list: str = redis_cli.get_key(key=__redis_key_authority)
+            if redis_admin_auth_list:
+                is_redis_have = True
+            if is_redis_have:
+                return None if redis_admin_auth_list and token_rtx_id in redis_admin_auth_list.split(',') \
+                    else token_rtx_id
     except:
         ...
 
@@ -121,12 +130,7 @@ async def auth_token_rtx(
                 return token_rtx_id
             if redis_cli.connection:
                 # 缓存数据
-                __key: str = format_redis_key(
-                    key=XtbXtcsKEY.ADMIN_DATA_AUTHORITY.value,
-                    type_="xtcs",
-                    xtcs_response="str"
-                )
-                redis_cli.set_key(key=__key, value=getattr(model, "value"))
+                redis_cli.set_key(key=__redis_key_authority, value=getattr(model, "value"))
             if token_rtx_id in str(getattr(model, "value")).split(','):
                 return None
             return token_rtx_id
