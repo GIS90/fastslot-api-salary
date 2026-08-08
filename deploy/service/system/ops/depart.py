@@ -40,7 +40,7 @@ from deploy.utils.status import Status, SuccessStatus, FailureStatus
 from deploy.utils.status_value import (StatusCode as status_code,
                                        StatusMsg as status_msg)
 from deploy.utils.converter import model_converter_dict
-from deploy.schema.dto.xtb_department import xtb_depart_tree_fields, xtb_depart_download_fields
+from deploy.schema.dto.xtb_department import xtb_depart_tree_fields, xtb_depart_download_fields, xtb_depart_node_fields
 from deploy.utils.utils import md5 as md5_func, get_now, build_menu_tree_iterative, flatten_tree_recursive
 from deploy.config import depart_root as DEPART_ROOT_ID, depart_root_pid as DEPART_ROOT_PID
 
@@ -68,7 +68,7 @@ class SystemOpsDepartService:
             md5_id: str,
             status_check: bool = True,
             response_type: Literal["dict", "model"] = "model",
-            fields: Union[List, None] = xtb_depart_tree_fields,
+            fields: Union[List, None] = xtb_depart_node_fields,
             lock_check: bool = False,
             root_check: bool = False
     ) -> Tuple[bool, Any]:
@@ -122,7 +122,7 @@ class SystemOpsDepartService:
             md5_id=md5,
             status_check=True,
             response_type="dict",
-            fields=xtb_depart_tree_fields,
+            fields=xtb_depart_node_fields,
             lock_check=False,
             root_check=False
         )
@@ -196,7 +196,7 @@ class SystemOpsDepartService:
             md5_id=md5,
             status_check=False,
             response_type="dict",
-            fields=xtb_depart_tree_fields,
+            fields=xtb_depart_node_fields,
             lock_check=False,
             root_check=False
         )

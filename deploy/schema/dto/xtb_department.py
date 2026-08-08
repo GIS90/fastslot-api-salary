@@ -38,6 +38,16 @@ xtb_depart_tree_fields: List = [
     {"key": "id", "type": ft.INT, "name": "id", "null": False},
     {"key": "md5", "type": ft.STR, "name": "md5", "null": False},
     {"key": "name", "type": ft.STR, "name": "label", "null": False},
+    {"key": "pid", "type": ft.INT, "name": "pid", "null": False},
+    {"key": "lock", "type": ft.BOOL, "name": "disabled", "null": True},
+    {"key": "level", "type": ft.INT, "name": "level", "null": True},
+]
+
+
+xtb_depart_node_fields: List = [
+    {"key": "id", "type": ft.INT, "name": "id", "null": False},
+    {"key": "md5", "type": ft.STR, "name": "md5", "null": False},
+    {"key": "name", "type": ft.STR, "name": "label", "null": False},
     {"key": "description", "type": ft.STR, "name": "description", "null": True},
     {"key": "pid", "type": ft.INT, "name": "pid", "null": False},
     {"key": "leaf", "type": ft.BOOL, "name": "leaf", "null": True},
