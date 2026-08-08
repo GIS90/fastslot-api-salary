@@ -666,7 +666,7 @@ def flatten_tree_recursive(tree_data, parent_id=None, result=None):
         flat_node = {
             'id': node['id'],
             'label': node['label'],
-            'level': node['level'],
+            # 'level': node['level'],
         }
         result.append(flat_node)
 

@@ -40,7 +40,6 @@ xtb_depart_tree_fields: List = [
     {"key": "name", "type": ft.STR, "name": "label", "null": False},
     {"key": "pid", "type": ft.INT, "name": "pid", "null": False},
     {"key": "lock", "type": ft.BOOL, "name": "disabled", "null": True},
-    {"key": "level", "type": ft.INT, "name": "level", "null": True},
 ]
 
 

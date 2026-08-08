@@ -39,6 +39,7 @@ from sqlalchemy import func
 from deploy.curd.base_curd import BaseCurd
 from deploy.schema.dao.xtb_user import XtbUserModel
 from deploy.schema.dao.csb_enum_value import CsbEnumValueModel
+from deploy.schema.dao.xtb_department import XtbDepartmentModel
 from deploy.utils.exception import SQLDBHandleException
 from deploy.utils.enumeration import CsbEnumKEY
 
@@ -111,13 +112,16 @@ class XtbUserCurd(BaseCurd):
                 XtbUserModel.email,
                 XtbUserModel.avatar,
                 XtbUserModel.introduction,
-                XtbUserModel.department,
+                XtbDepartmentModel.name.label("department"),
                 XtbUserModel.create_rtx,
                 XtbUserModel.create_time,
                 XtbUserModel.status
             ).outerjoin(
                 CsbEnumValueModel,
                 XtbUserModel.sex == CsbEnumValueModel.key
+            ).outerjoin(
+                XtbDepartmentModel,
+                XtbUserModel.department == XtbDepartmentModel.md5
             ).where(CsbEnumValueModel.name == CsbEnumKEY.SEX_TYPE.value)
             if content:
                 stmt = stmt.where(
@@ -150,13 +154,16 @@ class XtbUserCurd(BaseCurd):
                 XtbUserModel.avatar,
                 XtbUserModel.introduction,
                 XtbUserModel.role,
-                XtbUserModel.department,
+                XtbDepartmentModel.name.label("department"),
                 XtbUserModel.create_rtx,
                 XtbUserModel.create_time,
                 XtbUserModel.status
             ).outerjoin(
                 CsbEnumValueModel,
                 XtbUserModel.sex == CsbEnumValueModel.key
+            ).outerjoin(
+                XtbDepartmentModel,
+                XtbUserModel.department == XtbDepartmentModel.md5
             )
             stmt = stmt.where(CsbEnumValueModel.name == CsbEnumKEY.SEX_TYPE.value)
             if params.get("list"):

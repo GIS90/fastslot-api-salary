@@ -44,7 +44,7 @@ xtb_user_list_fields: List = [
     {"key": "phone", "type": ft.STR, "name": "phone", "null": False},
     {"key": "avatar", "type": ft.STR, "name": "avatar", "null": False},
     {"key": "introduction", "type": ft.STR, "name": "introduction", "null": True},
-    {"key": "department", "type": ft.STR, "name": "department", "null": False},
+    {"key": "department", "type": ft.STR, "name": "department", "null": True},
     {"key": "create_rtx", "type": ft.STR, "name": "createRtx", "null": True},
     {"key": "create_time", "type": ft.DATETIME, "name": "createTime", "null": True},
     {"key": "status", "type": ft.BOOL, "name": "status", "null": False}
@@ -59,13 +59,10 @@ xtb_user_detail_fields: List = [
     {"key": "sex"},
     {"key": "email"},
     {"key": "phone"},
+    {"key": "department", "null": True},
     {"key": "avatar"},
     {"key": "introduction"},
-    {"key": "role", "type": ft.SPLITLIST, "name": "role", "null": True},
-    # {"key": "create_rtx", "type": ft.STR, "name": "createRtx", "null": True},
-    # {"key": "create_time", "type": ft.DATETIME, "name": "createTime", "null": True},
-    # {"key": "update_rtx", "type": ft.STR, "name": "updateRtx", "null": True},
-    # {"key": "update_time", "type": ft.DATETIME, "name": "updateTime", "null": True}
+    {"key": "role", "type": ft.SPLITLIST, "name": "role", "null": True}
 ]
 
 

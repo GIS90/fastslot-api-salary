@@ -45,7 +45,7 @@ class __XtbUserBaseModel(baseModel):
     email: str = Field(..., min_length=1, max_length=80, description="邮箱")
     phone: str = Field(..., min_length=11, max_length=11, description="电话")
     introduction: Optional[str] = Field(..., max_length=255, description="个性签名")
-    # department: Optional[str] = Field(..., max_length=64, description="用户部门")
+    department: Optional[str] = Field(..., max_length=64, description="用户部门")
 
     model_config = {
         "json_schema_extra": {
