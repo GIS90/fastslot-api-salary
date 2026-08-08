@@ -42,7 +42,7 @@ from deploy.schema.po.system_main_menu import XtbMenuBaseModel, XtbMenuUpdateMod
 
 
 # router
-router: APIRouter = APIRouter(prefix="/system/main", tags=["系统管理-菜单管理"])
+router: APIRouter = APIRouter(prefix="/system/main", tags=["系统->权限管理->菜单管理"])
 # service
 def get_service(db: AsyncSession = Depends(get_session)) -> SystemMainMenuService:
     return SystemMainMenuService(db_connection=db)

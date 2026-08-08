@@ -44,7 +44,7 @@ from deploy.schema.po.x import RequestMd5StatusModel, RequestMd5Models
 
 
 # router
-router: APIRouter = APIRouter(prefix="/system/config", tags=["系统配置-数据字典"])
+router: APIRouter = APIRouter(prefix="/system/config", tags=["系统->系统配置->数据字典"])
 # service
 def get_service(db: AsyncSession = Depends(get_session)) -> SystemConfigDictService:
     return SystemConfigDictService(db_connection=db)

@@ -43,7 +43,7 @@ from deploy.schema.po.x import RequestMd5Models, RequestMd5StatusModel
 
 
 # router
-router: APIRouter = APIRouter(prefix="/system/main", tags=["系统管理-用户管理"])
+router: APIRouter = APIRouter(prefix="/system/main", tags=["系统->权限管理->用户管理"])
 # service
 def get_service(db: AsyncSession = Depends(get_session)) -> SystemMainUserService:
     return SystemMainUserService(db_connection=db)

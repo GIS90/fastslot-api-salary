@@ -43,7 +43,7 @@ from deploy.schema.po.system_ops_depart import XtbDepartmentAddModel, XtbDepartm
 
 
 # router
-router: APIRouter = APIRouter(prefix="/system/ops", tags=["系统维护-部门架构"])
+router: APIRouter = APIRouter(prefix="/system/ops", tags=["系统->系统维护->部门架构"])
 # service
 def get_service(db: AsyncSession = Depends(get_session)) -> SystemOpsDepartService:
     return SystemOpsDepartService(db_connection=db)

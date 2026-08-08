@@ -42,7 +42,7 @@ from deploy.schema.po.x import PageFilterModel, RequestMd5Models
 
 
 # router
-router: APIRouter = APIRouter(prefix="/system/ops", tags=["系统维护-系统日志"])
+router: APIRouter = APIRouter(prefix="/system/ops", tags=["系统->系统维护->系统日志"])
 # service
 def get_service(db: AsyncSession = Depends(get_session)) -> SystemOpsLogService:
     return SystemOpsLogService(db_connection=db)

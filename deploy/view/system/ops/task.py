@@ -42,7 +42,7 @@ from deploy.schema.po.x import PageFilterModel, RequestMd5Models
 
 
 # router
-router: APIRouter = APIRouter(prefix="/system/ops", tags=["系统维护-任务中心"])
+router: APIRouter = APIRouter(prefix="/system/ops", tags=["系统->系统维护->任务中心"])
 # service
 def get_service(db: AsyncSession = Depends(get_session)) -> SystemOpsTaskService:
     return SystemOpsTaskService(db_connection=db)

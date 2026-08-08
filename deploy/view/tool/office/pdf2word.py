@@ -42,7 +42,7 @@ from deploy.schema.po.x import RequestMd5Models, RequestMd5StatusModel
 
 
 # router
-router: APIRouter = APIRouter(prefix="/tool/office", tags=["工具-文档工具"])
+router: APIRouter = APIRouter(prefix="/tool/office", tags=["工具->文档工具->PDF转WORD"])
 # service
 def get_service(db: AsyncSession = Depends(get_session)) -> ToolOfficePdf2WordService:
     return ToolOfficePdf2WordService(db_connection=db)
