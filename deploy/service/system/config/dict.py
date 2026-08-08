@@ -43,7 +43,7 @@ from deploy.utils.status_value import (StatusCode as status_code,
                                        StatusMsg as status_msg)
 from deploy.utils.converter import model_converter_dict, option_converter_dict, many_model_converter_dict
 from deploy.schema.dto.csb_enum_key import csb_ek_list_fields, csb_ek_detail_fields
-from deploy.schema.dto.csb_enum_value import csb_ev_list_fields, csb_ev_detail_fields
+from deploy.schema.dto.csb_enum_value import csb_ev_list_fields, csb_ev_detail_fields, xtb_ev_download_fields
 from deploy.config import (redis_host, redis_port, redis_password, redis_db)
 from deploy.delib.redis_lib import RedisClientLib
 from deploy.utils.utils import format_redis_key, get_now, md5 as generator_md5
@@ -361,3 +361,15 @@ class SystemConfigDictService:
         return SuccessStatus() if query_count == request_count \
             else FailureStatus(code=status_code.CODE_508_DATA_PART_DELETE,
                                message=f"总数{request_count}，成功删除{query_count}，查询失败{request_count - query_count}")
+
+    async def download(self, params: dict) -> List:
+        models = await self.csb_ev_curd.download(db=self.db, params=params)
+        data: List = list()
+        _id = 1
+        for u in models:
+            if not u: continue
+            _d = await model_converter_dict(model=u, fields=xtb_ev_download_fields)
+            _d["序号"] = _id
+            _id +=  1
+            data.append(_d)
+        return data

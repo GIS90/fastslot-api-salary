@@ -34,7 +34,6 @@ from typing import List, Dict, Optional
 from datetime import datetime
 from sqlalchemy.ext.asyncio import AsyncSession
 from deploy.utils.status import Status, SuccessStatus, FailureStatus
-from deploy.service.system.config.dict import SystemConfigDictService
 from deploy.utils.enumeration import CsbEnumKEY
 from deploy.utils.status_value import StatusCode as status_code
 from deploy.utils.utils import md5 as md5_func, get_now
@@ -43,6 +42,7 @@ from deploy.schema.dao.xtb_user_task import XtbUserTaskModel
 from deploy.service.system.main.user import SystemMainUserService
 from deploy.service.system.main.role import SystemMainRoleService
 from deploy.service.system.config.xtcs import SystemConfigXtcsService
+from deploy.service.system.config.dict import SystemConfigDictService
 from deploy.service.system.ops.task import SystemOpsTaskService
 from deploy.service.system.ops.log import SystemOpsLogService
 from deploy.service.system.ops.depart import SystemOpsDepartService
@@ -142,9 +142,9 @@ class ApiDownloadService(object):
             elif api == "SystemConfigXtcs":
                 # 系统>配置>系统参数
                 __res = await self.system_config_xtcs_service.download(params=new_params)
-            # elif api == "SystemOpsDict":
-            #     # 系统>系统维护>数据字典
-            #     __res = await self.system_ops_service.dict_enum_download(params=new_params)
+            elif api == "SystemOpsDict":
+                # 系统>系统维护>数据字典
+                __res = await self.system_config_csb_enum_v_service.download(params=new_params)
             elif api == "SystemOpsLog":
                 # 系统>系统维护>系统日志
                 __res = await self.system_ops_log_service.download(params=new_params)
@@ -172,7 +172,7 @@ class ApiDownloadService(object):
         new_task_model.data = params.get("type")
         new_task_model.task = __task_status
         new_task_model.create_time = start_time
-        new_task_model.cost = cost
+        new_task_model.cost = round(cost, 4)
         new_task_model.update_time = end_time
         new_task_model.rtx_id = rtx_id
         new_task_model.status = False

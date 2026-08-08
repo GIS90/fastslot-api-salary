@@ -185,7 +185,37 @@ class CsbEnumValueCurd(BaseCurd):
     async def download(
             cls, db: AsyncSession, params: Dict, *args, **kwargs
     ) -> Optional[List]:
-        ...
+        try:
+            stmt = select(
+                CsbEnumKeyModel.key.label("ek_key"),
+                CsbEnumKeyModel.value.label("ek_value"),
+                CsbEnumValueModel.key.label("ev_key"),
+                CsbEnumValueModel.value.label("ev_value"),
+                CsbEnumValueModel.remark,
+                CsbEnumValueModel.lock,
+                CsbEnumValueModel.order_id,
+                CsbEnumValueModel.create_rtx,
+                CsbEnumValueModel.create_time,
+                CsbEnumValueModel.update_rtx,
+                CsbEnumValueModel.update_time
+            ).join(
+                CsbEnumKeyModel,
+                CsbEnumValueModel.name == CsbEnumKeyModel.key
+            ).where(CsbEnumValueModel.status != 1)
+
+            if params.get("list"):
+                stmt = stmt.where(CsbEnumValueModel.md5.in_(params.get("list")))
+
+            stmt = stmt.order_by(
+                asc(CsbEnumKeyModel.order_id),
+                asc(CsbEnumValueModel.order_id),
+                desc(CsbEnumValueModel.id)
+            )
+
+            result = await db.execute(stmt)
+            return result.mappings().all()  # 返回字典列表，方便通过字段名访问
+        except Exception as e:
+            raise SQLDBHandleException(f"[{cls.__name__}*下载]{e}")
 
     @classmethod
     async def add(
