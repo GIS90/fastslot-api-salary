@@ -66,6 +66,7 @@ xtb_xtcs_view_fields: List = [
 ]
 
 xtb_xtcs_download_fields: List =  [
+    {"key": "id", "type": ft.INT, "name": "序号", "null": True},
     {"key": "key", "type": ft.STR, "name": "参数名称", "null": False},
     {"key": "remark", "type": ft.STR, "name": "参数说明", "null": False},
     {"key": "value", "type": ft.STR, "name": "参数值", "null": False},

@@ -64,6 +64,7 @@ xtb_user_task_detail_fields: List = [
 
 
 xtb_user_task_download_fields: List = [
+    {"key": "id", "type": ft.INT, "name": "序号", "null": True},
     {"key": "create_time", "type": ft.STR, "name": "创建时间"},
     {"key": "rtx_id", "type": ft.STR, "name": "系统用户"},
     {"key": "name", "type": ft.STR, "name": "文件名称"},

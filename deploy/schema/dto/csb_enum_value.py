@@ -56,6 +56,7 @@ csb_ev_detail_fields: List = [
 
 
 xtb_ev_download_fields: List =  [
+    {"key": "id", "type": ft.INT, "name": "序号", "null": True},
     {"key": "ek_key", "type": ft.STR, "name": "字典分类标识", "null": False},
     {"key": "ek_value", "type": ft.STR, "name": "字典分类名称", "null": False},
     {"key": "ev_key", "type": ft.STR, "name": "字典枚举标识", "null": False},

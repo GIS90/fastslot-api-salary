@@ -187,6 +187,7 @@ class CsbEnumValueCurd(BaseCurd):
     ) -> Optional[List]:
         try:
             stmt = select(
+                CsbEnumValueModel.id,
                 CsbEnumKeyModel.key.label("ek_key"),
                 CsbEnumKeyModel.value.label("ek_value"),
                 CsbEnumValueModel.key.label("ev_key"),

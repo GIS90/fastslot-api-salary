@@ -173,6 +173,7 @@ class XtbUserTaskCurd(BaseCurd):
     ) -> Optional[List]:
         try:
             stmt = (select(
+                XtbUserTaskModel.id,
                 XtbUserTaskModel.rtx_id,
                 XtbUserTaskModel.api,
                 XtbUserTaskModel.name,
