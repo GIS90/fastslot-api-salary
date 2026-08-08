@@ -34,6 +34,8 @@ from deploy.view.root import router as root_router
 from deploy.view.access import router as access_router
 from deploy.view.api import router as api_router
 
+from deploy.view.tool.office.pdf2word import router as tool_office_pdf2word
+
 from deploy.view.system.main.user import router as system_main_user_router
 from deploy.view.system.main.role import router as system_mian_role_router
 from deploy.view.system.main.menu import router as system_mian_menu_router
@@ -42,6 +44,7 @@ from deploy.view.system.ops.log import router as system_ops_log_router
 from deploy.view.system.ops.depart import router as system_ops_depart_router
 from deploy.view.system.config.xtcs import router as system_config_xtcs_router
 from deploy.view.system.config.dict import router as system_config_dict_router
+
 from deploy.view.setter.profile import router as setter_profile_router
 
 
@@ -52,6 +55,8 @@ View根据系统设计的api进行模块划分，其中有3个比较特殊（不
 - api：系统正常运行的API集合，包含用户权限相关、通用接口、对外开发的API [不走token验证]
 
 功能模块
+  工具
+    文档工具：[pdf2word]PDF转WORD
   系统
     权限管理：[user]用户管理 [role]角色管理 [menu]菜单管理
     系统维护：[task]任务中心 [log]系统日志 [depart]部门管理
@@ -67,6 +72,7 @@ add_routers = [
     root_router,
     access_router,
     api_router,
+    tool_office_pdf2word,
     system_main_user_router,
     system_mian_role_router,
     system_mian_menu_router,
@@ -75,5 +81,5 @@ add_routers = [
     system_ops_depart_router,
     system_config_xtcs_router,
     system_config_dict_router,
-    setter_profile_router,
+    setter_profile_router
 ]

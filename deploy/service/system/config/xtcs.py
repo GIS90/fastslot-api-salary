@@ -62,6 +62,9 @@ class SystemConfigXtcsService:
         self.XTCS_INT_LIST = [
             XtbXtcsKEY.REDIS_CACHE_EXPIRE.value
         ]
+        self.XTCS_STR_LIST = [
+            XtbXtcsKEY.ADMIN_DATA_AUTHORITY.value
+        ]
 
     def __str__(self):
         return "SystemConfigXtcsService class."
@@ -145,6 +148,13 @@ class SystemConfigXtcsService:
 
         setattr(data, "lock", params.get("value"))
         await self.xtb_xtcs_curd.update(db=self.db, model=data)
+        # 缓存处理
+        __all_key: List = [*self.XTCS_STR_LIST, *self.XTCS_INT_LIST]
+        if getattr(data, "key") in __all_key and self.redis_cli.connection:
+            redis_key = await self.__redis_key(key=getattr(data, "key"))
+            # True 删除 False 新增
+            self.redis_cli.delete_key(redis_key) if params.get("value") \
+                else self.redis_cli.set_key(key=redis_key, value=getattr(data, "value"))
         return SuccessStatus()
 
     async def __redis_key(self, key: str) -> str:
@@ -208,6 +218,11 @@ class SystemConfigXtcsService:
         for k, v in model.items():
             setattr(data, k, v)
         await self.xtb_xtcs_curd.update(db=self.db, model=data)
+        # 更新缓存
+        __all_key: List = [*self.XTCS_STR_LIST, *self.XTCS_INT_LIST]
+        if model.get("key") in __all_key and self.redis_cli.connection:
+            redis_key = await self.__redis_key(key=model.get("key"))
+            self.redis_cli.set_key(key=redis_key, value=model.get("value"))
         return SuccessStatus()
 
     async def delete_(self, rtx_id: str, md5: str) -> Status:
@@ -220,6 +235,11 @@ class SystemConfigXtcsService:
         setattr(data, "delete_rtx", rtx_id)
         setattr(data, "delete_time", get_now())
         await self.xtb_xtcs_curd.update(db=self.db, model=data)
+        # 删除缓存
+        __all_key: List = [*self.XTCS_STR_LIST, *self.XTCS_INT_LIST]
+        if getattr(data, "key") in __all_key and self.redis_cli.connection:
+            redis_key = await self.__redis_key(key=getattr(data, "key"))
+            self.redis_cli.delete_key(redis_key)
         return SuccessStatus()
 
     async def batch_delete(self, rtx_id: str, md5_list: List) -> Status:

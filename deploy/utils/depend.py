@@ -30,20 +30,23 @@ Life is short, I use python.
 
 ------------------------------------------------
 """
+from typing import Union
 from os.path import splitext as os_path_splitext
 from fastapi import Header, Query
 from typing import Optional, Dict, List
 
 from deploy.utils.token import decode_access_token_rtx
 from deploy.utils.exception import JwtCredentialsException, UserInvalidException
-from deploy.utils.utils import get_now
+from deploy.utils.utils import get_now, format_redis_key
 from deploy.delib.redis_lib import RedisClientLib
-from deploy.config import redis_host, redis_port, redis_db, redis_password
+from deploy.config import redis_host, redis_port, redis_db, redis_password, server_user as SERVER_ADMIN
 from deploy.schema.po.x import PageFilterModel, DownloadFileModel
 from deploy.schema.po.system_main_menu import XtbMenuBaseModel, XtbMenuUpdateModel
 from deploy.curd.database import get_session_context
 from deploy.service.system.main.user import SystemMainUserService
+from deploy.curd.xtb_xtcs import XtbXtcsCurd
 from deploy.utils.enumeration import DownloadExcelFormat as DEF
+from deploy.utils.enumeration import XtbXtcsKEY
 
 
 # redis-cli
@@ -57,6 +60,7 @@ MAX_LENGTH = 299
 """
 Token-Rtx-ID依赖
 > depend_token_rtx：解码X-Token的Rtx-id
+> auth_token_rtx：管理员数据鉴权X-Token
 > depend_token_rtx_valid：解码X-Token的Rtx-id + 验证用户可用性（过滤数据不存在、已删除）
 """
 
@@ -85,6 +89,50 @@ async def depend_token_rtx(
     return await __get_token_rtx(token=x_token)
 
 
+async def auth_token_rtx(
+    x_token: str = Header(..., min_length=MIN_LENGTH, max_length=MAX_LENGTH, convert_underscores=True, description="X-Token")
+) -> Union[str, None]:
+    """
+    如果是管理员/管理员数据权限，返回None，否则为用户rtx-id
+    """
+    token_rtx_id = await __get_token_rtx(token=x_token)
+    # 管理员
+    # if token_rtx_id == SERVER_ADMIN:
+    #     return None
+    # 管理员数据权限
+    try:
+        if redis_cli.connection:
+            redis_admin_auth_list: str = redis_cli.get_key(key=XtbXtcsKEY.ADMIN_DATA_AUTHORITY)
+            return None if redis_admin_auth_list and token_rtx_id in redis_admin_auth_list.split(',') \
+                else token_rtx_id
+    except:
+        ...
+
+    # 系统表-系统参数
+    async with get_session_context() as db:
+        try:
+            curd: XtbXtcsCurd = XtbXtcsCurd()
+            model = await curd.get_by_key(db=db, key=XtbXtcsKEY.ADMIN_DATA_AUTHORITY.value)
+            # 数据不存在
+            if not model:
+                return token_rtx_id
+            # 数据已删除/锁定
+            if getattr(model, "status") or getattr(model, "lock"):
+                return token_rtx_id
+            if redis_cli.connection:
+                # 缓存数据
+                __key: str = format_redis_key(
+                    key=XtbXtcsKEY.ADMIN_DATA_AUTHORITY.value,
+                    type_="xtcs",
+                    xtcs_response="str"
+                )
+                redis_cli.set_key(key=__key, value=getattr(model, "value"))
+            if token_rtx_id in str(getattr(model, "value")).split(','):
+                return None
+            return token_rtx_id
+        except:
+            return token_rtx_id
+
 async def depend_token_rtx_valid(
     x_token: str = Header(..., min_length=MIN_LENGTH, max_length=MAX_LENGTH, convert_underscores=True, description="X-Token")
 ) -> str:
@@ -94,14 +142,13 @@ async def depend_token_rtx_valid(
     async with get_session_context() as db:
         try:
             service: SystemMainUserService = SystemMainUserService(db_connection=db)
-            # 调用 add 方法
             model = await service.depend_by_rtx_id(rtx_id=token_rtx_id)
         except Exception as e:
             raise UserInvalidException("用户信息异常")
         # 数据不存在
         if not model:
             raise UserInvalidException("用户不存在")
-        # 数据已删除
+        # 数据注销
         if getattr(model, "status"):
             raise UserInvalidException("用户已注销")
 

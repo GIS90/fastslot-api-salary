@@ -161,6 +161,16 @@ class SystemConfigDictService:
             )
         return __ev_value
 
+    async def __clear_dict_redis_by_man(self, key):
+        """模糊查询删除"""
+        if self.redis_cli.connection:
+            self.redis_cli.delete_key(
+          f"kv_option_True_{key}",
+                f"kv_option_False_{key}",
+                f"kv_dict_True_{key}",
+                f"kv_dict_False_{key}"
+            )
+
     async def dk_pagination(self, rtx_id: str) -> Status:
         models: List[Dict] = await self.csb_ek_curd.all_(db=self.db, filter_lock=False)
         if not models:
@@ -291,6 +301,9 @@ class SystemConfigDictService:
 
         setattr(data, "lock", params.get("value"))
         await self.csb_ev_curd.update(db=self.db, model=data)
+        if params.get("value"):
+            # 删除缓存
+            await self.__clear_dict_redis_by_man(getattr(data, 'name'))
         return SuccessStatus()
 
     async def de_add_init(self, rtx_id: str,) -> Status:
@@ -316,8 +329,6 @@ class SystemConfigDictService:
         new_model.create_rtx = rtx_id
         new_model.lock = False
         new_model.status = False
-        print("*" * 100)
-        print(model)
         for k, v in model.items():
             setattr(new_model, k, v)
         await self.csb_ev_curd.add(db=self.db, model=new_model)
@@ -338,6 +349,8 @@ class SystemConfigDictService:
         for k, v in model.items():
             setattr(data, k, v)
         await self.csb_ev_curd.update(db=self.db, model=data)
+        # 删除缓存
+        await self.__clear_dict_redis_by_man(key=getattr(data, 'name'))
         return SuccessStatus()
 
     async def de_delete(self, rtx_id: str, md5: str) -> Status:
@@ -350,6 +363,8 @@ class SystemConfigDictService:
         setattr(data, "delete_rtx", rtx_id)
         setattr(data, "delete_time", get_now())
         await self.csb_ev_curd.update(db=self.db, model=data)
+        # 删除缓存
+        await self.__clear_dict_redis_by_man(key=getattr(data, 'name'))
         return SuccessStatus()
 
     async def de_batch_delete(self, rtx_id: str, md5_list: List) -> Status:
