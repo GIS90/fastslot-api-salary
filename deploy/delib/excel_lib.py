@@ -42,7 +42,7 @@ import xlrd
 import openpyxl
 import zipfile
 from openpyxl.styles import colors
-from typing import List, Dict, Tuple, Optional, Union
+from typing import List, Dict, Tuple, Optional, Union, Literal
 
 from deploy.utils.utils import mk_dirs
 from deploy.utils.utils import get_now
@@ -73,8 +73,7 @@ class ExcelLib:
         """
         :param blank: blank row number, default is 0
         """
-        self.prefix_list: List = ['.xlsx', '.xls']
-        self.prefix_zip_list: List = ['.zip']
+        self.prefix_list: List = [self.DEFAULT_OLD_V_PREFIX, self.DEFAULT_NEW_V_PREFIX]
         self.blank: int = 0  # 0行
 
     def __str__(self) -> str:
@@ -564,7 +563,7 @@ class ExcelLib:
 
         # ================ name check ================
         compress_name = name
-        if os.path.splitext(compress_name)[-1] not in self.prefix_zip_list:
+        if os.path.splitext(compress_name)[-1] != self.DEFAULT_ZIP_PREFIX:
             compress_name = '%s%s' % (compress_name, self.DEFAULT_ZIP_PREFIX)
         reader_excel = xlrd.open_workbook(file)
         max_nsheet = len(reader_excel.sheet_names())
@@ -740,31 +739,54 @@ class ExcelLib:
         return self.visual_value(
             999, '暂无其他处理方式', {})
 
+    async def __base_verify(
+            self,
+            file_name: str,
+            check_format: Literal["only_new", "only_old", "all_"] = "only_new",
+    ) -> Tuple[int, str]:
+        """
+        文件检查
+        """
+        if check_format == "only_new":
+            __check_format_list = [self.DEFAULT_NEW_V_PREFIX]
+        elif check_format == "only_old":
+            __check_format_list = [self.DEFAULT_OLD_V_PREFIX]
+        else:
+            __check_format_list = self.prefix_list
+        if (not file_name
+                or not os.path.exists(file_name)
+                or not os.path.isfile(file_name)):
+            return 451, 'Excel文件不存在'
+        if check_format and os.path.splitext(file_name)[-1] not in __check_format_list:
+            return 454, 'Excel格式错误，仅支持.xlsx格式'
+        return 100, '检查通过'
+
     async def read_by_cell(
             self,
             read_file: str,
             sheet: int = 0,
             rows: List[int] = [],
             columns: List[int] = [],
+            format_: Literal["only_new", "only_old", "all_"] = "only_new",
             **kwargs
     ) -> Dict:
         """
-        read excel data
-        :param read_file: excel文件abs全路径
-        :param sheet: 读取的sheet数，从0开始，default value is 0
+        Cell方式读取数据
+        :param read_file: Excel文件abs全路径
+        :param sheet: 读取的Sheet索引数，默认为0
         :param rows: 读取数据的rows行列表，如果为空，默认读取全部行
         :param columns: 读取数据的columns列列表，如果为空，默认读取全部列
+        :param format_: 读取数据Excel的文件格式
         :param kwargs: 读取excel数据的其他参数配置
             request_title: 读取的表格是否包含title行，默认是true（bool类型）
             response_title: 返回的数据是否包含title说明，默认是true（bool类型）
 
         :return: dict result
         """
-        # ================== 检查 ==================
-        if (not read_file
-                or not os.path.exists(read_file)
-                or not os.path.isfile(read_file)):
-            return self.visual_value(451, '读取的Excel数据不存在', {})
+        code, message = await self.__base_verify(file_name=read_file, check_format=format_)
+        if code != 100:
+            return self.visual_value(code, message, {})
+
         request_title: bool = True if kwargs.get('request_title') else False
         # 数据读取开始的行数
         start_row: int = 2 if request_title else 1
@@ -773,7 +795,7 @@ class ExcelLib:
         excel_object = openpyxl.load_workbook(filename=read_file, data_only=True)
         excel_sheet_names = excel_object.sheetnames
         if sheet > len(excel_sheet_names) or sheet < 0:
-            return self.visual_value(452, '读取的sheet页不存在', {})
+            return self.visual_value(452, 'Excel文件Sheet页不存在', {})
         excel_sheet = excel_object.worksheets[sheet]
         # 读取指定行
         read_rows: List[int] = [int(r) for r in rows] if rows else range(start_row, excel_sheet.max_row + 1, 1)

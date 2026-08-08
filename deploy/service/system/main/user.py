@@ -364,6 +364,7 @@ class SystemMainUserService:
         excel_result: Dict = await self.excel_lib.read_by_cell(
             read_file=file_local,
             sheet=0,
+            format_="only_new",
             request_title=True,
             response_title=False)
         if excel_result.get("code") != 100:
@@ -374,11 +375,11 @@ class SystemMainUserService:
         if not excel_data:
             return FailureStatus(
                 code=status_code.CODE_101_SUCCESS_NO_DATA,
-                message="上传的文件不包含有效数据，请重新上传")
+                message="上传的模板文件不包含有效数据，请重新上传")
         if len(excel_data[0]) != 7:
             return FailureStatus(
                 code=status_code.CODE_466_REQUEST_FILE_TEMPLATE_ERROR.value,
-                message="上传的文件模板有误，请点击模板下载并重新上传")
+                message="上传的模板文件格式有误，请点击模板下载并重新上传")
         if len(excel_data) > 200:
             return SuccessStatus(code=status_code.CODE_453_REQUEST_FILE_EXCEED_MAX_ROW.value,
                                  message="单次导入最大数据量为200，请分批上传")
