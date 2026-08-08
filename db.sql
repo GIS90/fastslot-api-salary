@@ -446,7 +446,6 @@ CREATE TABLE `xtb_user_task`  (
 ) COMMENT='系统表-用户任务表';
 -- = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
 -- 系统表-用户部门表
--- ----------------------------------------------------------------------------------------------
 -- create xtb_department
 DROP TABLES IF EXISTS `xtb_department`;
 CREATE TABLE `xtb_department`  (
@@ -461,7 +460,7 @@ CREATE TABLE `xtb_department`  (
     `dept_path` varchar(254) NULL COMMENT '部门名称全路径，用>进行分割',
     `manage_rtx` varchar(254) COMMENT '部门主管rtx-id，多用户，用英文,分割',
     `create_rtx` varchar(35) COMMENT '创建用户',
-    `create_time` timestamp not null default CURRENT_TIMESTAMP COMMENT '创建时间',
+    `create_time` datetime default CURRENT_TIMESTAMP COMMENT '创建时间',
     `update_rtx` varchar(35) COMMENT '最新更新用户',
     `update_time` datetime COMMENT '最新更新时间',
     `delete_rtx` varchar(35) COMMENT '删除用户',
@@ -481,8 +480,45 @@ VALUES
 (2, '基础研发部', 'f99199aa3e689f8d339b909734aabdcb', '基础研发部', 1, True , False, 2, '根节点>基础研发部', 'admin', 'admin', False, 2),
 (3, '推广销售部', 'b9639531758dcdb8d0e7494d6ed9b5ac', '推广销售部', 1, True , False, 2, '根节点>推广销售部', 'admin', 'admin', False, 3),
 (4, '人力资源部', '38d7f0998b7acaf8db182219c7fb202c', '人力资源部', 1, True , True, 2, '根节点>人力资源部', 'admin', 'admin', False, 4);
--- ----------------------------------------------------------------------------------------------
+-- = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
+-- PDF文件记录表
+-- create table
+DROP TABLES IF EXISTS `tool_office_pdf`;
 
+CREATE TABLE `tool_office_pdf` (
+    `id` int NOT NULL AUTO_INCREMENT COMMENT '主键，自增ID',
+    `rtx_id` varchar(35) COMMENT '创建用户',
+    `name` varchar(100) NOT NULL COMMENT '文件名称',
+    `store_name` varchar(100) COMMENT '文件存储名称',
+    `transfer_name` varchar(100) COMMENT '文件转换store存储名称',
+    `md5` varchar(64) NOT NULL COMMENT '唯一标识：MD5-ID',
+    `transfer` bool DEFAULT False COMMENT '转换状态',
+    `transfer_time` datetime COMMENT '转换时间',
+    `local_url` varchar(130) COMMENT '文件本地资源路径（绝对路径）',
+    `store_url` varchar(130) COMMENT '原始文件store对象存储资源路径（绝对路径）',
+    `transfer_url` varchar(130) COMMENT '转换文件store对象存储资源路径（绝对路径）',
+    `mode` bool DEFAULT True COMMENT '转换模式：True页码，False指定页码',
+    `start` int COMMENT '转换开始页',
+    `end` int COMMENT '转换结束页',
+    `pages` varchar(120) COMMENT '指定的转换页码，用英文,分割',
+    `create_time` datetime default CURRENT_TIMESTAMP COMMENT '创建时间',
+    `update_rtx` varchar(35) COMMENT '最新更新用户',
+    `update_time` datetime COMMENT '最新更新时间',
+    `delete_rtx` varchar(35) COMMENT '删除用户',
+    `delete_time` datetime COMMENT '删除时间',
+    `status` bool default False COMMENT '数据状态：1注销；0启用（默认）',
+
+    PRIMARY KEY (`id`)
+) COMMENT='PDF文件记录表';
+
+CREATE UNIQUE INDEX tool_office_pdf_index ON tool_office_pdf (`md5`);
+-- = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
+-- = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
+-- = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
+-- = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
+-- = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
+-- = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
+-- = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
 -- = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
 -- = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
 

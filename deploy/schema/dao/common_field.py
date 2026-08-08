@@ -63,6 +63,15 @@ class CUDField:
     delete_time: Mapped[Optional[datetime]] = mapped_column(name="delete_time", type_=DateTime(), comment="删除时间")
 
 
+class RcUDField:
+    rtx_id: Mapped[str] = mapped_column(name="rtx_id", type_=String(35), nullable=False, comment="RTX-ID唯一标识，有英文+数字组成")
+    create_time: Mapped[datetime] = mapped_column(name="create_time", type_=DateTime(), comment="创建时间")
+    update_rtx: Mapped[Optional[str]] = mapped_column(name="update_rtx", type_=String(35), comment="更新用户RTX-ID")
+    update_time: Mapped[Optional[datetime]] = mapped_column(name="update_time", type_=DateTime(), comment="更新时间")
+    delete_rtx: Mapped[Optional[str]] = mapped_column(name="delete_rtx", type_=String(35), comment="删除用户RTX-ID")
+    delete_time: Mapped[Optional[datetime]] = mapped_column(name="delete_time", type_=DateTime(), comment="删除时间")
+
+
 class LockField:
     lock: Mapped[bool] = mapped_column(name="lock", type_=Boolean(), default=False, comment="锁定状态：1锁定；0非锁定")
 

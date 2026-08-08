@@ -41,7 +41,7 @@ from sqlalchemy import (
 )
 from sqlalchemy.orm import Mapped, mapped_column
 from deploy.schema._dao_base_model import baseModel
-from .common_field import IDField, RtxIdField, Md5Field, CUDField, StatusField
+from .common_field import IDField, Md5Field, CUDField, StatusField
 from typing import Optional
 
 
