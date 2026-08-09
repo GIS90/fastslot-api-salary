@@ -224,8 +224,7 @@ class QiNiuStoreLib:
             token = self.__new_token(
                 space_name=bucket_name,
                 store_name=store_name,
-                timeout=timeout
-            )
+                timeout=timeout)
             if not token:
                 return self.visual_value(
                     902, '[七牛云存储]Token创建失败，请检查网络或者对象存储配置', {})
