@@ -150,18 +150,18 @@ class ToolOfficePdf2WordService:
     #     """获取系统参数设置的Rides缓存有效期"""
     #     # redis
     #     redis_key = await self.__redis_key(key=XtbXtcsKEY.REDIS_CACHE_EXPIRE.value)
-    #     if self.redis_cli.connection:
+    #     if self.redis_cli.ping():
     #         redis_value = self.redis_cli.get_key(key=redis_key)
     #         if redis_value: return int(redis_value)
     #     # 数据库
     #     model = await self.tool_office_pdf_curd.get_by_key(db=self.db, key=XtbXtcsKEY.REDIS_CACHE_EXPIRE.value, filter_lock=True)
     #     if model and getattr(model, "value", None):
-    #         if self.redis_cli.connection:
+    #         if self.redis_cli.ping():
     #             self.redis_cli.set_key(key=redis_key, value=getattr(model, "value"))
     #         return getattr(model, "value")
     #     # 默认
     #     __rv_expire: int = _REDIS_EXPIRE_DEFAULT * 60
-    #     if self.redis_cli.connection:
+    #     if self.redis_cli.ping():
     #         self.redis_cli.set_key(key=redis_key, value=__rv_expire)
     #     return __rv_expire
     #

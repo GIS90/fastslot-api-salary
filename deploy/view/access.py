@@ -156,7 +156,7 @@ async def logout(
 
     if x_token_rtx:
         # 销毁x-token
-        if redis_cli.connection and x_token:
+        if redis_cli.ping() and x_token:
             redis_cli.delete_key(x_token)
         return SuccessStatus()
     else:

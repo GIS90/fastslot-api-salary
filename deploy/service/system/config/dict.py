@@ -138,7 +138,7 @@ class SystemConfigDictService:
             return None
         # redis 缓存
         __ev_redis_key = format_redis_key(key=name, type_="ev", ev_response=response_, ev_filter_lock=filter_lock)
-        if self.redis_cli.connection:
+        if self.redis_cli.ping():
             ev_redis_value = self.redis_cli.get_key(key=__ev_redis_key)
             if ev_redis_value and ev_redis_value != "null": return json.loads(ev_redis_value)
 
@@ -153,7 +153,7 @@ class SystemConfigDictService:
                 __ev_value[__key] = getattr(model, "value")
         else:
             __ev_value: List = await option_converter_dict(models=models, key_trans_int=key_trans_int, lock_view=True)
-        if __ev_value and self.redis_cli.connection:
+        if __ev_value and self.redis_cli.ping():
             self.redis_cli.set_key(
                 key=__ev_redis_key,
                 value=json.dumps(__ev_value),
@@ -163,7 +163,7 @@ class SystemConfigDictService:
 
     async def __clear_dict_redis_by_man(self, key):
         """模糊查询删除"""
-        if self.redis_cli.connection:
+        if self.redis_cli.ping():
             self.redis_cli.delete_key(
           f"kv_option_True_{key}",
                 f"kv_option_False_{key}",

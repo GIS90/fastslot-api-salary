@@ -150,7 +150,7 @@ class SystemConfigXtcsService:
         await self.xtb_xtcs_curd.update(db=self.db, model=data)
         # 缓存处理
         __all_key: List = [*self.XTCS_STR_LIST, *self.XTCS_INT_LIST]
-        if getattr(data, "key") in __all_key and self.redis_cli.connection:
+        if getattr(data, "key") in __all_key and self.redis_cli.ping():
             redis_key = await self.__redis_key(key=getattr(data, "key"))
             # True 删除 False 新增
             self.redis_cli.delete_key(redis_key) if params.get("value") \
@@ -169,18 +169,18 @@ class SystemConfigXtcsService:
         """获取系统参数设置的Rides缓存有效期"""
         # redis
         redis_key = await self.__redis_key(key=XtbXtcsKEY.REDIS_CACHE_EXPIRE.value)
-        if self.redis_cli.connection:
+        if self.redis_cli.ping():
             redis_value = self.redis_cli.get_key(key=redis_key)
             if redis_value: return int(redis_value)
         # 数据库
         model = await self.xtb_xtcs_curd.get_by_key(db=self.db, key=XtbXtcsKEY.REDIS_CACHE_EXPIRE.value, filter_lock=True)
         if model and getattr(model, "value", None):
-            if self.redis_cli.connection:
+            if self.redis_cli.ping():
                 self.redis_cli.set_key(key=redis_key, value=getattr(model, "value"))
             return getattr(model, "value")
         # 默认
         __rv_expire: int = _REDIS_EXPIRE_DEFAULT * 60
-        if self.redis_cli.connection:
+        if self.redis_cli.ping():
             self.redis_cli.set_key(key=redis_key, value=__rv_expire)
         return __rv_expire
 
@@ -220,7 +220,7 @@ class SystemConfigXtcsService:
         await self.xtb_xtcs_curd.update(db=self.db, model=data)
         # 更新缓存
         __all_key: List = [*self.XTCS_STR_LIST, *self.XTCS_INT_LIST]
-        if model.get("key") in __all_key and self.redis_cli.connection:
+        if model.get("key") in __all_key and self.redis_cli.ping():
             redis_key = await self.__redis_key(key=model.get("key"))
             self.redis_cli.set_key(key=redis_key, value=model.get("value"))
         return SuccessStatus()
@@ -237,7 +237,7 @@ class SystemConfigXtcsService:
         await self.xtb_xtcs_curd.update(db=self.db, model=data)
         # 删除缓存
         __all_key: List = [*self.XTCS_STR_LIST, *self.XTCS_INT_LIST]
-        if getattr(data, "key") in __all_key and self.redis_cli.connection:
+        if getattr(data, "key") in __all_key and self.redis_cli.ping():
             redis_key = await self.__redis_key(key=getattr(data, "key"))
             self.redis_cli.delete_key(redis_key)
         return SuccessStatus()
