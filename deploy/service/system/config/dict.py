@@ -154,10 +154,11 @@ class SystemConfigDictService:
         else:
             __ev_value: List = await option_converter_dict(models=models, key_trans_int=key_trans_int, lock_view=True)
         if __ev_value and self.redis_cli.ping():
+            __redis_expire: int = await self.system_config_xtcs_service.get_xtcs_redis_expire() # 默认是秒
             self.redis_cli.set_key(
                 key=__ev_redis_key,
                 value=json.dumps(__ev_value),
-                ex=await self.system_config_xtcs_service.get_xtcs_redis_expire()        # 默认是秒
+                ex= __redis_expire
             )
         return __ev_value
 
