@@ -216,3 +216,7 @@ log/
 
 # 静态资源
 # deploy/static
+
+# trae配置
+.trae
+.trae/
