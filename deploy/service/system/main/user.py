@@ -62,6 +62,7 @@ _SERVER_USER_DEFAULT_AVATAR: str = server_avatar
 
 
 class SystemMainUserService:
+    IMPORT_FILE_MAX_FIELD: int = 8
 
     def __init__(self, db_connection: AsyncSession):
         """
@@ -376,7 +377,7 @@ class SystemMainUserService:
             return FailureStatus(
                 code=status_code.CODE_101_SUCCESS_NO_DATA,
                 message="上传的模板文件不包含有效数据，请重新上传")
-        if len(excel_data[0]) != 7:
+        if len(excel_data[0]) != self.IMPORT_FILE_MAX_FIELD:
             return FailureStatus(
                 code=status_code.CODE_466_REQUEST_FILE_TEMPLATE_ERROR.value,
                 message="上传的模板文件格式有误，请点击模板下载并重新上传")
@@ -424,9 +425,11 @@ class SystemMainUserService:
             if not __status:
                 if len(d[4]) != 11: __status = True; __message: str = "电话长度必须符合11位"
             if not __status and d[5]:
-                if len(d[5]) > 255: __status = True; __message: str = "个性签名长度必须在255个字符以内"
+                if len(d[5]) > 64: __status = True; __message: str = "个性签名长度必须在64个字符以内"
             if not __status and d[6]:
-                if len(d[6]) > 255: __status = True; __message: str = "角色长度必须在255个字符以内"
+                if len(d[6]) > 255: __status = True; __message: str = "个性签名长度必须在255个字符以内"
+            if not __status and d[7]:
+                if len(d[7]) > 255: __status = True; __message: str = "角色长度必须在255个字符以内"
 
             __d: Dict = {
                 "id": index,
@@ -435,8 +438,9 @@ class SystemMainUserService:
                 "sex": d[2],
                 "email": d[3],
                 "phone": d[4],
-                "introduction": d[5],
-                "role": d[6],
+                "department": d[5],
+                "introduction": d[6],
+                "role": d[7],
                 "status": __status,
                 "message": __message
             }
