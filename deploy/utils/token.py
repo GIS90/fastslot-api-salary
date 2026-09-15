@@ -98,7 +98,7 @@ async def encode_access_token(
     to_encode_data['expire_time_ts'] = expire_ts
     to_encode_data.update({"exp": expire_ts})    # jwt过期时间KEY：['exp', 'iat', 'nbf']
     # header
-    HEADERS = {"alg": __JWT_TOKEN_ALGORITHM, "typ": "JWT"}
+    HEADERS: Dict = {"alg": __JWT_TOKEN_ALGORITHM, "typ": "JWT"}
     try:
         encoded_jwt_token = jwt.encode(
             claims=to_encode_data,
@@ -106,7 +106,7 @@ async def encode_access_token(
             algorithm=__JWT_TOKEN_ALGORITHM,
             headers=HEADERS)
         # 存储->Redis
-        if redis_cli.connection:
+        if redis_cli.ping():
             redis_cli.set_key(key=encoded_jwt_token, value=rtx_id, ex=token_time * 60)
     except Exception as e:
         raise JwtCredentialsException(f"Jwt Token [encode] error, [{e}].")
@@ -261,7 +261,7 @@ async def verify_access_token_expire(
         return True, None
 
     try:
-        if redis_cli.connection:
+        if redis_cli.ping():
             token_rtx_id = redis_cli.get_key(key=x_token)
     except Exception as e:
         ...

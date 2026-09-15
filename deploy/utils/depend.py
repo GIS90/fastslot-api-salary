@@ -69,7 +69,7 @@ async def __get_token_rtx(token: str) -> str:
     token_rtx_id = None
     # >>>>> 优先redis
     try:
-        if redis_cli.connection:
+        if redis_cli.ping():
             token_rtx_id = redis_cli.get_key(key=token)
     except:
         ...
@@ -107,7 +107,7 @@ async def auth_token_rtx(
     )
     is_redis_have: bool = False   # redis 缓存
     try:
-        if redis_cli.connection:
+        if redis_cli.ping():
             redis_admin_auth_list: str = redis_cli.get_key(key=__redis_key_authority)
             if redis_admin_auth_list:
                 is_redis_have = True
@@ -128,7 +128,7 @@ async def auth_token_rtx(
             # 数据已删除/锁定
             if getattr(model, "status") or getattr(model, "lock"):
                 return token_rtx_id
-            if redis_cli.connection:
+            if redis_cli.ping():
                 # 缓存数据
                 redis_cli.set_key(key=__redis_key_authority, value=getattr(model, "value"))
             if token_rtx_id in str(getattr(model, "value")).split(','):

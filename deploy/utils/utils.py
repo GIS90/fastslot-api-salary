@@ -736,7 +736,7 @@ def format_redis_key(
         ev_response: Literal["option", "dict"] = "dict",
         ev_filter_lock: bool = False,
         xtcs_response: Literal["str", "int"] = "str"
-):
+) -> str:
     if type_ == "ev":
         return  f"kv_{ev_response}_{ev_filter_lock}_{key}"
     else:

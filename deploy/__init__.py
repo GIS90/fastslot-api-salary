@@ -31,6 +31,7 @@ Life is short, I use python.
 ------------------------------------------------
 """
 import sys
+from contextlib import asynccontextmanager
 from typing import Any
 from fastapi import FastAPI, APIRouter
 from starlette.staticfiles import StaticFiles
@@ -48,12 +49,25 @@ from deploy.config import (app_openapi_url, app_docs_url,
                            APPProfile, _author_contact)
 
 
+# FastAPI App lifespan: 替代已废弃的 @app.on_event("startup"/"shutdown")
+@asynccontextmanager
+async def __app_lifespan(app: FastAPI):
+    # startup: 应用启动完成后执行
+    LOG.info('>>>>> Web app startup success......')
+    tip_color_startup()
+    yield
+    # shutdown: 应用关闭前执行
+    LOG.info('>>>>> Web app shutdown success......')
+    tip_color_shutdown()
+
+
 # FastAPI App instance
 __app: FastAPI = FastAPI(
     openapi_url=app_openapi_url,
     # Docs配置[str类型，设置None为禁用状态]
     docs_url=None,  # 重定向
-    redoc_url=None  # 禁用redoc_url
+    redoc_url=None,  # 禁用redoc_url
+    lifespan=__app_lifespan
 )
 
 
@@ -109,16 +123,7 @@ class FSWebAppClass(WebBaseClass):
 
         # FSWebAppClass initialize
         super(FSWebAppClass, self).__init__()
-
-        @self.app.on_event("startup")
-        async def startup_event():
-            LOG.info('>>>>> Web app startup success......')
-            tip_color_startup()
-
-        @self.app.on_event("shutdown")
-        async def shutdown_event():
-            LOG.info('>>>>> Web app shutdown success......')
-            tip_color_shutdown()
+        # 注：startup/shutdown 生命周期已统一由模块级 lifespan(__app_lifespan) 管理
 
     def __str__(self) -> str:
         return """

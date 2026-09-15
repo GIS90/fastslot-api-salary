@@ -164,10 +164,10 @@ def register_app_middleware(app: FastAPI, app_headers: Dict):
           - api: rest open apis, special api for blueprints
           - access: login in and login out APIs
         """
-        if request.url.path == "/" or \
+        if (request.url.path == "/" or \
                 request.url.path.startswith("/api/open") or \
                 request.url.path.startswith("/static/") or \
-                request.url.path.startswith("/access/"):
+                request.url.path.startswith("/access/")):
             __is_verify_token = False
 
         if __is_verify_token:
