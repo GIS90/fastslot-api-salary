@@ -133,31 +133,32 @@ class ApiDownloadService(object):
 
         # >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
         try:
-            if api == "SystemMainUser":
-                # 系统>权限>用户管理
-                __res = await self.system_main_user_service.download(params=new_params)
-            elif api == "SystemMainRole":
-                # 系统>权限>角色管理
-                __res = await self.system_main_role_service.download(params=new_params)
-            elif api == "SystemConfigXtcs":
-                # 系统>配置>系统参数
-                __res = await self.system_config_xtcs_service.download(params=new_params)
-            elif api == "SystemOpsDict":
-                # 系统>系统维护>数据字典
-                __res = await self.system_config_csb_enum_v_service.download(params=new_params)
-            elif api == "SystemOpsLog":
-                # 系统>系统维护>系统日志
-                __res = await self.system_ops_log_service.download(params=new_params)
-            elif api == "SystemOpsTask":
-                # 系统>系统维护>任务中心
-                __res = await self.system_ops_task_service.download(params=new_params)
-            elif api == "SystemOpsDepart":
-                # 系统>系统维护>部门管理
-                __res = await self.system_ops_depart_service.download(params=new_params)
-            else:
-                return FailureStatus(
-                    code=status_code.CODE_404_REQUEST_PARAMETER_VALUE_ERROR.value,
-                    message="请求参数api值不合法")
+            match api:
+                case "SystemMainUser":
+                    # 系统>权限>用户管理
+                    __res = await self.system_main_user_service.download(params=new_params)
+                case "SystemMainRole":
+                    # 系统>权限>角色管理
+                    __res = await self.system_main_role_service.download(params=new_params)
+                case "SystemConfigXtcs":
+                    # 系统>配置>系统参数
+                    __res = await self.system_config_xtcs_service.download(params=new_params)
+                case "SystemOpsDict":
+                    # 系统>系统维护>数据字典
+                    __res = await self.system_config_csb_enum_v_service.download(params=new_params)
+                case "SystemOpsLog":
+                    # 系统>系统维护>系统日志
+                    __res = await self.system_ops_log_service.download(params=new_params)
+                case "SystemOpsTask":
+                    # 系统>系统维护>任务中心
+                    __res = await self.system_ops_task_service.download(params=new_params)
+                case "SystemOpsDepart":
+                    # 系统>系统维护>部门管理
+                    __res = await self.system_ops_depart_service.download(params=new_params)
+                case _:
+                    return FailureStatus(
+                        code=status_code.CODE_404_REQUEST_PARAMETER_VALUE_ERROR.value,
+                        message="请求参数api值不合法")
         except Exception as e:
             __task_status = TS.FAILURE.value
             __error = "服务端请求数据异常：" + str(e)
