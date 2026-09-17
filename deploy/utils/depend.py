@@ -97,8 +97,8 @@ async def auth_token_rtx(
     """
     token_rtx_id = await __get_token_rtx(token=x_token)
     # 管理员
-    # if token_rtx_id == SERVER_ADMIN:
-    #     return None
+    if token_rtx_id == SERVER_ADMIN:
+        return None
     # 管理员数据权限
     __redis_key_authority: str = format_redis_key(
         key=XtbXtcsKEY.ADMIN_DATA_AUTHORITY.value,

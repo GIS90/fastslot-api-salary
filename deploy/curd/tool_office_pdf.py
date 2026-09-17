@@ -90,7 +90,7 @@ class ToolOfficePdfCurd(BaseCurd):
         try:
             stmt = select(func.count(ToolOfficePdfModel.id)).where(ToolOfficePdfModel.status != 1)
             if rtx_id:
-                stmt = stmt.where(ToolOfficePdfModel.rtx_id == rtx_id)
+                stmt = stmt.where(ToolOfficePdfModel.create_rtx == rtx_id)
             result = await db.execute(stmt)
             return result.scalar()
         except Exception as e:
@@ -103,7 +103,7 @@ class ToolOfficePdfCurd(BaseCurd):
         try:
             stmt = select(ToolOfficePdfModel).where(ToolOfficePdfModel.status != 1)
             if rtx_id:
-                stmt = stmt.where(ToolOfficePdfModel.rtx_id == rtx_id)
+                stmt = stmt.where(ToolOfficePdfModel.create_rtx == rtx_id)
             stmt = stmt.order_by(desc(ToolOfficePdfModel.create_time)).offset(offset).limit(limit)
             result = await db.execute(stmt)
             return result.scalars().all()

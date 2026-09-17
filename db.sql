@@ -148,7 +148,7 @@ VALUES
 (2, '首页', 'Home', '/', 1, 1, '8cf04a9734132302f96da8e113e80ce5', '/home', FALSE, '', 'Platform', TRUE, FALSE, FALSE, 'MENU', TRUE, 1, 'admin', FALSE, FALSE, ''),
 --   > 控制台[二级菜单]
 (3, '控制台', 'HomeDashboard', '/dashboard', 2, 2, '7e359079d011694cfb41d864ea66a5da', '/home/index', FALSE, '', 'Grid', TRUE, TRUE, FALSE, 'MENU', TRUE, 2, 'admin', FALSE, FALSE, ''),
-(4, '数据面板', 'HomeDataPan', '/datapan', 2, 2, 'd97c7ab6c1fb8827f81a21c2b8dff8c4', '/home/dataPan', FALSE, '', 'Histogram', TRUE, TRUE, FALSE, 'MENU', TRUE, 3, 'admin', FALSE, FALSE, ''),
+(4, '数据面板', 'HomeDataPan', '/datapan', 2, 2, 'd97c7ab6c1fb8827f81a21c2b8dff8c4', '/home/dataPan', FALSE, '', 'Histogram', TRUE, FALSE, FALSE, 'MENU', TRUE, 3, 'admin', FALSE, FALSE, ''),
 
 
 -- 工资模块[一级菜单]
@@ -487,7 +487,6 @@ DROP TABLES IF EXISTS `tool_office_pdf`;
 
 CREATE TABLE `tool_office_pdf` (
     `id` int NOT NULL AUTO_INCREMENT COMMENT '主键，自增ID',
-    `rtx_id` varchar(35) COMMENT '创建用户',
     `name` varchar(100) NOT NULL COMMENT '文件名称',
     `store_name` varchar(100) COMMENT '文件存储名称',
     `transfer_name` varchar(100) COMMENT '文件转换store存储名称',
@@ -501,12 +500,13 @@ CREATE TABLE `tool_office_pdf` (
     `start` int COMMENT '转换开始页',
     `end` int COMMENT '转换结束页',
     `pages` varchar(120) COMMENT '指定的转换页码，用英文,分割',
+    `create_rtx` varchar(35) COMMENT '创建用户RTX-ID',
     `create_time` datetime default CURRENT_TIMESTAMP COMMENT '创建时间',
-    `update_rtx` varchar(35) COMMENT '最新更新用户',
-    `update_time` datetime COMMENT '最新更新时间',
-    `delete_rtx` varchar(35) COMMENT '删除用户',
+    `update_rtx` varchar(35) COMMENT '更新用户RTX-ID',
+    `update_time` datetime COMMENT '更新时间',
+    `delete_rtx` varchar(35) COMMENT '删除用户RTX-ID',
     `delete_time` datetime COMMENT '删除时间',
-    `status` bool default False COMMENT '数据状态：1注销；0启用（默认）',
+    `status` bool default False COMMENT '数据状态：1删除；0正常（默认）',
 
     PRIMARY KEY (`id`)
 ) COMMENT='PDF文件记录表';

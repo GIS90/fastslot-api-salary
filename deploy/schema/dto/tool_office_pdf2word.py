@@ -35,32 +35,43 @@ from deploy.utils.enumeration import FieldTypeEnum as ft
 
 
 tool_office_pdf2word_list_fields: List = [
-    {"key": "key", "type": ft.STR, "name": "key", "null": False},
+    {"key": "name", "type": ft.STR, "name": "name", "null": False},
+    {"key": "store_name", "type": ft.STR, "name": "storeName", "null": False},
+    {"key": "transfer_name", "type": ft.STR, "name": "transferName", "null": False},
     {"key": "md5", "type": ft.STR, "name": "md5", "null": False},
-    {"key": "remark", "type": ft.STR, "name": "remark", "null": False},
-    {"key": "value", "type": ft.STR, "name": "value", "null": False},
-    {"key": "lock", "type": ft.BOOL, "name": "lock", "null": True},
-    {"key": "order_id", "type": ft.INT, "name": "orderId", "null": True}
+    {"key": "transfer", "type": ft.BOOL_TEXT, "null": False},
+    {"key": "transfer_time", "type": ft.STR, "name": "transferTime", "null": True},
+    {"key": "transfer_url", "type": ft.STR, "name": "transferUrl", "null": True},
+    {"key": "mode", "type": ft.BOOL, "name": "mode", "null": True},
+    {"key": "start", "type": ft.INT, "name": "start", "null": True},
+    {"key": "end", "type": ft.INT, "name": "end", "null": True},
+    {"key": "pages", "type": ft.STR, "name": "pages", "null": True},
+    {"key": "create_rtx", "type": ft.STR, "name": "createRtx", "null": True},
+    {"key": "create_time", "type": ft.DATETIME, "name": "createTime", "null": True}
 ]
 
 
 tool_office_pdf2word_detail_fields: List = [
-    {"key": "key"},
     {"key": "md5"},
-    {"key": "remark"},
-    {"key": "value"},
-    {"key": "order_id", "type": ft.INT, "name": "orderId", "null": True}
+    {"key": "mode", "type": ft.BOOL},
+    {"key": "start", "type": ft.INT},
+    {"key": "end", "type": ft.INT},
+    {"key": "pages", "type": ft.STR}
 ]
 
 
 tool_office_pdf2word_download_fields: List =  [
     {"key": "id", "type": ft.INT, "name": "序号", "null": True},
-    {"key": "key", "type": ft.STR, "name": "参数名称", "null": False},
-    {"key": "remark", "type": ft.STR, "name": "参数说明", "null": False},
-    {"key": "value", "type": ft.STR, "name": "参数值", "null": False},
-    {"key": "lock", "type": ft.LOCK_TEXT, "name": "状态", "null": True},
+    {"key": "name", "type": ft.STR, "name": "文件名", "null": False},
+    {"key": "store_name", "type": ft.STR, "name": "文件存储名称", "null": False},
+    {"key": "transfer_name", "type": ft.STR, "name": "文件转换名称", "null": False},
+    {"key": "transfer", "type": ft.BOOL_TEXT, "转换状态": False},
+    {"key": "transfer_time", "type": ft.STR, "name": "转换时间", "null": True},
+    {"key": "transfer_url", "type": ft.STR, "name": "转换文件下载地址", "null": True},
+    {"key": "mode", "type": ft.BOOL, "name": "转换模式", "null": True},
+    {"key": "start", "type": ft.INT, "name": "起始页码", "null": True},
+    {"key": "end", "type": ft.INT, "name": "结束页码", "null": True},
+    {"key": "pages", "type": ft.STR, "name": "转换页码", "null": True},
     {"key": "create_rtx", "type": ft.STR, "name": "创建人", "null": True},
-    {"key": "create_time", "type": ft.DATETIME, "name": "创建时间", "null": True},
-    {"key": "update_rtx", "type": ft.STR, "name": "更新人", "null": True},
-    {"key": "update_time", "type": ft.DATETIME, "name": "更新时间", "null": True}
+    {"key": "create_time", "type": ft.DATETIME, "name": "创建时间", "null": True}
 ]

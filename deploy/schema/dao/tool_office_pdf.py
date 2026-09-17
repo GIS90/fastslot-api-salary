@@ -43,13 +43,13 @@ from sqlalchemy import (
 )
 from sqlalchemy.orm import Mapped, mapped_column
 from deploy.schema._dao_base_model import baseModel
-from .common_field import IDField, Md5Field, RcUDField, StatusField
+from .common_field import IDField, Md5Field, CUDField, StatusField
 
 
 __all__ = ["ToolOfficePdfModel"]
 
 
-class ToolOfficePdfModel(baseModel, IDField, Md5Field, RcUDField, StatusField):
+class ToolOfficePdfModel(baseModel, IDField, Md5Field, CUDField, StatusField):
     __tablename__ = 'tool_office_pdf'
     __table_args__ = ({'comment': '工具表-PDF转WORD'})
 
