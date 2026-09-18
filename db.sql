@@ -578,6 +578,8 @@ CREATE TABLE `csb_enum_value`  (
 	`field_type` varchar(35) NOT NULL COMMENT '字段类型',
     `width` decimal(10, 4) NOT NULL COMMENT '宽度',
 	`fixed` varchar(35) NOT NULL COMMENT '锁定：left right',
+    `list` bool default True COMMENT '列表：1支持；0不支持',
+    `detail` bool default True COMMENT '详情：1支持；0不支持',
 	`import` bool default True COMMENT '导出：1支持；0不支持',
 	`null` bool default True COMMENT '空值：1允许；0不允许（主要涉及系统数据展示、数据导出）',
     `create_rtx` varchar(35) COMMENT '创建用户RTX-ID',
