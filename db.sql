@@ -317,7 +317,9 @@ insert into csb_enum_key(`key`, `md5`, `value`, `lock`, `status`, `create_rtx`, 
 ('menu-type', 'e32c70446571ce05a25702889c56cbac', '菜单类型', False, False, 'admin', 5),
 ('menu-level', 'cde5d071f0b5bbb56033121304b6604a', '菜单级别', False, False, 'admin', 6),
 ('api-type', 'ddf8dac28ba9f6a1d86d2b79b6e9cbe9', '请求类型', False, False, 'admin', 7),
-('task-status', 'a4115b287aab1804586eb9390841ab6b', '任务状态', False, False, 'admin', 8);
+('task-status', 'a4115b287aab1804586eb9390841ab6b', '任务状态', False, False, 'admin', 8),
+('xtbb-fixed-status', '3f9a8c2b7e1d4f6a5c8e2b9d7a3f1c4e', '系统报表字段固定状态', False, False, 'admin', 9),
+('field-type', 'a7d2f9e4c1b8a3d6f5e2c9b7a4d1f8e3', '字段类型', False, False, 'admin', 10);
 
 -- CSB_ENUM_VALUE枚举 Value表
 -- create table && index
@@ -376,9 +378,23 @@ insert into csb_enum_value(`name`, `md5`, `key`, `value`, `remark`, `lock`, `sta
 ('api-type', 'de77797d9f646e2055e7d6e08b6421d3', 'error', 'OTHER', 'API接口操作类型 > 其他', False, False, 'admin', 5),
 ('task-status', 'f6c92121b95675feb64d8bf785859f2f', 'SUCCESS', '成功', '任务状态 > 成功', False, False, 'admin', 1),
 ('task-status', '9b3bd908456381af4ef69f98f9810846', 'FAILURE', '失败', '任务状态 > 失败', False, False, 'admin', 2),
-('task-status', '85a78a1c4bfc5ad70a542c0e32c43026', 'WORKING', '执行中', '任务状态 > 执行中', False, True, 'admin', 3);
-
-
+('task-status', '85a78a1c4bfc5ad70a542c0e32c43026', 'WORKING', '执行中', '任务状态 > 执行中', False, True, 'admin', 3),
+('xtbb-fixed-status', 'b5e8c1a4d7f2e9b6c3a8d5f1e4b7c2a9', 'left', '左固定', '系统报表字段固定状态 > 左固定', False, False, 'admin', 1),
+('xtbb-fixed-status', 'c8f1a5d9e2b6c3f7a4d8e1b5c9f2a6d3', 'right', '右固定', '系统报表字段固定状态 > 右固定', False, True, 'admin', 2),
+('field-type', 'd4b7e1a8c5f2d9b6e3a7c4f1d8b5e2a9', 'str', '字符串', '系统报表字段类型 > 字符串', False, False, 'admin', 1),
+('field-type', 'e2a6c9f3b7d1e5a8c4f2b6d9e3a7c1f5', 'int', '整数', '系统报表字段类型 > 整数', False, True, 'admin', 2),
+('field-type', 'f7b3d8a2c6e1f9b5d4a8c2e6f3b7d1a9', 'float', '浮点数', '系统报表字段类型 > 浮点数', False, False, 'admin', 3),
+('field-type', 'a1c5e9b3d7f2a6c4e8b1d5f9a3c7e2b6', 'bool', '布尔值', '系统报表字段类型 > 布尔值', False, True, 'admin', 4),
+('field-type', 'b8d2f6a1c5e9b3d7f4a8c2e6b1d5f9a3', 'bool_text', '布尔文本', '系统报表字段类型 > 布尔文本', False, False, 'admin', 5),
+('field-type', 'c3e7a1b5d9f2c6e4a8b1d5f9c3e7a2b6', 'datetime', '日期时间', '系统报表字段类型 > 日期时间', False, True, 'admin', 6),
+('field-type', 'd9b5e2a8c4f1d7b3e6a2c9f5d1b8e4a7', 'date', '日期', '系统报表字段类型 > 日期', False, False, 'admin', 7),
+('field-type', 'e5c1a7d3f9b6e2a8c4d1f7b3e9a5c2d8', 'time', '时间', '系统报表字段类型 > 时间', False, True, 'admin', 8),
+('field-type', 'f1d7b3e9a5c2f8d4b1e7a3c9f5d2b8e4', 'timestamp', '时间戳', '系统报表字段类型 > 时间戳', False, False, 'admin', 9),
+('field-type', 'a8c4e1b7d3f9a5c2e8b4d1f7a3c9e6b2', 'list', '列表', '系统报表字段类型 > 列表', False, True, 'admin', 10),
+('field-type', 'b4d1f7a3c9e6b2d8f5a1c7e3b9d6f2a8', 'dict', '字典', '系统报表字段类型 > 字典', False, False, 'admin', 11),
+('field-type', 'c9e6b2d8f5a1c7e3b9d6f2a8c4e1b7d3', 'split_list', '拆分列表', '系统报表字段类型 > 拆分列表', False, True, 'admin', 12),
+('field-type', 'd6f2a8c4e1b7d3f9a5c2e8b4d1f7a3c9', 'user_status_text', '用户状态文本', '系统报表字段类型 > 用户状态文本', False, True, 'admin', 13),
+('field-type', 'e3b9d6f2a8c4e1b7d3f9a5c2e8b4d1f7', 'lock_text', '锁定文本', '系统报表字段类型 > 持定文本', False, True, 'admin', 14);
 
 
 
@@ -523,3 +539,86 @@ CREATE UNIQUE INDEX tool_office_pdf_index ON tool_office_pdf (`md5`);
 -- = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
 
 
+-- 系统表-系统报表
+-- create table && index
+DROP TABLES IF EXISTS `xtb_xtbb`;
+CREATE TABLE `xtb_xtbb`  (
+    `id` int NOT NULL AUTO_INCREMENT COMMENT '主键，自增ID',
+    `name` varchar(35) NOT NULL COMMENT '报表名称',
+	`table` varchar(35) NOT NULL COMMENT '数据库表名',
+    `md5` varchar(64) NOT NULL UNIQUE COMMENT '数据唯一标识：MD5-ID',
+    `remark` varchar(100) COMMENT '报表说明',
+	`mode` bool default False COMMENT '宽度模式：1百分比（要求合计100）；0固定数值',
+    `create_rtx` varchar(35) COMMENT '创建用户RTX-ID',
+    `create_time` datetime default CURRENT_TIMESTAMP COMMENT '创建时间',
+    `update_rtx` varchar(35) COMMENT '更新用户RTX-ID',
+    `update_time` datetime COMMENT '更新时间',
+    `delete_rtx` varchar(35) COMMENT '删除用户RTX-ID',
+    `delete_time` datetime COMMENT '删除时间',
+    `status` bool default False COMMENT '数据状态：1删除；0正常（默认）',
+
+    PRIMARY KEY (`id`),
+    UNIQUE INDEX `xtb_xtbb_md5_index`(`md5`) USING HASH COMMENT 'md5唯一索引'
+) COMMENT='系统表-系统报表';
+
+delete from xtb_xtbb;
+
+insert into xtb_xtbb(`name`, `table`, `md5`, `remark`, `mode`, `create_rtx`) VALUES
+('SystemMainUser', 'xtb_user', '6cfc35fda5cebaa3d39afa1a438a0e27', '系统表-用户表', False, 'admin');
+
+
+-- 系统表-系统报表字段
+-- create table && index
+DROP TABLES IF EXISTS `xtb_xtbb_field`;
+CREATE TABLE `csb_enum_value`  (
+    `id` int NOT NULL AUTO_INCREMENT COMMENT '主键，自增ID',
+	`name_zh` varchar(35) NOT NULL COMMENT '字段英文名称',
+    `name_ch` varchar(35) NOT NULL COMMENT '字段中文名称',
+    `md5` varchar(64) NOT NULL UNIQUE COMMENT '数据唯一标识：MD5-ID',
+	`field_type` varchar(35) NOT NULL COMMENT '字段类型',
+    `width` decimal(10, 4) NOT NULL COMMENT '宽度',
+	`fixed` varchar(35) NOT NULL COMMENT '锁定：left right',
+	`import` bool default True COMMENT '导出：1支持；0不支持',
+	`null` bool default True COMMENT '空值：1允许；0不允许（主要涉及系统数据展示、数据导出）',
+    `create_rtx` varchar(35) COMMENT '创建用户RTX-ID',
+    `create_time` datetime default CURRENT_TIMESTAMP COMMENT '创建时间',
+    `update_rtx` varchar(35) COMMENT '更新用户RTX-ID',
+    `update_time` datetime COMMENT '更新时间',
+    `delete_rtx` varchar(35) COMMENT '删除用户RTX-ID',
+    `delete_time` datetime COMMENT '删除时间',
+    `status` bool default False COMMENT '数据状态：1删除；0正常（默认）',
+    `order_id` int COMMENT '排序ID',
+
+    PRIMARY KEY (`id`),
+    UNIQUE INDEX `index_id`(`id`) USING HASH COMMENT 'id索引'
+) COMMENT='系统表-系统报表字段';
+
+delete from csb_enum_value;
+
+insert into csb_enum_value(`name`, `md5`, `key`, `value`, `remark`, `lock`, `status`, `create_rtx`, `order_id`) VALUES
+
+
+
+
+
+
+    `id` int NOT NULL AUTO_INCREMENT COMMENT '主键，自增ID',
+    `rtx_id` varchar(35) not null unique COMMENT 'RTX-ID唯一标识，英文+数字组成',
+    `md5` varchar(64) not null unique COMMENT '数据唯一标识：MD5-ID',
+    `name` varchar(30) not null COMMENT '名称',
+    `password` varchar(120) not null COMMENT '密码[md5加密]',
+    `salt` varchar(32) COMMENT '密码盐值，随机MD5-ID[32位]',
+    `sex` varchar(2) COMMENT '性别',
+    `email` varchar(80) COMMENT '邮箱',
+    `phone` varchar(15) COMMENT '电话',
+    `avatar` varchar(120) COMMENT '头像地址',
+    `introduction` text COMMENT '描述',
+    `role` varchar(255) COMMENT '角色RTX-ID值（大写），关联role表，多角色用;分割',
+    `department` varchar(64) COMMENT '部门MD5-ID值，关联department表',
+    `create_rtx` varchar(35) COMMENT '创建用户RTX-ID',
+    `create_time` datetime default CURRENT_TIMESTAMP COMMENT '创建时间',
+    `update_rtx` varchar(35) COMMENT '更新用户RTX-ID',
+    `update_time` datetime COMMENT '更新时间',
+    `delete_rtx` varchar(35) COMMENT '删除用户RTX-ID',
+    `delete_time` datetime COMMENT '删除时间',
+    `status` bool default False COMMENT '数据状态：1注销；0启用（默认）',
