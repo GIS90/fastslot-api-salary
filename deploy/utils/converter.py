@@ -83,7 +83,7 @@ async def model_converter_dict(
 
         if not key: continue  # 忽略无效字段定义
         __name: str = key if not name else name  # 为空默认取key
-        __type: str = type_ if type_ else "str"  # 为空默认为字符串格式
+        __type: str = type_ if type_ else "string"  # 为空默认为字符串格式
         __null: bool = True if null else False   # True允许为空 False不允许为空
         valid_fields.append((key, __type, __name, __null))
 
@@ -96,15 +96,15 @@ async def model_converter_dict(
         if field_value is None: field_value = ""
         try:
             match field_type:
-                case "str":
+                case "string":
                     model_dict[field_name] = str(field_value)
-                case "int":
+                case "integer":
                     model_dict[field_name] = int(field_value)
-                case "float":
+                case "number":
                     model_dict[field_name] = float(field_value)
-                case "bool":
+                case "boolean":
                     model_dict[field_name] = bool(field_value)
-                case "bool_text":
+                case "boolean_text":
                     model_dict[field_name] = "是" if bool(field_value) else "否"
                 case "user_status_text":
                     model_dict[field_name] = "注销" if bool(field_value) else "启用"
