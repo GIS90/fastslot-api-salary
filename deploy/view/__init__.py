@@ -44,6 +44,7 @@ from deploy.view.system.ops.log import router as system_ops_log_router
 from deploy.view.system.ops.depart import router as system_ops_depart_router
 from deploy.view.system.config.xtcs import router as system_config_xtcs_router
 from deploy.view.system.config.dict import router as system_config_dict_router
+from deploy.view.system.config.report import router as system_config_report_router
 
 from deploy.view.setter.profile import router as setter_profile_router
 
@@ -81,5 +82,6 @@ add_routers = [
     system_ops_depart_router,
     system_config_xtcs_router,
     system_config_dict_router,
+    system_config_report_router,
     setter_profile_router
 ]
