@@ -37,7 +37,7 @@
 另外，supervisor_XXXX.conf是项目进程管理的配置信息，部署到线上。
 
 ## 数据库
-详情见db.sql。
+详情见db > db.sql。
 
 
 > ## 3、架构
@@ -75,8 +75,8 @@
 - file_lib.py   
   文件处理包(the file dealing lib)  
   静态工具包，适用于任何项目以及脚本
-- http_lib.py    
-  HTTP请求工具，基于requests
+- aiohttp_lib.py    
+  异步HTTP请求工具，基于httpx
 - image_lib.py    
   图片处理
 - qywx_lib.py    

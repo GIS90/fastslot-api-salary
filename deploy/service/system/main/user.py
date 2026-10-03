@@ -47,8 +47,7 @@ from deploy.utils.status_value import (StatusCode as status_code,
                                        StatusMsg as status_msg)
 from deploy.utils.converter import model_converter_dict
 from deploy.schema.dto.xtb_user import (xtb_user_list_fields, xtb_user_detail_fields,
-                                        xtb_user_login_fields, xtb_user_download_fields,
-                                        xtb_user_import_fields)
+                                        xtb_user_login_fields, xtb_user_download_fields)
 from deploy.utils.utils import get_now, random_string, md5 as generator_md5, d2s
 from deploy.config import server_user, server_password, server_avatar
 from deploy.utils.enumeration import XtbXtcsKEY, CsbEnumKEY, FileTypeEnum
