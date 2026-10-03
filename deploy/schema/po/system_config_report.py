@@ -48,7 +48,7 @@ class __XtbXtbbBaseModel(baseModel):
 
 
 class XtbXtbbAddModel(__XtbXtbbBaseModel):
-    pass
+    ...
 
 
 class XtbXtbbUpdateModel(__XtbXtbbBaseModel):
@@ -75,7 +75,7 @@ class __XtbXtbbFieldBaseModel(baseModel):
 
 
 class XtbXtbbFieldAddModel(__XtbXtbbFieldBaseModel):
-    pass
+    ...
 
 
 class XtbXtbbFieldUpdateModel(__XtbXtbbFieldBaseModel):
