@@ -167,7 +167,10 @@ class SystemConfigReportService:
         setattr(data, "status", True)
         setattr(data, "delete_rtx", rtx_id)
         setattr(data, "delete_time", get_now())
+        # 删除xtbb
         await self.xtb_xtbb_curd.update(db=self.db, model=data)
+        # 删除xtbb-field
+        await self.xtb_xtbb_field_curd.delete_by_xtbb_soft(db=self.db, xtbb=data.name, rtx_id=rtx_id)
         return SuccessStatus()
 
     async def batch_delete(self, rtx_id: str, md5_list: List) -> Status:

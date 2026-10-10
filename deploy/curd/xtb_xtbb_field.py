@@ -187,6 +187,20 @@ class XtbXtbbFieldCurd(BaseCurd):
             raise SQLDBHandleException(f"[{cls.__name__}*删除]{e}")
 
     @classmethod
+    async def delete_by_xtbb_soft(
+            cls, db: AsyncSession, xtbb: str, rtx_id: str
+    ) -> None:
+        try:
+            stmt = update(XtbXtbbFieldModel).where(XtbXtbbFieldModel.xtbb == xtbb).values(
+                status=True,
+                delete_rtx=rtx_id,
+                delete_time=func.now(),
+            )
+            await db.execute(stmt)
+        except Exception as e:
+            raise SQLDBHandleException(f"[{cls.__name__}*表删除整个字段]{e}")
+
+    @classmethod
     async def batch_soft_delete_update(
             cls, db: AsyncSession, md5_list: List[str], rtx_id: str
     ) -> None:

@@ -37,7 +37,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from deploy.curd.database import get_session
 from deploy.service.system.config.report import SystemConfigReportService
 from deploy.utils.status import Status
-from deploy.utils.depend import pageable_like_params, depend_token_rtx
+from deploy.utils.depend import pageable_params, depend_token_rtx
 from deploy.schema.po.system_config_report import (
     XtbXtbbAddModel, XtbXtbbUpdateModel,
     XtbXtbbFieldAddModel, XtbXtbbFieldUpdateModel
@@ -55,7 +55,7 @@ def get_service(db: AsyncSession = Depends(get_session)) -> SystemConfigReportSe
 
 @router.get("/report.list", summary="数据列表")
 async def pagination(
-    params: dict = Depends(pageable_like_params),
+    params: dict = Depends(pageable_params),
     token_rtx_id: str = Depends(depend_token_rtx),
     service: SystemConfigReportService = Depends(get_service)
 ) -> Status:
