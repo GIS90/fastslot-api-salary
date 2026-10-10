@@ -30,6 +30,7 @@ Life is short, I use python.
 
 ------------------------------------------------
 """
+import json
 from datetime import datetime
 from typing import Dict, List, Tuple, Any, Union
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -254,7 +255,7 @@ class SystemConfigReportService:
             _d["label"] = getattr(model, "name_ch", "")
             _d["width"] = f"{model.width}%" if xtbb_mode else str(model.width)
             if model.filter:
-                _d["filter"] = model.filter
+                _d["filter"] = json.loads(model.filter)
             if model.fixed:
                 _d["fixed"] = model.fixed
             data.append(_d)

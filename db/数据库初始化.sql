@@ -561,16 +561,16 @@ CREATE TABLE `xtb_xtbb_field`  (
 delete from xtb_xtbb_field;
 insert into xtb_xtbb_field(`field`,`name_zh`,`name_ch`,`md5`,`xtbb`,`remark`,`width`,`fixed`,`list`,`list_type`,`export`,`export_type`,`null`,`id_auto`,`extend`,`filter`,`create_rtx`,`order_id`) VALUES
 ('id','id','序号','3aabf39f2d943fa886d86dcbbee4d910','SystemMainUser','主键，自增ID',100.0000,'',1,'int',1,'int',0,1,0,'','admin',1),
-('rtx_id','rtx_id','账号','b1c2d3e4f5a60718293a4b5c6d7e8f90','SystemMainUser','RTX-ID唯一标识，英文+数字组成',200,'',1,'string',1,'string',0,0,0,'{"type":"input","placeholder":"请输入账号"}','admin',2),
+('rtx_id','rtxId','账号','b1c2d3e4f5a60718293a4b5c6d7e8f90','SystemMainUser','RTX-ID唯一标识，英文+数字组成',200,'',1,'string',1,'string',0,0,0,'{"type":"input","placeholder":"请输入账号"}','admin',2),
 ('avatar','avatar','头像','293a4b5c6d7e8f901223344556677889','SystemMainUser','头像地址',130.0000,'',1,'string',1,'string',1,0,0,'','admin',3),
 ('name','name','昵称','d3e4f5a60718293a4b5c6d7e8f901223','SystemMainUser','昵称',200.0000,'',1,'string',1,'string',1,0,0,'{"type":"input","placeholder":"请输入昵称"}','admin',4),
-('sex','sex','性别','a60718293a4b5c6d7e8f901223344556','SystemMainUser','性别',130.0000,'',1,'string',1,'string',1,0,0,'{"type":"select","placeholder":"请选择性别","options":[{"label":"男","value":"男"},{"label":"女","value":"女"},{"label":"保密","value":"保密"}]}}','admin',5),
+('sex','sex','性别','a60718293a4b5c6d7e8f901223344556','SystemMainUser','性别',130.0000,'',1,'string',1,'string',1,0,0,'{"type":"select","placeholder":"请选择性别","options":[{"label":"男","value":"男"},{"label":"女","value":"女"},{"label":"保密","value":"保密"}]}','admin',5),
 ('phone','phone','电话','18293a4b5c6d7e8f9012233445566778','SystemMainUser','电话',150.0000,'',1,'string',1,'string',1,0,0,'{"type":"input","placeholder":"请输入电话"}','admin',6),
 ('email','email','邮箱','0718293a4b5c6d7e8f90122334455667','SystemMainUser','邮箱',200.0000,'',1,'string',1,'string',1,0,0,'{"type":"input","placeholder":"请输入邮箱"}','admin',7),
 ('introduction','introduction','描述','3a4b5c6d7e8f90122334455667788990','SystemMainUser','描述',300.0000,'',0,'string',1,'string',1,0,0,'{"type":"input","placeholder":"请输入描述"}','admin',8),
 ('department','department','部门','5c6d7e8f901223344556677889900a1b','SystemMainUser','部门MD5-ID值，关联department表',200.0000,'',1,'string',1,'string',1,0,0,'{"type":"input","placeholder":"请输入部门名称"}','admin',9),
-('createRtx','create_rtx','创建人','6d7e8f901223344556677889900a1b2c','SystemMainUser','创建用户RTX-ID',200.0000,'',1,'string',1,'string',0,1,0,'{"type":"input","placeholder":"请输入创建人"}','admin',10),
-('createTime','create_time','创建时间','7e8f901223344556677889900a1b2c3d','SystemMainUser','创建时间',180.0000,'',1,'datetime',1,'datetime',0,1,0,'{"type":"daterange","placeholder":"请选择创建时间"}','admin',11),
+('create_rtx','createRtx','创建人','6d7e8f901223344556677889900a1b2c','SystemMainUser','创建用户RTX-ID',200.0000,'',1,'string',1,'string',0,1,0,'{"type":"input","placeholder":"请输入创建人"}','admin',10),
+('create_time','createTime','创建时间','7e8f901223344556677889900a1b2c3d','SystemMainUser','创建时间',180.0000,'',1,'datetime',1,'datetime',0,1,0,'{"type":"daterange","placeholder":"请选择创建时间"}','admin',11),
 ('options','options','操作','93da65a9fd0004d9477aeac024e08e15','SystemMainUser','操作按钮',160.0000,'right',1,'string',0,'string',0,1,0,'','admin',12),
 ('status','status','状态管理','223344556677889900a1b2c3d4e5f678','SystemMainUser','数据状态：1注销；0启用（默认）',180.0000,'right',1,'boolean',1,'user_status_text',1,1,1,'{"type":"select","placeholder":"请选择状态","options":[{"label":"启用","value":false}, {"label": "注销","value":true}]}','admin',13);
 
