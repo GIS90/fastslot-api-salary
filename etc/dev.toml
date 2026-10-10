@@ -89,4 +89,8 @@ yun_space = "open2lstore"
 quality = 100
 width = 700
 
+# 表格
+[table]
+selection_width = 100
+
 

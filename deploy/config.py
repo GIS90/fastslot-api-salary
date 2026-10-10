@@ -152,6 +152,8 @@ store_yun_space: str = data["store"].get("yun_space")
 image_quality: int = data["image"].get("quality")
 image_width: int = data["image"].get("width")
 
+# table
+table_selection_width: int = data["table"].get("selection_width")
 
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

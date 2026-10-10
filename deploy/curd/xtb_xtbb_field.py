@@ -137,6 +137,24 @@ class XtbXtbbFieldCurd(BaseCurd):
             raise SQLDBHandleException(f"[{cls.__name__}*按报表查询]{e}")
 
     @classmethod
+    async def column_by_xtbb(
+        cls, db: AsyncSession, xtbb: str, list_: bool = True, export_: bool = False
+    ) -> Optional[List]:
+        # 不允许同真、同假
+        if list_ == export_: return None
+        try:
+            stmt = (select(XtbXtbbFieldModel).where(
+                XtbXtbbFieldModel.status != 1,
+                XtbXtbbFieldModel.xtbb == xtbb
+            ))
+            stmt = stmt.where(XtbXtbbFieldModel.list == True) if list_ else stmt.where(XtbXtbbFieldModel.export == True)
+            stmt.order_by(asc(XtbXtbbFieldModel.order_id), asc(XtbXtbbFieldModel.create_time))
+            result = await db.execute(stmt)
+            return result.scalars().all()
+        except Exception as e:
+            raise SQLDBHandleException(f"[{cls.__name__}*按报表查询]{e}")
+
+    @classmethod
     async def pagination(
         cls, db: AsyncSession, offset: int = 0, limit: int = 15, content: str = None, *args, **kwargs
     ) -> Optional[List]:

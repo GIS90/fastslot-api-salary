@@ -46,6 +46,7 @@ from deploy.schema.dto.xtb_xtbb import (xtb_xtbb_list_fields, xtb_xtbb_detail_fi
 from deploy.schema.dto.xtb_xtbb_field import (xtb_xtbb_field_list_fields, xtb_xtbb_field_detail_fields,
                                              xtb_xtbb_field_view_fields)
 from deploy.utils.utils import get_now, md5 as generator_md5, d2s
+from deploy.config import table_selection_width as TABLE_SW
 
 
 class SystemConfigReportService:
@@ -231,16 +232,32 @@ class SystemConfigReportService:
         return SuccessStatus(data=data)
 
     async def field_column_by_xtbb(self, rtx_id: str, xtbb: str) -> Status:
-        models: List[XtbXtbbFieldModel] = await self.xtb_xtbb_field_curd.list_by_xtbb(
-            db=self.db, xtbb=xtbb
+        # 第一步：报表
+        xtbb_model: XtbXtbbModel = await self.xtb_xtbb_curd.get_by_name(db=self.db, name=xtbb)
+        if not xtbb_model:
+            return FailureStatus(code=status_code.CODE_501_DATA_NOT_EXIST)
+        xtbb_mode = getattr(xtbb_model, "mode", False)  # 默认为固定数值模式
+        # 第二步：报表字段
+        models: List[XtbXtbbFieldModel] = await self.xtb_xtbb_field_curd.column_by_xtbb(
+            db=self.db, xtbb=xtbb, list_=True, export_=False
         )
         if not models:
             return SuccessStatus(data=[])
 
-        data: List = await many_model_converter_dict(
-            models=models,
-            fields=xtb_xtbb_field_list_fields
-        )
+        data: List = [
+            {"prop": "", "width": TABLE_SW, "type": "selection", "fixed": "left"}   # 默认选择列
+        ]
+        for model in models:
+            if not model: continue
+            _d: Dict = dict()
+            _d["prop"] = getattr(model, "name_zh", "")
+            _d["label"] = getattr(model, "name_ch", "")
+            _d["width"] = f"{model.width}%" if xtbb_mode else str(model.width)
+            if model.filter:
+                _d["filter"] = model.filter
+            if model.fixed:
+                _d["fixed"] = model.fixed
+            data.append(_d)
         return SuccessStatus(data=data)
 
     async def field_add(self, rtx_id: str, model: Dict) -> Status:
