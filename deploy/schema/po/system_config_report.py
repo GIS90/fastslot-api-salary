@@ -59,7 +59,7 @@ class __XtbXtbbFieldBaseModel(baseModel):
     field: str = Field(..., min_length=1, max_length=35, description="数据库字段名称", alias="field")
     name_zh: str = Field(..., min_length=1, max_length=35, description="字段英文名称", alias="nameZh")
     name_ch: str = Field(..., min_length=1, max_length=35, description="字段中文名称", alias="nameCh")
-    xtbb_md5: str = Field(..., min_length=1, max_length=64, description="系统报表MD5-ID", alias="xtbbMd5")
+    xtbb: str = Field(..., min_length=1, max_length=35, description="系统报表名称", alias="xtbb")
     remark: str | None = Field(default=None, max_length=100, description="字段说明", alias="remark")
     width: float = Field(default=0, description="宽度", alias="width")
     fixed: str = Field(default="", max_length=35, description="锁定：left right", alias="fixed")

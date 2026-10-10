@@ -107,24 +107,24 @@ async def batch_delete(
     return await service.batch_delete(rtx_id=token_rtx_id, md5_list=params.model_dump().get("md5"))
 
 
-@router.get("/report.view", summary="视图")
-async def view(
-    md5: str = Query(..., description="数据Md5-Id"),
-    token_rtx_id: str = Depends(depend_token_rtx),
-    service: SystemConfigReportService = Depends(get_service)
-) -> Status:
-    return await service.view(rtx_id=token_rtx_id, md5=md5)
-
-
 # ======================== report field ========================
 
 @router.get("/report.field.list", summary="字段列表-按报表Md5")
-async def field_list_by_xtbb_md5(
-    xtbbMd5: str = Query(..., description="报表Md5-Id"),
+async def field_list_by_xtbb(
+    xtbb: str = Query(..., description="报表名称"),
     token_rtx_id: str = Depends(depend_token_rtx),
     service: SystemConfigReportService = Depends(get_service)
 ) -> Status:
-    return await service.field_list_by_xtbb_md5(rtx_id=token_rtx_id, xtbb_md5=xtbbMd5)
+    return await service.field_list_by_xtbb(rtx_id=token_rtx_id, xtbb=xtbb)
+
+
+@router.get("/report.field.column", summary="字段列表-按报表名称获取Table的Column")
+async def field_column(
+    xtbb: str = Query(..., description="报表名称"),
+    token_rtx_id: str = Depends(depend_token_rtx),
+    service: SystemConfigReportService = Depends(get_service)
+) -> Status:
+    return await service.field_column_by_xtbb(rtx_id=token_rtx_id, xtbb=xtbb)
 
 
 @router.post("/report.field", summary="新增字段")

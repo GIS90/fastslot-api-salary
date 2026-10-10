@@ -55,7 +55,7 @@ class XtbXtbbFieldModel(baseModel, IDField, Md5Field, CUDField, StatusField, Ord
     field: Mapped[str] = mapped_column(name="field", type_=String(35), comment="数据库字段名称")
     name_zh: Mapped[str] = mapped_column(name="name_zh", type_=String(35), comment="字段英文名称")
     name_ch: Mapped[str] = mapped_column(name="name_ch", type_=String(35), comment="字段中文名称")
-    xtbb_md5: Mapped[str] = mapped_column(name="xtbb_md5", type_=String(64), comment="系统报表MD5-ID，关联xtb_xtbb表")
+    xtbb: Mapped[str] = mapped_column(name="xtbb", type_=String(35), comment="系统报表名称，关联xtb_xtbb表")
     remark: Mapped[str | None] = mapped_column(name="remark", type_=String(100), comment="字段说明")
     width: Mapped[float] = mapped_column(name="width", type_=Numeric(10, 4), default=0, comment="宽度")
     fixed: Mapped[str] = mapped_column(name="fixed", type_=String(35), default="", comment="锁定：left right")

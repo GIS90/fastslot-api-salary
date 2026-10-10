@@ -97,12 +97,12 @@ class XtbXtbbFieldCurd(BaseCurd):
             raise SQLDBHandleException(f"[{cls.__name__}*总数]{e}")
 
     @classmethod
-    async def count_by_xtbb_md5(cls, db: AsyncSession, xtbb_md5: str) -> int:
+    async def count_by_xtbb(cls, db: AsyncSession, xtbb: str) -> int:
         try:
             result = await db.execute(
                 select(func.count(XtbXtbbFieldModel.id)).where(
                     XtbXtbbFieldModel.status != 1,
-                    XtbXtbbFieldModel.xtbb_md5 == xtbb_md5
+                    XtbXtbbFieldModel.xtbb == xtbb
                 )
             )
             return result.scalar()
@@ -123,13 +123,13 @@ class XtbXtbbFieldCurd(BaseCurd):
             raise SQLDBHandleException(f"[{cls.__name__}*查询总数]{e}")
 
     @classmethod
-    async def list_by_xtbb_md5(
-        cls, db: AsyncSession, xtbb_md5: str
+    async def list_by_xtbb(
+        cls, db: AsyncSession, xtbb: str
     ) -> Optional[List]:
         try:
             stmt = select(XtbXtbbFieldModel).where(
                 XtbXtbbFieldModel.status != 1,
-                XtbXtbbFieldModel.xtbb_md5 == xtbb_md5
+                XtbXtbbFieldModel.xtbb == xtbb
             ).order_by(asc(XtbXtbbFieldModel.order_id), asc(XtbXtbbFieldModel.create_time))
             result = await db.execute(stmt)
             return result.scalars().all()
@@ -142,8 +142,8 @@ class XtbXtbbFieldCurd(BaseCurd):
     ) -> Optional[List]:
         try:
             stmt = select(XtbXtbbFieldModel).where(XtbXtbbFieldModel.status != 1)
-            if kwargs.get("xtbb_md5"):
-                stmt = stmt.where(XtbXtbbFieldModel.xtbb_md5 == kwargs.get("xtbb_md5"))
+            if kwargs.get("xtbb"):
+                stmt = stmt.where(XtbXtbbFieldModel.xtbb == kwargs.get("xtbb"))
             if content:
                 stmt = stmt.where(
                     or_(
@@ -204,8 +204,8 @@ class XtbXtbbFieldCurd(BaseCurd):
     async def download(cls, db: AsyncSession, params: dict) -> Optional[List]:
         try:
             stmt = select(XtbXtbbFieldModel).where(XtbXtbbFieldModel.status != 1)
-            if params.get("xtbb_md5"):
-                stmt = stmt.where(XtbXtbbFieldModel.xtbb_md5 == params.get("xtbb_md5"))
+            if params.get("xtbb"):
+                stmt = stmt.where(XtbXtbbFieldModel.xtbb == params.get("xtbb"))
             stmt = stmt.order_by(asc(XtbXtbbFieldModel.order_id), asc(XtbXtbbFieldModel.create_time))
             result = await db.execute(stmt)
             return result.scalars().all()

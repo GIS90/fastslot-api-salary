@@ -61,7 +61,7 @@ View根据系统设计的api进行模块划分，其中有3个比较特殊（不
   系统
     权限管理：[user]用户管理 [role]角色管理 [menu]菜单管理
     系统维护：[task]任务中心 [log]系统日志 [depart]部门管理
-    系统配置：[xtcs]参数配置 [dict]数据字典
+    系统配置：[xtcs]参数配置 [dict]数据字典 [report]报表配置
   设置
     [profile]个人中心
     

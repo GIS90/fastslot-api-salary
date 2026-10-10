@@ -533,7 +533,7 @@ CREATE TABLE `xtb_xtbb_field`  (
     `name_zh` varchar(35) NOT NULL COMMENT '字段英文名称',
     `name_ch` varchar(35) NOT NULL COMMENT '字段中文名称',
     `md5` varchar(64) NOT NULL UNIQUE COMMENT '数据唯一标识：MD5-ID',
-    `xtbb_md5` varchar(64) NOT NULL COMMENT '系统报表MD5-ID，关联xtb_xtbb表',
+    `xtbb` varchar(35) NOT NULL COMMENT '系统报表名称，关联xtb_xtbb表',
     `remark` varchar(100) COMMENT '字段说明',
     `width` decimal(10, 4) NOT NULL COMMENT '宽度',
     `fixed` varchar(35) NOT NULL COMMENT '锁定：left right',
@@ -559,20 +559,20 @@ CREATE TABLE `xtb_xtbb_field`  (
 ) COMMENT='系统表-系统报表字段';
 
 delete from xtb_xtbb_field;
-insert into xtb_xtbb_field(`field`,`name_zh`,`name_ch`,`md5`,`xtbb_md5`,`remark`,`width`,`fixed`,`list`,`list_type`,`export`,`export_type`,`null`,`id_auto`,`extend`,`filter`,`create_rtx`,`order_id`) VALUES
-('id','id','序号','3aabf39f2d943fa886d86dcbbee4d910','6cfc35fda5cebaa3d39afa1a438a0e27','主键，自增ID',100.0000,'',1,'int',1,'int',0,1,0,'','admin',1),
-('rtx_id','rtx_id','账号','b1c2d3e4f5a60718293a4b5c6d7e8f90','6cfc35fda5cebaa3d39afa1a438a0e27','RTX-ID唯一标识，英文+数字组成',200,'',1,'string',1,'string',0,0,0,'{"type":"input","placeholder":"请输入账号"}','admin',2),
-('avatar','avatar','头像','293a4b5c6d7e8f901223344556677889','6cfc35fda5cebaa3d39afa1a438a0e27','头像地址',130.0000,'',1,'string',1,'string',1,0,0,'','admin',3),
-('name','name','昵称','d3e4f5a60718293a4b5c6d7e8f901223','6cfc35fda5cebaa3d39afa1a438a0e27','昵称',200.0000,'',1,'string',1,'string',1,0,0,'{"type":"input","placeholder":"请输入昵称"}','admin',4),
-('sex','sex','性别','a60718293a4b5c6d7e8f901223344556','6cfc35fda5cebaa3d39afa1a438a0e27','性别',130.0000,'',1,'string',1,'string',1,0,0,'{"type":"select","placeholder":"请选择性别","options":[{"label":"男","value":"男"},{"label":"女","value":"女"},{"label":"保密","value":"保密"}]}}','admin',5),
-('phone','phone','电话','18293a4b5c6d7e8f9012233445566778','6cfc35fda5cebaa3d39afa1a438a0e27','电话',150.0000,'',1,'string',1,'string',1,0,0,'{"type":"input","placeholder":"请输入电话"}','admin',6),
-('email','email','邮箱','0718293a4b5c6d7e8f90122334455667','6cfc35fda5cebaa3d39afa1a438a0e27','邮箱',200.0000,'',1,'string',1,'string',1,0,0,'{"type":"input","placeholder":"请输入邮箱"}','admin',7),
-('introduction','introduction','描述','3a4b5c6d7e8f90122334455667788990','6cfc35fda5cebaa3d39afa1a438a0e27','描述',300.0000,'',0,'string',1,'string',1,0,0,'{"type":"input","placeholder":"请输入描述"}','admin',8),
-('department','department','部门','5c6d7e8f901223344556677889900a1b','6cfc35fda5cebaa3d39afa1a438a0e27','部门MD5-ID值，关联department表',200.0000,'',1,'string',1,'string',1,0,0,'{"type":"input","placeholder":"请输入部门名称"}','admin',9),
-('createRtx','create_rtx','创建人','6d7e8f901223344556677889900a1b2c','6cfc35fda5cebaa3d39afa1a438a0e27','创建用户RTX-ID',200.0000,'',1,'string',1,'string',0,1,0,'{"type":"input","placeholder":"请输入创建人"}','admin',10),
-('createTime','create_time','创建时间','7e8f901223344556677889900a1b2c3d','6cfc35fda5cebaa3d39afa1a438a0e27','创建时间',180.0000,'',1,'datetime',1,'datetime',0,1,0,'{"type":"daterange","placeholder":"请选择创建时间"}','admin',11),
-('options','options','操作','93da65a9fd0004d9477aeac024e08e15','6cfc35fda5cebaa3d39afa1a438a0e27','操作按钮',160.0000,'right',1,'string',0,'string',0,1,0,'','admin',12),
-('status','status','状态管理','223344556677889900a1b2c3d4e5f678','6cfc35fda5cebaa3d39afa1a438a0e27','数据状态：1注销；0启用（默认）',180.0000,'right',1,'boolean',1,'user_status_text',1,1,1,'{"type":"select","placeholder":"请选择状态","options":[{"label":"启用","value":false}, {"label": "注销","value":true}]}','admin',13);
+insert into xtb_xtbb_field(`field`,`name_zh`,`name_ch`,`md5`,`xtbb`,`remark`,`width`,`fixed`,`list`,`list_type`,`export`,`export_type`,`null`,`id_auto`,`extend`,`filter`,`create_rtx`,`order_id`) VALUES
+('id','id','序号','3aabf39f2d943fa886d86dcbbee4d910','SystemMainUser','主键，自增ID',100.0000,'',1,'int',1,'int',0,1,0,'','admin',1),
+('rtx_id','rtx_id','账号','b1c2d3e4f5a60718293a4b5c6d7e8f90','SystemMainUser','RTX-ID唯一标识，英文+数字组成',200,'',1,'string',1,'string',0,0,0,'{"type":"input","placeholder":"请输入账号"}','admin',2),
+('avatar','avatar','头像','293a4b5c6d7e8f901223344556677889','SystemMainUser','头像地址',130.0000,'',1,'string',1,'string',1,0,0,'','admin',3),
+('name','name','昵称','d3e4f5a60718293a4b5c6d7e8f901223','SystemMainUser','昵称',200.0000,'',1,'string',1,'string',1,0,0,'{"type":"input","placeholder":"请输入昵称"}','admin',4),
+('sex','sex','性别','a60718293a4b5c6d7e8f901223344556','SystemMainUser','性别',130.0000,'',1,'string',1,'string',1,0,0,'{"type":"select","placeholder":"请选择性别","options":[{"label":"男","value":"男"},{"label":"女","value":"女"},{"label":"保密","value":"保密"}]}}','admin',5),
+('phone','phone','电话','18293a4b5c6d7e8f9012233445566778','SystemMainUser','电话',150.0000,'',1,'string',1,'string',1,0,0,'{"type":"input","placeholder":"请输入电话"}','admin',6),
+('email','email','邮箱','0718293a4b5c6d7e8f90122334455667','SystemMainUser','邮箱',200.0000,'',1,'string',1,'string',1,0,0,'{"type":"input","placeholder":"请输入邮箱"}','admin',7),
+('introduction','introduction','描述','3a4b5c6d7e8f90122334455667788990','SystemMainUser','描述',300.0000,'',0,'string',1,'string',1,0,0,'{"type":"input","placeholder":"请输入描述"}','admin',8),
+('department','department','部门','5c6d7e8f901223344556677889900a1b','SystemMainUser','部门MD5-ID值，关联department表',200.0000,'',1,'string',1,'string',1,0,0,'{"type":"input","placeholder":"请输入部门名称"}','admin',9),
+('createRtx','create_rtx','创建人','6d7e8f901223344556677889900a1b2c','SystemMainUser','创建用户RTX-ID',200.0000,'',1,'string',1,'string',0,1,0,'{"type":"input","placeholder":"请输入创建人"}','admin',10),
+('createTime','create_time','创建时间','7e8f901223344556677889900a1b2c3d','SystemMainUser','创建时间',180.0000,'',1,'datetime',1,'datetime',0,1,0,'{"type":"daterange","placeholder":"请选择创建时间"}','admin',11),
+('options','options','操作','93da65a9fd0004d9477aeac024e08e15','SystemMainUser','操作按钮',160.0000,'right',1,'string',0,'string',0,1,0,'','admin',12),
+('status','status','状态管理','223344556677889900a1b2c3d4e5f678','SystemMainUser','数据状态：1注销；0启用（默认）',180.0000,'right',1,'boolean',1,'user_status_text',1,1,1,'{"type":"select","placeholder":"请选择状态","options":[{"label":"启用","value":false}, {"label": "注销","value":true}]}','admin',13);
 
 -- = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
 -- PDF文件记录表

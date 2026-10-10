@@ -148,7 +148,9 @@ class SystemConfigReportService:
         )
         if not __flag: return data
 
+        # 不可用更新字段
         del model["md5"]
+        del model["name"]
         model["update_rtx"] = rtx_id
         model["update_time"] = get_now()
         for k, v in model.items():
@@ -177,15 +179,6 @@ class SystemConfigReportService:
         return SuccessStatus() if query_count == request_count \
             else FailureStatus(code=status_code.CODE_508_DATA_PART_DELETE,
                                message=f"总数{request_count}，成功删除{query_count}，查询失败{request_count - query_count}")
-
-    async def view(self, rtx_id: str, md5: str) -> Status:
-        __flag, data = await self.__valid_model_by_md5(
-            md5=md5,
-            status_check=False,
-            response_type="dict",
-            fields=xtb_xtbb_view_fields
-        )
-        return SuccessStatus(data=data) if __flag else data
 
     async def download(self, params: dict) -> List:
         models = await self.xtb_xtbb_curd.download(db=self.db, params=params)
@@ -221,12 +214,22 @@ class SystemConfigReportService:
         return (True, model if response_type == "model"
                         else await model_converter_dict(model=model, fields=fields, default_value="****"))
 
-    async def field_list_by_xtbb_md5(self, rtx_id: str, xtbb_md5: str) -> Status:
-        if not xtbb_md5:
-            return FailureStatus(code=status_code.CODE_400_REQUEST_PARAMETER_MISS, message="缺少xtbbMd5参数")
+    async def field_list_by_xtbb(self, rtx_id: str, xtbb: str) -> Status:
+        models: List[XtbXtbbFieldModel] = await self.xtb_xtbb_field_curd.list_by_xtbb(
+            db=self.db, xtbb=xtbb
+        )
+        if not models:
+            return SuccessStatus(data=[])
 
-        models: List[XtbXtbbFieldModel] = await self.xtb_xtbb_field_curd.list_by_xtbb_md5(
-            db=self.db, xtbb_md5=xtbb_md5
+        data: List = await many_model_converter_dict(
+            models=models,
+            fields=xtb_xtbb_field_list_fields
+        )
+        return SuccessStatus(data=data)
+
+    async def field_column_by_xtbb(self, rtx_id: str, xtbb: str) -> Status:
+        models: List[XtbXtbbFieldModel] = await self.xtb_xtbb_field_curd.list_by_xtbb(
+            db=self.db, xtbb=xtbb
         )
         if not models:
             return SuccessStatus(data=[])
@@ -238,8 +241,8 @@ class SystemConfigReportService:
         return SuccessStatus(data=data)
 
     async def field_add(self, rtx_id: str, model: Dict) -> Status:
-        if not model.get("xtbb_md5"):
-            return FailureStatus(code=status_code.CODE_400_REQUEST_PARAMETER_MISS, message="缺少xtbbMd5参数")
+        if not model.get("xtbb"):
+            return FailureStatus(code=status_code.CODE_400_REQUEST_PARAMETER_MISS, message="缺少xtbb参数")
 
         new_model: XtbXtbbFieldModel = await self.xtb_xtbb_field_curd.new_model()
         __now = datetime.now()
