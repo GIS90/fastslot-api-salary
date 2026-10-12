@@ -172,3 +172,12 @@ async def de_one(
     service: SystemConfigDictService = Depends(get_service)
 ) -> Status:
     return await service.de_one_by_md5(token_rtx_id, md5)
+
+
+@router.get('/dict/de.option', summary="DE>通过Key获取枚举值")
+async def de_get_by_name(
+    name: str = Query(..., description="枚举Key名称"),
+    token_rtx_id: str = Depends(depend_token_rtx),
+    service: SystemConfigDictService = Depends(get_service)
+) -> Status:
+    return await service.de_get_by_option(name=name, rtx_id=token_rtx_id)

@@ -148,6 +148,8 @@ class SystemConfigDictService:
         if response_ == "dict":
             __ev_value: Dict = {}
             for model in models:
+                print('@' * 20)
+                print(model)
                 if not model or not getattr(model, "key") or not getattr(model, "value"): continue
                 __key = int(getattr(model, "key")) if key_trans_int else getattr(model, "key")
                 __ev_value[__key] = getattr(model, "value")
@@ -389,3 +391,16 @@ class SystemConfigDictService:
             _id +=  1
             data.append(_d)
         return data
+
+    async def de_get_by_option(self, name: str, rtx_id: str = None) -> Status:
+        if not name:
+            return FailureStatus(code=status_code.CODE_400_PARAM_ERROR, message="key不能为空")
+        data = await self.dict_value_by_name_money(
+            name=name,
+            response_="option",
+            filter_lock=True,
+            key_trans_int=False
+        )
+        if not data:
+            return FailureStatus(code=status_code.CODE_501_DATA_NOT_EXIST, message=f"未找到枚举key: {name}")
+        return SuccessStatus(data=data)

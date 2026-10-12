@@ -319,7 +319,7 @@ insert into csb_enum_key(`key`, `md5`, `value`, `lock`, `status`, `create_rtx`, 
 ('api-type', 'ddf8dac28ba9f6a1d86d2b79b6e9cbe9', '请求类型', False, False, 'admin', 7),
 ('task-status', 'a4115b287aab1804586eb9390841ab6b', '任务状态', False, False, 'admin', 8),
 ('xtbb-fixed-status', '3f9a8c2b7e1d4f6a5c8e2b9d7a3f1c4e', '系统报表字段固定状态', False, False, 'admin', 9),
-('field-type', 'a7d2f9e4c1b8a3d6f5e2c9b7a4d1f8e3', '字段类型', False, False, 'admin', 10);
+('xtbb-field-type', 'a7d2f9e4c1b8a3d6f5e2c9b7a4d1f8e3', '字段类型', False, False, 'admin', 10);
 
 -- CSB_ENUM_VALUE枚举 Value表
 -- create table && index
@@ -381,20 +381,20 @@ insert into csb_enum_value(`name`, `md5`, `key`, `value`, `remark`, `lock`, `sta
 ('task-status', '85a78a1c4bfc5ad70a542c0e32c43026', 'WORKING', '执行中', '任务状态 > 执行中', False, False, 'admin', 3),
 ('xtbb-fixed-status', 'b5e8c1a4d7f2e9b6c3a8d5f1e4b7c2a9', 'left', '左固定', '系统报表字段固定状态 > 左固定', False, False, 'admin', 1),
 ('xtbb-fixed-status', 'c8f1a5d9e2b6c3f7a4d8e1b5c9f2a6d3', 'right', '右固定', '系统报表字段固定状态 > 右固定', False, False, 'admin', 2),
-('field-type', 'd4b7e1a8c5f2d9b6e3a7c4f1d8b5e2a9', 'string', '字符串', '系统报表字段类型 > 字符串', False, False, 'admin', 1),
-('field-type', 'e2a6c9f3b7d1e5a8c4f2b6d9e3a7c1f5', 'integer', '整数', '系统报表字段类型 > 整数', False, True, 'admin', 2),
-('field-type', 'f7b3d8a2c6e1f9b5d4a8c2e6f3b7d1a9', 'number', '浮点数', '系统报表字段类型 > 浮点数', False, False, 'admin', 3),
-('field-type', 'a1c5e9b3d7f2a6c4e8b1d5f9a3c7e2b6', 'boolean', '布尔值', '系统报表字段类型 > 布尔值', False, True, 'admin', 4),
-('field-type', 'b8d2f6a1c5e9b3d7f4a8c2e6b1d5f9a3', 'boolean_text', '布尔文本', '系统报表字段类型 > 布尔文本', False, False, 'admin', 5),
-('field-type', 'c3e7a1b5d9f2c6e4a8b1d5f9c3e7a2b6', 'datetime', '日期时间', '系统报表字段类型 > 日期时间', False, True, 'admin', 6),
-('field-type', 'd9b5e2a8c4f1d7b3e6a2c9f5d1b8e4a7', 'date', '日期', '系统报表字段类型 > 日期', False, False, 'admin', 7),
-('field-type', 'e5c1a7d3f9b6e2a8c4d1f7b3e9a5c2d8', 'time', '时间', '系统报表字段类型 > 时间', False, True, 'admin', 8),
-('field-type', 'f1d7b3e9a5c2f8d4b1e7a3c9f5d2b8e4', 'timestamp', '时间戳', '系统报表字段类型 > 时间戳', False, False, 'admin', 9),
-('field-type', 'a8c4e1b7d3f9a5c2e8b4d1f7a3c9e6b2', 'list', '列表', '系统报表字段类型 > 列表', False, True, 'admin', 10),
-('field-type', 'b4d1f7a3c9e6b2d8f5a1c7e3b9d6f2a8', 'dict', '字典', '系统报表字段类型 > 字典', False, False, 'admin', 11),
-('field-type', 'c9e6b2d8f5a1c7e3b9d6f2a8c4e1b7d3', 'split_list', '拆分列表', '系统报表字段类型 > 拆分列表', False, True, 'admin', 12),
-('field-type', 'd6f2a8c4e1b7d3f9a5c2e8b4d1f7a3c9', 'user_status_text', '用户状态文本', '系统报表字段类型 > 用户状态文本', False, True, 'admin', 13),
-('field-type', 'e3b9d6f2a8c4e1b7d3f9a5c2e8b4d1f7', 'lock_text', '锁定文本', '系统报表字段类型 > 持定文本', False, True, 'admin', 14);
+('xtbb-field-type', 'd4b7e1a8c5f2d9b6e3a7c4f1d8b5e2a9', 'string', '字符串', '系统报表字段类型 > 字符串', False, False, 'admin', 1),
+('xtbb-field-type', 'e2a6c9f3b7d1e5a8c4f2b6d9e3a7c1f5', 'integer', '整数', '系统报表字段类型 > 整数', False, False, 'admin', 2),
+('xtbb-field-type', 'f7b3d8a2c6e1f9b5d4a8c2e6f3b7d1a9', 'number', '浮点数', '系统报表字段类型 > 浮点数', False, False, 'admin', 3),
+('xtbb-field-type', 'a1c5e9b3d7f2a6c4e8b1d5f9a3c7e2b6', 'boolean', '布尔值', '系统报表字段类型 > 布尔值', False, False, 'admin', 4),
+('xtbb-field-type', 'b8d2f6a1c5e9b3d7f4a8c2e6b1d5f9a3', 'boolean_text', '布尔文本', '系统报表字段类型 > 布尔文本', False, False, 'admin', 5),
+('xtbb-field-type', 'c3e7a1b5d9f2c6e4a8b1d5f9c3e7a2b6', 'datetime', '日期时间', '系统报表字段类型 > 日期时间', False, False, 'admin', 6),
+('xtbb-field-type', 'd9b5e2a8c4f1d7b3e6a2c9f5d1b8e4a7', 'date', '日期', '系统报表字段类型 > 日期', False, False, 'admin', 7),
+('xtbb-field-type', 'e5c1a7d3f9b6e2a8c4d1f7b3e9a5c2d8', 'time', '时间', '系统报表字段类型 > 时间', False, False, 'admin', 8),
+('xtbb-field-type', 'f1d7b3e9a5c2f8d4b1e7a3c9f5d2b8e4', 'timestamp', '时间戳', '系统报表字段类型 > 时间戳', False, False, 'admin', 9),
+('xtbb-field-type', 'a8c4e1b7d3f9a5c2e8b4d1f7a3c9e6b2', 'list', '列表', '系统报表字段类型 > 列表', False, False, 'admin', 10),
+('xtbb-field-type', 'b4d1f7a3c9e6b2d8f5a1c7e3b9d6f2a8', 'dict', '字典', '系统报表字段类型 > 字典', False, False, 'admin', 11),
+('xtbb-field-type', 'c9e6b2d8f5a1c7e3b9d6f2a8c4e1b7d3', 'split_list', '拆分列表', '系统报表字段类型 > 拆分列表', False, False, 'admin', 12),
+('xtbb-field-type', 'd6f2a8c4e1b7d3f9a5c2e8b4d1f7a3c9', 'user_status_text', '用户状态文本', '系统报表字段类型 > 用户状态文本', False, False, 'admin', 13),
+('xtbb-field-type', 'e3b9d6f2a8c4e1b7d3f9a5c2e8b4d1f7', 'lock_text', '锁定文本', '系统报表字段类型 > 持定文本', False, False, 'admin', 14);
 
 
 
@@ -560,7 +560,7 @@ CREATE TABLE `xtb_xtbb_field`  (
 
 delete from xtb_xtbb_field;
 insert into xtb_xtbb_field(`field`,`name_zh`,`name_ch`,`md5`,`xtbb`,`remark`,`width`,`fixed`,`list`,`list_type`,`export`,`export_type`,`null`,`id_auto`,`extend`,`filter`,`create_rtx`,`order_id`) VALUES
-('id','id','序号','3aabf39f2d943fa886d86dcbbee4d910','SystemMainUser','主键，自增ID',100.0000,'',1,'int',1,'int',0,1,0,'','admin',1),
+('id','id','序号','3aabf39f2d943fa886d86dcbbee4d910','SystemMainUser','主键，自增ID',100.0000,'',1,'integer',1,'integer',0,1,0,'','admin',1),
 ('rtx_id','rtxId','账号','b1c2d3e4f5a60718293a4b5c6d7e8f90','SystemMainUser','RTX-ID唯一标识，英文+数字组成',200,'',1,'string',1,'string',0,0,0,'{"type":"input","placeholder":"请输入账号"}','admin',2),
 ('avatar','avatar','头像','293a4b5c6d7e8f901223344556677889','SystemMainUser','头像地址',130.0000,'',1,'string',1,'string',1,0,0,'','admin',3),
 ('name','name','昵称','d3e4f5a60718293a4b5c6d7e8f901223','SystemMainUser','昵称',200.0000,'',1,'string',1,'string',1,0,0,'{"type":"input","placeholder":"请输入昵称"}','admin',4),

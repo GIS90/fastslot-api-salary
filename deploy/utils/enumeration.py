@@ -216,6 +216,9 @@ class CsbEnumKEY(StrEnum):
     MENU_LEVEL = "menu-level"
     API_TYPE = "api-type"
     TASK_STATUS = "task-status"
+    XTBB_FIXED_STATUS = "xtbb-fixed-status"
+    XTBB_FIELD_TYPE = "xtbb-field-type"
+
 
 
 @unique
