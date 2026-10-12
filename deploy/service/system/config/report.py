@@ -253,7 +253,8 @@ class SystemConfigReportService:
             _d: Dict = dict()
             _d["prop"] = getattr(model, "name_zh", "")
             _d["label"] = getattr(model, "name_ch", "")
-            _d["width"] = f"{model.width}%" if xtbb_mode else str(model.width)
+            if model.width:
+                _d["width"] = f"{model.width}%" if xtbb_mode else str(model.width)
             if model.filter:
                 _d["filter"] = json.loads(model.filter)
             if model.fixed:
