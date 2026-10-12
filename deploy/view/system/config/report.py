@@ -118,6 +118,7 @@ async def field_list_by_xtbb(
     return await service.field_list_by_xtbb(rtx_id=token_rtx_id, xtbb=xtbb)
 
 
+# @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @
 @router.get("/report.field.column", summary="字段列表-按报表名称获取Table的Column")
 async def field_column(
     xtbb: str = Query(..., description="报表名称"),
@@ -125,6 +126,7 @@ async def field_column(
     service: SystemConfigReportService = Depends(get_service)
 ) -> Status:
     return await service.field_column_by_xtbb(rtx_id=token_rtx_id, xtbb=xtbb)
+# @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @
 
 
 @router.post("/report.field", summary="新增字段")
