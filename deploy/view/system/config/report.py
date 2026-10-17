@@ -163,3 +163,14 @@ async def field_batch_delete(
     service: SystemConfigReportService = Depends(get_service)
 ) -> Status:
     return await service.field_batch_delete(rtx_id=token_rtx_id, md5_list=params.model_dump().get("md5"))
+
+
+@router.post("/report.field.check", summary="字段校验>验证表字段是否存在")
+async def field_check_exist(
+    body: dict = Body(..., description="请求体: { table: 表名, fields: [字段名列表] }"),
+    token_rtx_id: str = Depends(depend_token_rtx),
+    service: SystemConfigReportService = Depends(get_service)
+) -> Status:
+    table_name = body.get("table")
+    fields = body.get("fields", [])
+    return await service.field_check_exist(rtx_id=token_rtx_id, table_name=table_name, fields=fields)

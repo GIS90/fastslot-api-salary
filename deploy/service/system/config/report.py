@@ -313,3 +313,36 @@ class SystemConfigReportService:
         return SuccessStatus() if query_count == request_count \
             else FailureStatus(code=status_code.CODE_508_DATA_PART_DELETE,
                                message=f"总数{request_count}，成功删除{query_count}，查询失败{request_count - query_count}")
+
+    async def field_check_exist(self, rtx_id: str, table_name: str, fields: List[str]) -> Status:
+        if not table_name:
+            return FailureStatus(code=status_code.CODE_400_REQUEST_PARAMETER_MISS, message="缺少table参数")
+        if not fields:
+            return FailureStatus(code=status_code.CODE_400_REQUEST_PARAMETER_MISS, message="缺少fields参数")
+
+        from sqlalchemy import text as sa_text
+        try:
+            result = await self.db.execute(sa_text(f"SHOW COLUMNS FROM `{table_name}`"))
+            db_columns = {row[0] for row in result.fetchall()}
+        except Exception as e:
+            return FailureStatus(code=status_code.CODE_501_DATA_NOT_EXIST,
+                                 message=f"表 `{table_name}` 不存在或无权限访问: {str(e)}")
+
+        exist_list = []
+        not_exist_list = []
+        for f in fields:
+            if not f:
+                continue
+            if f in db_columns:
+                exist_list.append(f)
+            else:
+                not_exist_list.append(f)
+
+        return SuccessStatus(data={
+            "table": table_name,
+            "db_columns": sorted(db_columns),
+            "check_fields": fields,
+            "exist": exist_list,
+            "not_exist": not_exist_list,
+            "all_exist": len(not_exist_list) == 0
+        })
