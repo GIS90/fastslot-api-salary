@@ -32,7 +32,7 @@ Life is short, I use python.
 """
 from typing import Optional, List, Any, Dict
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy import select, update, delete, insert, asc, or_, desc
+from sqlalchemy import select, update, delete, insert, asc, or_, desc, and_
 from sqlalchemy.orm.attributes import InstrumentedAttribute
 from sqlalchemy import func
 
@@ -118,11 +118,14 @@ class XtbUserCurd(BaseCurd):
                 XtbUserModel.status
             ).outerjoin(
                 CsbEnumValueModel,
-                XtbUserModel.sex == CsbEnumValueModel.key
+                and_(
+                    XtbUserModel.sex == CsbEnumValueModel.key,
+                    CsbEnumValueModel.name == CsbEnumKEY.SEX_TYPE.value
+                )
             ).outerjoin(
                 XtbDepartmentModel,
                 XtbUserModel.department == XtbDepartmentModel.md5
-            ).where(CsbEnumValueModel.name == CsbEnumKEY.SEX_TYPE.value)
+            )
             if content and content != "%%":
                 stmt = stmt.where(
                     or_(
