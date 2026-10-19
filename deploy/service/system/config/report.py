@@ -32,7 +32,7 @@ Life is short, I use python.
 """
 import json
 from datetime import datetime
-from typing import Dict, List, Tuple, Any, Union
+from typing import Dict, List, Tuple, Any, Union, Literal
 from sqlalchemy.ext.asyncio import AsyncSession
 from deploy.curd.xtb_xtbb import XtbXtbbCurd
 from deploy.curd.xtb_xtbb_field import XtbXtbbFieldCurd
@@ -346,3 +346,51 @@ class SystemConfigReportService:
             "not_exist": not_exist_list,
             "all_exist": len(not_exist_list) == 0
         })
+
+    async def report_column_by_xtbb(
+            self,
+            rtx_id: str,
+            xtbb: str,
+            type_: Literal["list", "export"]
+    ) -> Dict:
+        """
+        用于数据展示的字段列
+        :param rtx_id: 用户RTD-ID
+        :param xtbb: 系统报表
+        :param type_: 列类型，list表示列表列，export表示导出列
+        :return: Dict
+            格式：{
+                "column": [],
+                "id_auto": True
+            }
+        """
+        xtbb_model: XtbXtbbModel = await self.xtb_xtbb_curd.get_by_name(db=self.db, name=xtbb)
+        if not xtbb_model: return {}
+
+        if type_ == "list":
+            models: List[XtbXtbbFieldModel] = await self.xtb_xtbb_field_curd.column_by_xtbb(
+                db=self.db, xtbb=xtbb, list_=True, export_=False
+            )
+        else:
+            models: List[XtbXtbbFieldModel] = await self.xtb_xtbb_field_curd.column_by_xtbb(
+                db=self.db, xtbb=xtbb, list_=False, export_=True
+            )
+        if not models: return {}
+
+        column: List = []
+        _id_auto: bool = False
+        for model in models:
+            if not model: continue
+            _d: Dict = dict()
+            _d["key"] = getattr(model, "field", "")
+            _d["name"] = getattr(model, "name_zh", "")
+            _d["type"] = getattr(model, f"{type_}_type", "")
+            _d["null"] = getattr(model, "null", "")
+            column.append(_d)
+            if str(_d["key"]).lower() == "id":
+                _id_auto = getattr(model, "id_auto", False)
+        data: Dict = {
+            "column": column,
+            "id_auto": _id_auto
+        }
+        return data

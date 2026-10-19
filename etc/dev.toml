@@ -92,5 +92,6 @@ width = 700
 # 表格
 [table]
 selection_width = 100
+default_null = "-"
 
 

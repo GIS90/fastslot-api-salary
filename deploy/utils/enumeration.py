@@ -230,6 +230,7 @@ class DownloadExcelFormat(StrEnum):
     XLSX = ".xlsx"
 
 
+# API类型字典
 API_TYPE_DICT: Dict[str, str] =  {
     "GET": "primary",
     "POST": "success",
@@ -244,3 +245,9 @@ class DICT_KEY_ALL:
     md5 = "ALL"
     key = "ALL"
     value = "全部"
+
+
+@unique
+class XtbReportKey(StrEnum):
+    SystemMainUser = "SystemMainUser"
+    SystemMainRole = "SystemMainRole"

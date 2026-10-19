@@ -42,15 +42,16 @@ from deploy.schema.dao.xtb_user import XtbUserModel
 from deploy.schema.dao.xtb_xtcs import XtbXtcsModel
 from deploy.service.system.config.dict import SystemConfigDictService
 from deploy.service.system.main.role import SystemMainRoleService
+from deploy.service.system.config.report import SystemConfigReportService
 from deploy.utils.status import Status, SuccessStatus, FailureStatus
 from deploy.utils.status_value import (StatusCode as status_code,
                                        StatusMsg as status_msg)
-from deploy.utils.converter import model_converter_dict
+from deploy.utils.converter import model_converter_dict, many_model_converter_dict
 from deploy.schema.dto.xtb_user import (xtb_user_list_fields, xtb_user_detail_fields,
                                         xtb_user_login_fields, xtb_user_download_fields)
 from deploy.utils.utils import get_now, random_string, md5 as generator_md5, d2s
-from deploy.config import server_user, server_password, server_avatar
-from deploy.utils.enumeration import XtbXtcsKEY, CsbEnumKEY, FileTypeEnum
+from deploy.config import server_user, server_password, server_avatar, table_default_null
+from deploy.utils.enumeration import XtbXtcsKEY, CsbEnumKEY, FileTypeEnum, XtbReportKey
 from deploy.utils.upload import uploadUtils
 from deploy.delib.excel_lib import ExcelLib
 
@@ -72,6 +73,7 @@ class SystemMainUserService:
         self.xtb_xtcs_curd: XtbXtcsCurd = XtbXtcsCurd()
         self.system_config_dict_service: SystemConfigDictService = SystemConfigDictService(db_connection=db_connection)
         self.system_main_role_service: SystemMainRoleService = SystemMainRoleService(db_connection=db_connection)
+        self.system_main_report_service: SystemConfigReportService = SystemConfigReportService(db_connection=db_connection)
         self.upload_utils: uploadUtils = uploadUtils()
         self.excel_lib: ExcelLib = ExcelLib()
 
@@ -115,21 +117,29 @@ class SystemMainUserService:
             limit=params.get("limit"),
             content=params.get("content")
         )
+        _default_data = {
+            "list": [],
+            "page": params.get("page"),
+            "pageSize": params.get("limit"),
+            "total": 0
+        }
         if not models:
-            __data = {
-                "list": [],
-                "page": params.get("page"),
-                "pageSize": params.get("limit"),
-                "total": 0
-            }
-            return FailureStatus(code=status_code.CODE_101_SUCCESS_NO_DATA, data=__data)
+            return FailureStatus(code=status_code.CODE_101_SUCCESS_NO_DATA.value, data=_default_data)
+        fields: Dict = await self.system_main_report_service.report_column_by_xtbb(
+            rtx_id=rtx_id,
+            xtbb=XtbReportKey.SystemMainUser.value,
+            type_="list"
+        )
+        if not fields:
+            return FailureStatus(code=status_code.CODE_102_SUCCESS_NO_COLUMN.value, data=_default_data)
 
-        data: List = list()
-        for model in models:
-            if not model: continue
-            _d = await model_converter_dict(model=model, fields=xtb_user_list_fields)
-            if not _d: continue
-            data.append(_d)
+        data: List = await many_model_converter_dict(
+            models=models,
+            fields=fields.get("column"),
+            default_value=table_default_null,
+            auto_id=fields.get("id_auto"),
+            auto_id_value=params.get("offset") + 1
+        )
         result: Dict = {
             "list": data,
             "page": params.get("page"),

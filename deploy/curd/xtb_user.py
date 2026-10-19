@@ -123,7 +123,7 @@ class XtbUserCurd(BaseCurd):
                 XtbDepartmentModel,
                 XtbUserModel.department == XtbDepartmentModel.md5
             ).where(CsbEnumValueModel.name == CsbEnumKEY.SEX_TYPE.value)
-            if content:
+            if content and content != "%%":
                 stmt = stmt.where(
                     or_(
                         XtbUserModel.rtx_id.like(content),

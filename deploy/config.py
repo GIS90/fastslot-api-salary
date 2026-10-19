@@ -154,6 +154,7 @@ image_width: int = data["image"].get("width")
 
 # table
 table_selection_width: int = data["table"].get("selection_width")
+table_default_null: str = data["table"].get("default_null")
 
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

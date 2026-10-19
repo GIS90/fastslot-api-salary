@@ -148,8 +148,6 @@ class SystemConfigDictService:
         if response_ == "dict":
             __ev_value: Dict = {}
             for model in models:
-                print('@' * 20)
-                print(model)
                 if not model or not getattr(model, "key") or not getattr(model, "value"): continue
                 __key = int(getattr(model, "key")) if key_trans_int else getattr(model, "key")
                 __ev_value[__key] = getattr(model, "value")

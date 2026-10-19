@@ -44,7 +44,8 @@ class StatusEnum(StrEnum):
 StatusMsg = {
     # ** success **
     100: "成功",
-    101: "成功，请求数据为空",
+    101: "成功，报表暂无数据",
+    102: "菜单未配置报表字段，请联系管理员进行配置",
 
     # ** login **
     200: "用户未登录",
@@ -139,6 +140,7 @@ class StatusCode(IntEnum):
     # ** success **
     CODE_100_SUCCESS = 100
     CODE_101_SUCCESS_NO_DATA = 101
+    CODE_102_SUCCESS_NO_COLUMN = 102
 
     # ** login **
     CODE_200_LOGIN_NOT = 200
