@@ -30,7 +30,7 @@ Life is short, I use python.
 
 ------------------------------------------------
 """
-from typing import Annotated
+from typing import Annotated, List
 from fastapi import APIRouter, Depends, Query, Body
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -182,4 +182,13 @@ async def de_get_by_name(
     service: SystemConfigDictService = Depends(get_service)
 ) -> Status:
     return await service.de_get_by_option(name=name, rtx_id=token_rtx_id)
+
+
+@router.get('/dict/de.options', summary="DE>通过Key列表获取枚举值")
+async def de_get_by_names(
+    names: List[str] = Query(..., description="枚举Key名称"),
+    token_rtx_id: str = Depends(depend_token_rtx),
+    service: SystemConfigDictService = Depends(get_service)
+) -> Status:
+    return await service.de_get_by_options(names=names, rtx_id=token_rtx_id)
 # @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @

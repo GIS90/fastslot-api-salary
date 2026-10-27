@@ -38,6 +38,7 @@ from deploy.curd.xtb_xtbb import XtbXtbbCurd
 from deploy.curd.xtb_xtbb_field import XtbXtbbFieldCurd
 from deploy.schema.dao.xtb_xtbb import XtbXtbbModel
 from deploy.schema.dao.xtb_xtbb_field import XtbXtbbFieldModel
+from deploy.service.system.config.dict import SystemConfigDictService
 from deploy.utils.status import Status, SuccessStatus, FailureStatus
 from deploy.utils.status_value import (StatusCode as status_code,
                                        StatusMsg as status_msg)
@@ -56,6 +57,7 @@ class SystemConfigReportService:
         self.db: AsyncSession = db_connection
         self.xtb_xtbb_curd: XtbXtbbCurd = XtbXtbbCurd()
         self.xtb_xtbb_field_curd: XtbXtbbFieldCurd = XtbXtbbFieldCurd()
+        self.system_config_dict_service: SystemConfigDictService = SystemConfigDictService(db_connection=db_connection)
 
     def __str__(self):
         return "SystemConfigReportService class."
@@ -246,21 +248,29 @@ class SystemConfigReportService:
             return SuccessStatus(data=[])
 
         data: List = [
-            {"prop": "", "width": TABLE_SW, "type": "selection", "fixed": "left"}   # 默认选择列
+            {"prop": "", "width": TABLE_SW, "type": "selection", "fixed": "left", "align": "center"}   # 默认选择列
         ]
         for model in models:
             if not model: continue
             _d: Dict = dict()
             _d["prop"] = getattr(model, "name_zh", "")
             _d["label"] = getattr(model, "name_ch", "")
+            _d["align"] = getattr(model, "align", "center")
             if model.width:
-                _d["width"] = f"{model.width}%" if xtbb_mode else str(model.width)
+                if xtbb_mode:
+                    _d["width"] = f"{model.width}%"
+                else:
+                    _d["min-width"] = str(model.width)
             if model.filter:
                 _d["filter"] = json.loads(model.filter)
             if model.fixed:
                 _d["fixed"] = model.fixed
             data.append(_d)
         return SuccessStatus(data=data)
+        
+    async def field_enum(self, rtx_id: str) -> Status:
+        keys: List[str] = ["xtbb-field-fixed", "xtbb-field-type", "xtbb-field-align"]
+        return await self.system_config_dict_service.de_get_by_options(names=keys, rtx_id=rtx_id)
 
     async def field_add(self, rtx_id: str, model: Dict) -> Status:
         if not model.get("xtbb"):

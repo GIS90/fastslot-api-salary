@@ -3,6 +3,8 @@ CREATE DATABASE `salary` DEFAULT CHARACTER SET utf8 COLLATE utf8_general_ci;
 CREATE USER 'salary'@'%' IDENTIFIED BY '28aa838315633f0e44049ce88de36803';
 GRANT ALL ON `salary`.* TO 'salary'@'%';
 FLUSH PRIVILEGES;
+
+
 -- = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
 -- 系统表-用户表
 DROP TABLES IF EXISTS `xtb_user`;
@@ -36,10 +38,10 @@ CREATE UNIQUE INDEX xtb_user_rtx_id_index ON xtb_user (`rtx_id`);
 
 -- insert default admin
 insert into
-xtb_user(rtx_id, md5, name, `password`, email , phone, avatar, introduction, role, create_rtx, status)
+xtb_user(rtx_id, md5, name, `password`, email , phone, avatar, introduction, role, department, create_rtx, status)
 VALUES
-('admin', '21232f297a57a5a743894a0e4a801fc3', 'ADMIN系统管理员', 'e10adc3949ba59abbe56e057f20f883e', 'gaoming971366@163.com', '13051355646',
-'http://pygo2.top/images/article_github.jpg', 'SUPER_ADMIN系统管理员', 'ADMIN', 'admin', FALSE);
+('admin', '21232f297a57a5a743894a0e4a801fc3', '系统管理员', 'e10adc3949ba59abbe56e057f20f883e', 'gaoming971366@163.com', '13051355646',
+'http://pygo2.top/images/article_github.jpg', 'ADMIN系统管理员', 'ADMIN', '63a9f0ea7bb98050796b649e85481845','admin', FALSE);
 -- = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
 -- 系统表-请求表
 -- create && index
@@ -65,9 +67,6 @@ CREATE TABLE `xtb_request`  (
     PRIMARY KEY (`id`),
     UNIQUE INDEX `index_id`(`id`) USING HASH COMMENT 'id索引'
 ) COMMENT='系统表-请求表';
-
--- delete
-delete from xtb_request;
 -- = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
 -- 系统表-角色权限表
 -- create table && index
@@ -96,7 +95,7 @@ CREATE TABLE `xtb_role`  (
 insert into
 xtb_role(engname, chnname, md5,  authority, introduction, create_rtx, status)
 VALUES
-('ADMIN', 'Super管理员', '21232f297a57a5a743894a0e4a801fc3', '', '系统所有功能权限', 'admin', FALSE);
+('ADMIN', '系统管理员角色', '21232f297a57a5a743894a0e4a801fc3', '', '系统所有功能权限（默认）', 'admin', FALSE);
 -- = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
 -- 系统表-菜单
 -- create table && index
@@ -318,8 +317,9 @@ insert into csb_enum_key(`key`, `md5`, `value`, `lock`, `status`, `create_rtx`, 
 ('menu-level', 'cde5d071f0b5bbb56033121304b6604a', '菜单级别', False, False, 'admin', 6),
 ('api-type', 'ddf8dac28ba9f6a1d86d2b79b6e9cbe9', '请求类型', False, False, 'admin', 7),
 ('task-status', 'a4115b287aab1804586eb9390841ab6b', '任务状态', False, False, 'admin', 8),
-('xtbb-fixed-status', '3f9a8c2b7e1d4f6a5c8e2b9d7a3f1c4e', '系统报表字段固定状态', False, False, 'admin', 9),
-('xtbb-field-type', 'a7d2f9e4c1b8a3d6f5e2c9b7a4d1f8e3', '字段类型', False, False, 'admin', 10);
+('xtbb-field-fixed', '3f9a8c2b7e1d4f6a5c8e2b9d7a3f1c4e', '报表字段固定状态', False, False, 'admin', 9),
+('xtbb-field-type', 'a7d2f9e4c1b8a3d6f5e2c9b7a4d1f8e3', '报表字段类型', False, False, 'admin', 10),
+('xtbb-field-align', 'e3b0c44298fc1c149afbf4c8996fb924', '报表字段对齐方式', False, False, 'admin', 11);
 
 -- CSB_ENUM_VALUE枚举 Value表
 -- create table && index
@@ -379,8 +379,8 @@ insert into csb_enum_value(`name`, `md5`, `key`, `value`, `remark`, `lock`, `sta
 ('task-status', 'f6c92121b95675feb64d8bf785859f2f', 'SUCCESS', '成功', '任务状态 > 成功', False, False, 'admin', 1),
 ('task-status', '9b3bd908456381af4ef69f98f9810846', 'FAILURE', '失败', '任务状态 > 失败', False, False, 'admin', 2),
 ('task-status', '85a78a1c4bfc5ad70a542c0e32c43026', 'WORKING', '执行中', '任务状态 > 执行中', False, False, 'admin', 3),
-('xtbb-fixed-status', 'b5e8c1a4d7f2e9b6c3a8d5f1e4b7c2a9', 'left', '左固定', '系统报表字段固定状态 > 左固定', False, False, 'admin', 1),
-('xtbb-fixed-status', 'c8f1a5d9e2b6c3f7a4d8e1b5c9f2a6d3', 'right', '右固定', '系统报表字段固定状态 > 右固定', False, False, 'admin', 2),
+('xtbb-field-fixed', 'b5e8c1a4d7f2e9b6c3a8d5f1e4b7c2a9', 'left', '左固定', '系统报表字段固定状态 > 左固定', False, False, 'admin', 1),
+('xtbb-field-fixed', 'c8f1a5d9e2b6c3f7a4d8e1b5c9f2a6d3', 'right', '右固定', '系统报表字段固定状态 > 右固定', False, False, 'admin', 2),
 ('xtbb-field-type', 'd4b7e1a8c5f2d9b6e3a7c4f1d8b5e2a9', 'string', '字符串', '系统报表字段类型 > 字符串', False, False, 'admin', 1),
 ('xtbb-field-type', 'e2a6c9f3b7d1e5a8c4f2b6d9e3a7c1f5', 'integer', '整数', '系统报表字段类型 > 整数', False, False, 'admin', 2),
 ('xtbb-field-type', 'f7b3d8a2c6e1f9b5d4a8c2e6f3b7d1a9', 'number', '浮点数', '系统报表字段类型 > 浮点数', False, False, 'admin', 3),
@@ -394,7 +394,10 @@ insert into csb_enum_value(`name`, `md5`, `key`, `value`, `remark`, `lock`, `sta
 ('xtbb-field-type', 'b4d1f7a3c9e6b2d8f5a1c7e3b9d6f2a8', 'dict', '字典', '系统报表字段类型 > 字典', False, False, 'admin', 11),
 ('xtbb-field-type', 'c9e6b2d8f5a1c7e3b9d6f2a8c4e1b7d3', 'split_list', '拆分列表', '系统报表字段类型 > 拆分列表', False, False, 'admin', 12),
 ('xtbb-field-type', 'd6f2a8c4e1b7d3f9a5c2e8b4d1f7a3c9', 'user_status_text', '用户状态文本', '系统报表字段类型 > 用户状态文本', False, False, 'admin', 13),
-('xtbb-field-type', 'e3b9d6f2a8c4e1b7d3f9a5c2e8b4d1f7', 'lock_text', '锁定文本', '系统报表字段类型 > 持定文本', False, False, 'admin', 14);
+('xtbb-field-type', 'e3b9d6f2a8c4e1b7d3f9a5c2e8b4d1f7', 'lock_text', '锁定文本', '系统报表字段类型 > 持定文本', False, False, 'admin', 14),
+('xtbb-field-align', 'e3b0c44298fc1c149afbf4c8996fb924', 'center', '居中对齐', '系统报表字段对齐方式 > 居中对齐', False, False, 'admin', 1),
+('xtbb-field-align', '5d41402abc4b2a76b9719d911017c592', 'left', '左对齐', '系统报表字段对齐方式 > 左对齐', False, False, 'admin', 2),
+('xtbb-field-align', '6f1ed002ab5595859014ebf0951522d9', 'right', '右对齐', '系统报表字段对齐方式 > 右对齐', False, False, 'admin', 3);
 
 
 
@@ -492,10 +495,10 @@ CREATE TABLE `xtb_department`  (
 insert into
 xtb_department(`id`, `name`, `md5`, `description`, `pid`, `leaf`, `lock`, `level`, `dept_path`, `manage_rtx`, `create_rtx`, `status`, `order_id`)
 VALUES
-(1, '根节点', '63a9f0ea7bb98050796b649e85481845', '部门根节点', 0, True , False, 1, '根节点', 'admin', 'admin', False, 1),
-(2, '基础研发部', 'f99199aa3e689f8d339b909734aabdcb', '基础研发部', 1, True , False, 2, '根节点>基础研发部', 'admin', 'admin', False, 2),
-(3, '推广销售部', 'b9639531758dcdb8d0e7494d6ed9b5ac', '推广销售部', 1, True , False, 2, '根节点>推广销售部', 'admin', 'admin', False, 3),
-(4, '人力资源部', '38d7f0998b7acaf8db182219c7fb202c', '人力资源部', 1, True , True, 2, '根节点>人力资源部', 'admin', 'admin', False, 4);
+(1, '部门根节点', '63a9f0ea7bb98050796b649e85481845', '部门根节点', 0, True , False, 1, '根节点', 'admin', 'admin', False, 1),
+(2, '基础研发部', 'f99199aa3e689f8d339b909734aabdcb', '基础研发部', 1, True , False, 2, '部门根节点>基础研发部', 'admin', 'admin', False, 2),
+(3, '推广销售部', 'b9639531758dcdb8d0e7494d6ed9b5ac', '推广销售部', 1, True , False, 2, '部门根节点>推广销售部', 'admin', 'admin', False, 3),
+(4, '人力资源部', '38d7f0998b7acaf8db182219c7fb202c', '人力资源部', 1, True , True, 2, '部门根节点>人力资源部', 'admin', 'admin', False, 4);
 -- = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
 -- 系统表-系统报表
 -- create table && index
@@ -535,6 +538,7 @@ CREATE TABLE `xtb_xtbb_field`  (
     `xtbb` varchar(35) NOT NULL COMMENT '系统报表名称，关联xtb_xtbb表',
     `remark` varchar(100) COMMENT '字段说明',
     `width` decimal(10, 4) NOT NULL COMMENT '宽度',
+    `align` varchar(15) NOT NULL COMMENT '对齐：left right ',
     `fixed` varchar(35) NOT NULL COMMENT '锁定：left right',
     `list` bool default True COMMENT '列表：1支持；0不支持',
     `list_type` varchar(35) NOT NULL COMMENT 'List字段类型',
@@ -557,9 +561,7 @@ CREATE TABLE `xtb_xtbb_field`  (
     UNIQUE INDEX `xtb_xtbb_field_md5_index`(`md5`) USING HASH COMMENT 'md5索引'
 ) COMMENT='系统表-系统报表字段';
 
-
 --详情见表《xtb_xtbb_field.sql》
-
 -- = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
 -- PDF文件记录表
 -- create table

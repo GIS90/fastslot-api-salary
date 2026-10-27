@@ -30,6 +30,7 @@ CREATE TABLE `xtb_xtbb_field` (
   `xtbb` varchar(35) NOT NULL COMMENT '系统报表名称，关联xtb_xtbb表',
   `remark` varchar(100) DEFAULT NULL COMMENT '字段说明',
   `width` decimal(10,4) NOT NULL COMMENT '宽度',
+  `align` varchar(15) DEFAULT NULL COMMENT '对齐方式：left center right',
   `fixed` varchar(35) NOT NULL COMMENT '锁定：left right',
   `list` tinyint(1) DEFAULT 1 COMMENT '列表：1支持；0不支持',
   `list_type` varchar(35) NOT NULL COMMENT 'List字段类型',

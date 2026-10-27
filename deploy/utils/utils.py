@@ -583,6 +583,14 @@ def cut_string(content: str, length: Optional[int]) -> str:
     return content[:_max_len] + "......详情" if len(content) >= length else content
 
 
+def kebab_to_camel(s: str) -> str:
+    """
+    将 kebab-case 字符串转换为 camelCase。
+    例：'xtbb-field-align' -> 'xtbbFieldAlign'
+    """
+    parts = s.split("-")
+    return parts[0] + "".join(p.capitalize() for p in parts[1:])
+
 """ - - - - - - - - - - - - - - - - - 菜单 - - - - - - - - - - - - - - - - -"""
 
 

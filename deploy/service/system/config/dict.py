@@ -46,7 +46,7 @@ from deploy.schema.dto.csb_enum_key import csb_ek_list_fields, csb_ek_detail_fie
 from deploy.schema.dto.csb_enum_value import csb_ev_list_fields, csb_ev_detail_fields, xtb_ev_download_fields
 from deploy.config import (redis_host, redis_port, redis_password, redis_db)
 from deploy.delib.redis_lib import RedisClientLib
-from deploy.utils.utils import format_redis_key, get_now, md5 as generator_md5
+from deploy.utils.utils import format_redis_key, get_now, md5 as generator_md5, kebab_to_camel
 
 
 class SystemConfigDictService:
@@ -390,15 +390,33 @@ class SystemConfigDictService:
             data.append(_d)
         return data
 
-    async def de_get_by_option(self, name: str, rtx_id: str = None) -> Status:
+    async def de_get_by_option(self, name: str, rtx_id: str) -> Status:
         if not name:
-            return FailureStatus(code=status_code.CODE_400_PARAM_ERROR, message="key不能为空")
+            return FailureStatus(code=status_code.CODE_400_REQUEST_PARAMETER_MISS.value, message="key不能为空")
         data = await self.dict_value_by_name_money(
             name=name,
             response_="option",
             filter_lock=True,
             key_trans_int=False
         )
+        if not data:
+            return FailureStatus(code=status_code.CODE_501_DATA_NOT_EXIST, message=f"未找到枚举key: {name}")
+        return SuccessStatus(data=data)
+
+    async def de_get_by_options(self, names: List[str], rtx_id: str) -> Status:
+        if not names:
+            return FailureStatus(code=status_code.CODE_400_REQUEST_PARAMETER_MISS.value, message="key不能为空")
+        
+        data: Dict = {}
+        for name in names:
+            if not name: continue
+            key: str = kebab_to_camel(s=name)
+            data[key] = await self.dict_value_by_name_money(
+                name=name,
+                response_="option",
+                filter_lock=True,
+                key_trans_int=False
+            )
         if not data:
             return FailureStatus(code=status_code.CODE_501_DATA_NOT_EXIST, message=f"未找到枚举key: {name}")
         return SuccessStatus(data=data)
