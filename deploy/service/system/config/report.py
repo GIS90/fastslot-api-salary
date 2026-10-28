@@ -247,8 +247,9 @@ class SystemConfigReportService:
             return SuccessStatus(data=[])
 
         data: List = [
-            {"prop": "", "width": TABLE_SW, "type": "selection", "fixed": "left", "align": "center"}   # 默认选择列
+            {"prop": "", "width": str(TABLE_SW), "type": "selection", "fixed": "left", "align": "center"}   # 默认选择列
         ]
+        __fix_width_fields: List = ["options"]
         for model in models:
             if not model: continue
             _d: Dict = dict()
@@ -256,7 +257,13 @@ class SystemConfigReportService:
             _d["label"] = getattr(model, "name_ch", "")
             _d["align"] = getattr(model, "align", "center") # 默认居中对齐
             if model.width:
-                _d["min-width"] = str(model.width)
+                if model.name_zh in __fix_width_fields:
+                    """
+                    固定宽度字段，宽度不自适应
+                    """
+                    _d["width"] = str(model.width)
+                else:
+                    _d["min-width"] = str(model.width)
             if model.filter:
                 _d["filter"] = json.loads(model.filter)
             if model.fixed:

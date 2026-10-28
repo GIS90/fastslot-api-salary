@@ -36,13 +36,15 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from deploy.curd.xtb_role import XtbRoleCurd
 from deploy.curd.xtb_menu import XtbMenuCurd
 from deploy.schema.dao.xtb_role import XtbRoleModel
+from deploy.service.system.config.report import SystemConfigReportService
 from deploy.utils.status import Status, SuccessStatus, FailureStatus
 from deploy.utils.status_value import (StatusCode as status_code,
                                        StatusMsg as status_msg)
 from deploy.utils.converter import model_converter_dict, many_model_converter_dict, menu_converter_dict
 from deploy.schema.dto.xtb_role import xtb_role_list_fields, xtb_role_download_fields
 from deploy.utils.utils import get_now, d2s, md5 as generator_md5, build_menu_tree_iterative
-from deploy.config import server_role as SERVER_ROLE_ADMIN, menu_root as MENU_ROOT_ID
+from deploy.config import server_role as SERVER_ROLE_ADMIN, menu_root as MENU_ROOT_ID, table_default_null as TABLE_DEFAULT_NULL
+from deploy.utils.enumeration import XtbReportKey
 
 
 class SystemMainRoleService:
@@ -54,6 +56,7 @@ class SystemMainRoleService:
         self.db: AsyncSession = db_connection
         self.xtb_role_curd: XtbRoleCurd = XtbRoleCurd()
         self.xtb_menu_curd: XtbMenuCurd = XtbMenuCurd()
+        self.system_main_report_service: SystemConfigReportService = SystemConfigReportService(db_connection=db_connection)
 
     def __str__(self):
         return "SystemMainRoleService class."
@@ -92,21 +95,29 @@ class SystemMainRoleService:
             limit=params.get("limit"),
             content=params.get("content")
         )
+        _default_data = {
+            "list": [],
+            "page": params.get("page"),
+            "pageSize": params.get("limit"),
+            "total": 0
+        }
         if not models:
-            __data = {
-                "list": [],
-                "page": params.get("page"),
-                "pageSize": params.get("limit"),
-                "total": 0
-            }
-            return FailureStatus(code=status_code.CODE_101_SUCCESS_NO_DATA, data=__data)
+            return FailureStatus(code=status_code.CODE_101_SUCCESS_NO_DATA.value, data=_default_data)
+        fields: Dict = await self.system_main_report_service.report_column_by_xtbb(
+            rtx_id=rtx_id,
+            xtbb=XtbReportKey.SystemMainRole.value,
+            type_="list",
+            is_md5=True
+        )
+        if not fields:
+            return FailureStatus(code=status_code.CODE_102_SUCCESS_NO_COLUMN.value, data=_default_data)
 
-        id_value: int = params.get("offset") + 1
         data: List = await many_model_converter_dict(
             models=models,
-            fields=xtb_role_list_fields,
-            auto_id=True,
-            auto_id_value=id_value
+            fields=fields.get("column"),
+            default_value=TABLE_DEFAULT_NULL,
+            auto_id=fields.get("id_auto"),
+            auto_id_value=params.get("offset") + 1
         )
         result: Dict = {
             "list": data,

@@ -95,7 +95,7 @@ class XtbRoleCurd(BaseCurd):
     ) -> Optional[List]:
         try:
             stmt = select(XtbRoleModel).where(XtbRoleModel.status != 1)
-            if content:
+            if content and content != "%%":
                 stmt = stmt.where(
                     or_(
                         XtbRoleModel.engname.like(content),

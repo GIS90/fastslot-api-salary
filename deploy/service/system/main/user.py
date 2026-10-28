@@ -50,7 +50,7 @@ from deploy.utils.converter import model_converter_dict, many_model_converter_di
 from deploy.schema.dto.xtb_user import (xtb_user_list_fields, xtb_user_detail_fields,
                                         xtb_user_login_fields, xtb_user_download_fields)
 from deploy.utils.utils import get_now, random_string, md5 as generator_md5, d2s
-from deploy.config import server_user, server_password, server_avatar, table_default_null
+from deploy.config import server_user, server_password, server_avatar, table_default_null as TABLE_DEFAULT_NULL
 from deploy.utils.enumeration import XtbXtcsKEY, CsbEnumKEY, FileTypeEnum, XtbReportKey
 from deploy.utils.upload import uploadUtils
 from deploy.delib.excel_lib import ExcelLib
@@ -137,7 +137,7 @@ class SystemMainUserService:
         data: List = await many_model_converter_dict(
             models=models,
             fields=fields.get("column"),
-            default_value=table_default_null,
+            default_value=TABLE_DEFAULT_NULL,
             auto_id=fields.get("id_auto"),
             auto_id_value=params.get("offset") + 1
         )
