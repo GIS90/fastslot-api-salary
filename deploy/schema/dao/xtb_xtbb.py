@@ -33,11 +33,7 @@ Life is short, I use python.
 ------------------------------------------------
 """
 from sqlalchemy import (
-    String,
-    Integer,
-    Boolean,
-    DateTime,
-    Text
+    String
 )
 from sqlalchemy.orm import Mapped, mapped_column
 from deploy.schema._dao_base_model import baseModel
@@ -54,7 +50,6 @@ class XtbXtbbModel(baseModel, IDField, Md5Field, CUDField, StatusField):
     name: Mapped[str] = mapped_column(name="name", type_=String(35), comment="报表名称")
     table: Mapped[str] = mapped_column(name="table", type_=String(35), comment="数据库表名")
     remark: Mapped[str] = mapped_column(name="remark", type_=String(100), comment="报表说明")
-    mode: Mapped[bool] = mapped_column(name="mode", type_=Boolean(), default=False, comment="宽度模式：1百分比；0固定数值")
 
     def __str__(self):
         return f"XtbXtbbModel Class[DB table: {self.__tablename__}], name: {self.name}, table: {self.table}, remark: {self.remark}."

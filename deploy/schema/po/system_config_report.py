@@ -44,7 +44,6 @@ class __XtbXtbbBaseModel(baseModel):
     name: str = Field(..., min_length=1, max_length=35, description="报表名称", alias="name")
     table: str = Field(..., min_length=1, max_length=35, description="数据库表名", alias="table")
     remark: str | None = Field(default=None, max_length=100, description="报表说明", alias="remark")
-    mode: bool = Field(default=False, description="宽度模式：1百分比；0固定数值", alias="mode")
 
 
 class XtbXtbbAddModel(__XtbXtbbBaseModel):
@@ -63,6 +62,7 @@ class __XtbXtbbFieldBaseModel(baseModel):
     remark: str | None = Field(default=None, max_length=100, description="字段说明", alias="remark")
     width: float = Field(default=0, description="宽度", alias="width")
     fixed: str = Field(default="", max_length=35, description="锁定：left right", alias="fixed")
+    align: str = Field(default="", max_length=35, description="对齐方式", alias="align")
     list: bool = Field(default=True, description="列表：1支持；0不支持", alias="list")
     list_type: str = Field(default="", max_length=35, description="List字段类型", alias="listType")
     export: bool = Field(default=True, description="导出：1支持；0不支持", alias="export")

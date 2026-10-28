@@ -239,7 +239,6 @@ class SystemConfigReportService:
         xtbb_model: XtbXtbbModel = await self.xtb_xtbb_curd.get_by_name(db=self.db, name=xtbb)
         if not xtbb_model:
             return FailureStatus(code=status_code.CODE_501_DATA_NOT_EXIST)
-        xtbb_mode = getattr(xtbb_model, "mode", False)  # 默认为固定数值模式
         # 第二步：报表字段
         models: List[XtbXtbbFieldModel] = await self.xtb_xtbb_field_curd.column_by_xtbb(
             db=self.db, xtbb=xtbb, list_=True, export_=False
@@ -255,12 +254,9 @@ class SystemConfigReportService:
             _d: Dict = dict()
             _d["prop"] = getattr(model, "name_zh", "")
             _d["label"] = getattr(model, "name_ch", "")
-            _d["align"] = getattr(model, "align", "center")
+            _d["align"] = getattr(model, "align", "center") # 默认居中对齐
             if model.width:
-                if xtbb_mode:
-                    _d["width"] = f"{model.width}%"
-                else:
-                    _d["min-width"] = str(model.width)
+                _d["min-width"] = str(model.width)
             if model.filter:
                 _d["filter"] = json.loads(model.filter)
             if model.fixed:

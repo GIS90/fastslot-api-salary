@@ -38,8 +38,7 @@ xtb_xtbb_list_fields: List = [
     {"key": "name", "type": ft.STR, "name": "name", "null": False},
     {"key": "table", "type": ft.STR, "name": "table", "null": False},
     {"key": "md5", "type": ft.STR, "name": "md5", "null": False},
-    {"key": "remark", "type": ft.STR, "name": "remark", "null": False},
-    {"key": "mode", "type": ft.BOOL, "name": "mode", "null": True}
+    {"key": "remark", "type": ft.STR, "name": "remark", "null": False}
 ]
 
 
@@ -47,8 +46,7 @@ xtb_xtbb_detail_fields: List = [
     {"key": "name"},
     {"key": "table"},
     {"key": "md5"},
-    {"key": "remark"},
-    {"key": "mode", "type": ft.BOOL, "name": "mode", "null": True}
+    {"key": "remark"}
 ]
 
 
@@ -57,7 +55,6 @@ xtb_xtbb_view_fields: List = [
     {"key": "table"},
     {"key": "md5"},
     {"key": "remark"},
-    {"key": "mode", "type": ft.BOOL, "name": "mode", "null": True},
     {"key": "create_rtx", "type": ft.STR, "name": "createRtx", "null": True},
     {"key": "create_time", "type": ft.DATETIME, "name": "createTime", "null": True},
     {"key": "update_rtx", "type": ft.STR, "name": "updateRtx", "null": True},
@@ -69,7 +66,6 @@ xtb_xtbb_download_fields: List = [
     {"key": "name", "type": ft.STR, "name": "报表名称", "null": False},
     {"key": "table", "type": ft.STR, "name": "数据库表名", "null": False},
     {"key": "remark", "type": ft.STR, "name": "报表说明", "null": False},
-    {"key": "mode", "type": ft.BOOL, "name": "宽度模式", "null": True},
     {"key": "create_rtx", "type": ft.STR, "name": "创建人", "null": True},
     {"key": "create_time", "type": ft.DATETIME, "name": "创建时间", "null": True},
     {"key": "update_rtx", "type": ft.STR, "name": "更新人", "null": True},
