@@ -39,6 +39,7 @@ xtb_role_list_fields: List = [
     {"key": "engname", "type": ft.STR, "name": "engname", "null": False},
     {"key": "chnname", "type": ft.STR, "name": "chnname", "null": False},
     {"key": "introduction", "type": ft.STR, "name": "introduction", "null": True},
+    {"key": "order_id", "type": ft.INT, "name": "orderId", "null": True},
     {"key": "create_rtx", "type": ft.STR, "name": "createRtx", "null": True},
     {"key": "create_time", "type": ft.DATETIME, "name": "createTime", "null": True}
 ]
@@ -49,6 +50,7 @@ xtb_role_detail_fields: List = [
     {"key": "engname"},
     {"key": "chnname"},
     {"key": "introduction"},
+    {"key": "order_id", "type": ft.INT, "name": "orderId", "null": True},
     # {"key": "create_rtx", "type": ft.STR, "name": "createRtx", "null": True},
     # {"key": "create_time", "type": ft.DATETIME, "name": "createTime", "null": True},
     # {"key": "update_rtx", "type": ft.STR, "name": "updateRtx", "null": True},
@@ -67,6 +69,7 @@ xtb_role_download_fields: List = [
     {"key": "engname", "type": ft.STR, "name": "角色ID", "null": False},
     {"key": "chnname", "type": ft.STR, "name": "角色名称", "null": False},
     {"key": "introduction", "type": ft.STR, "name": "角色介绍", "null": True},
+    {"key": "order_id", "type": ft.INT, "name": "排序ID", "null": True},
     {"key": "create_rtx", "type": ft.STR, "name": "创建人", "null": True},
     {"key": "create_time", "type": ft.DATETIME, "name": "创建时间", "null": True}
 ]

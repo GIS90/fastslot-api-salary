@@ -103,7 +103,7 @@ class XtbRoleCurd(BaseCurd):
                         XtbRoleModel.introduction.like(content)
                     )
                 )
-            stmt = stmt.order_by(desc(XtbRoleModel.create_time), asc(XtbRoleModel.id)).offset(offset).limit(limit)
+            stmt = stmt.order_by(asc(XtbRoleModel.order_id), desc(XtbRoleModel.create_time), asc(XtbRoleModel.id)).offset(offset).limit(limit)
             result = await db.execute(stmt)
             return result.scalars().all()
         except Exception as e:
@@ -117,7 +117,7 @@ class XtbRoleCurd(BaseCurd):
             stmt = select(XtbRoleModel).where(XtbRoleModel.status != 1)
             if params.get("list"):
                 stmt = stmt.where(XtbRoleModel.md5.in_(params.get("list")))
-            stmt = stmt.order_by(asc(XtbRoleModel.create_time))
+            stmt = stmt.order_by(asc(XtbRoleModel.order_id), asc(XtbRoleModel.create_time))
             result = await db.execute(stmt)
             return result.scalars().all()
         except Exception as e:

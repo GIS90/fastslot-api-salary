@@ -42,12 +42,14 @@ __all__ = ["XtbRoleAddModel", "XtbRoleUpdateModel", "XtbRoleAuthModel"]
 class __XtbRoleBaseModel(baseModel):
     chnname: str = Field(..., min_length=1, max_length=35, description="角色中文名称", alias="chnname")
     introduction: Optional[str] = Field(..., max_length=255, description="角色描述")
+    order_id: int = Field(default=0, description="排序ID", alias="orderId")
 
     model_config = {
         "json_schema_extra": {
             "example": {
                 "chnname": "abcd木头人",
-                "introduction": "哈哈哈哈哈"
+                "introduction": "哈哈哈哈哈",
+                "orderId": 0
             }
         }
     }

@@ -78,6 +78,7 @@ CREATE TABLE `xtb_role`  (
     `md5` varchar(64) not null unique COMMENT '数据唯一标识：MD5-ID',
     `authority` varchar(255) COMMENT '角色权限ID集合，用英文,分割',
     `introduction` text COMMENT '描述',
+    `order_id` int default 0 COMMENT '排序ID',
     `create_rtx` varchar(35) COMMENT '创建用户RTX-ID',
     `create_time` datetime default CURRENT_TIMESTAMP COMMENT '创建时间',
     `update_rtx` varchar(35) COMMENT '更新用户RTX-ID',
@@ -85,6 +86,7 @@ CREATE TABLE `xtb_role`  (
     `delete_rtx` varchar(35) COMMENT '删除用户RTX-ID',
     `delete_time` datetime COMMENT '删除时间',
     `status` bool default False COMMENT '数据状态：1删除；0正常（默认）',
+    `order_id` int COMMENT '排序ID',
 
     PRIMARY KEY (`id`),
     UNIQUE INDEX `xtb_role_md5_index`(`md5`) USING HASH COMMENT 'md5唯一索引',
@@ -93,9 +95,9 @@ CREATE TABLE `xtb_role`  (
 
 -- insert default role
 insert into
-xtb_role(engname, chnname, md5,  authority, introduction, create_rtx, status)
+xtb_role(engname, chnname, md5,  authority, introduction, create_rtx, status, order_id)
 VALUES
-('ADMIN', '系统管理员角色', '21232f297a57a5a743894a0e4a801fc3', '', '系统所有功能权限（默认）', 'admin', FALSE);
+('ADMIN', '系统管理员角色', '21232f297a57a5a743894a0e4a801fc3', '', '系统所有功能权限（默认）', 'admin', FALSE, 1);
 -- = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
 -- 系统表-菜单
 -- create table && index
@@ -509,6 +511,7 @@ CREATE TABLE `xtb_xtbb`  (
     `table` varchar(35) NOT NULL COMMENT '数据库表名',
     `md5` varchar(64) NOT NULL UNIQUE COMMENT '数据唯一标识：MD5-ID',
     `remark` varchar(100) COMMENT '报表说明',
+    `order_id` int default 0 COMMENT '排序ID',
     `create_rtx` varchar(35) COMMENT '创建用户RTX-ID',
     `create_time` datetime default CURRENT_TIMESTAMP COMMENT '创建时间',
     `update_rtx` varchar(35) COMMENT '更新用户RTX-ID',

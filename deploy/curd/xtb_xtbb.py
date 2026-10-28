@@ -131,7 +131,7 @@ class XtbXtbbCurd(BaseCurd):
                         XtbXtbbModel.remark.like(content)
                     )
                 )
-            stmt = stmt.order_by(asc(XtbXtbbModel.create_time)).offset(offset).limit(limit)
+            stmt = stmt.order_by(asc(XtbXtbbModel.order_id), asc(XtbXtbbModel.create_time)).offset(offset).limit(limit)
             result = await db.execute(stmt)
             return result.scalars().all()
         except Exception as e:
@@ -145,7 +145,7 @@ class XtbXtbbCurd(BaseCurd):
             stmt = select(XtbXtbbModel).where(XtbXtbbModel.status != 1)
             if params.get("list"):
                 stmt = stmt.where(XtbXtbbModel.md5.in_(params.get("list")))
-            stmt = stmt.order_by(asc(XtbXtbbModel.create_time))
+            stmt = stmt.order_by(asc(XtbXtbbModel.order_id), asc(XtbXtbbModel.create_time))
             result = await db.execute(stmt)
             return result.scalars().all()
         except Exception as e:

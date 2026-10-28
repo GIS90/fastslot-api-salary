@@ -44,6 +44,7 @@ class __XtbXtbbBaseModel(baseModel):
     name: str = Field(..., min_length=1, max_length=35, description="报表名称", alias="name")
     table: str = Field(..., min_length=1, max_length=35, description="数据库表名", alias="table")
     remark: str | None = Field(default=None, max_length=100, description="报表说明", alias="remark")
+    order_id: int = Field(default=0, description="排序ID", alias="orderId")
 
 
 class XtbXtbbAddModel(__XtbXtbbBaseModel):
