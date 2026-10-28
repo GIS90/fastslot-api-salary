@@ -58,6 +58,7 @@ class XtbXtbbFieldModel(baseModel, IDField, Md5Field, CUDField, StatusField, Ord
     xtbb: Mapped[str] = mapped_column(name="xtbb", type_=String(35), comment="系统报表名称，关联xtb_xtbb表")
     remark: Mapped[str | None] = mapped_column(name="remark", type_=String(100), comment="字段说明")
     width: Mapped[float] = mapped_column(name="width", type_=Numeric(10, 4), default=0, comment="宽度")
+    mode: Mapped[bool] = mapped_column(name="mode", type_=Boolean(), default=False, comment="字段宽度模式：0固定宽度；1最小宽度")
     align: Mapped[str | None] = mapped_column(name="align", type_=String(35), default=None, comment="对齐方式：left center right")
     fixed: Mapped[str] = mapped_column(name="fixed", type_=String(35), default="", comment="锁定：left right")
     list: Mapped[bool] = mapped_column(name="list", type_=Boolean(), default=True, comment="列表：1支持；0不支持")

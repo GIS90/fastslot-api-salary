@@ -61,6 +61,7 @@ class __XtbXtbbFieldBaseModel(baseModel):
     xtbb: str = Field(..., min_length=1, max_length=35, description="系统报表名称", alias="xtbb")
     remark: str | None = Field(default=None, max_length=100, description="字段说明", alias="remark")
     width: float = Field(default=0, description="宽度", alias="width")
+    mode: bool = Field(default=False, description="字段宽度模式：0固定宽度；1最小宽度", alias="mode")
     fixed: str = Field(default="", max_length=35, description="锁定：left right", alias="fixed")
     align: str = Field(default="", max_length=35, description="对齐方式", alias="align")
     list: bool = Field(default=True, description="列表：1支持；0不支持", alias="list")

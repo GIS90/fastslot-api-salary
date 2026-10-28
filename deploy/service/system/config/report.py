@@ -249,18 +249,15 @@ class SystemConfigReportService:
         data: List = [
             {"prop": "", "width": str(TABLE_SW), "type": "selection", "fixed": "left", "align": "center"}   # 默认选择列
         ]
-        __fix_width_fields: List = ["options"]
         for model in models:
             if not model: continue
-            _d: Dict = dict()
+            _d: Dict = dict[str, Any]()
             _d["prop"] = getattr(model, "name_zh", "")
             _d["label"] = getattr(model, "name_ch", "")
             _d["align"] = getattr(model, "align", "center") # 默认居中对齐
             if model.width:
-                if model.name_zh in __fix_width_fields:
-                    """
-                    固定宽度字段，宽度不自适应
-                    """
+                # mode=0 固定宽度(width)，mode=1 最小宽度(min-width)
+                if model.mode is False:
                     _d["width"] = str(model.width)
                 else:
                     _d["min-width"] = str(model.width)
