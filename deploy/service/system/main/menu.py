@@ -213,7 +213,6 @@ class SystemMainMenuService:
             md5_id=_md5, status_check=False, response_type="model", root_check=False
         )
         if not __flag: return data
-
         del model["md5"]
         del model["id"]
         model["update_rtx"] = rtx_id

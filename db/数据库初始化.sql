@@ -97,7 +97,7 @@ CREATE TABLE `xtb_role`  (
 insert into
 xtb_role(engname, chnname, md5,  authority, introduction, create_rtx, status, order_id)
 VALUES
-('ADMIN', '系统管理员角色', '21232f297a57a5a743894a0e4a801fc3', '', '系统所有功能权限（默认）', 'admin', FALSE, 1);
+('ADMIN', '系统管理员角色', '21232f297a57a5a743894a0e4a801fc3', '', '系统所有功能权限（默认）', 'admin', FALSE, 0);
 -- = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
 -- 系统表-菜单
 -- create table && index
