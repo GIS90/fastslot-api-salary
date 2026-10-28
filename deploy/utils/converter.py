@@ -258,7 +258,7 @@ async def menu_converter_dict(model, type_: str = 'base', format_: str = "tree")
             elif attr == 'md5':
                 _res["md5"] = model.md5
             elif attr == 'order_id':
-                _res[attr] = model.order_id
+                _res["orderId"] = model.order_id
             elif attr == 'component':
                 _res[attr] = model.component
             elif attr == 'redirect':
@@ -309,7 +309,7 @@ async def menu_converter_dict(model, type_: str = 'base', format_: str = "tree")
             elif attr == 'md5':
                 _res["md5"] = model.md5
             elif attr == 'order_id':
-                _res[attr] = model.order_id
+                _res["orderId"] = model.order_id
             elif attr == 'component':
                 _res[attr] = model.component
             elif attr == 'redirect':

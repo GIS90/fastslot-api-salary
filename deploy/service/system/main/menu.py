@@ -200,6 +200,8 @@ class SystemMainMenuService:
         del model["isBreadcrumb"]
         model["hidden"] = model.get("isHide")
         del model["isHide"]
+        model["order_id"] = model.get("orderId")
+        del model["orderId"]
         for k, v in model.items():
             setattr(new_model, k, v)
         await self.xtb_menu_curd.add(db=self.db, model=new_model)
@@ -226,6 +228,8 @@ class SystemMainMenuService:
         del model["isBreadcrumb"]
         model["hidden"] = model.get("isHide")
         del model["isHide"]
+        model["order_id"] = model.get("orderId")
+        del model["orderId"]
         for k, v in model.items():
             setattr(data, k, v)
         await self.xtb_menu_curd.update(db=self.db, model=data)

@@ -49,6 +49,7 @@ from deploy.schema.dto.xtb_xtbb_field import (xtb_xtbb_field_list_fields, xtb_xt
                                              xtb_xtbb_field_view_fields)
 from deploy.utils.utils import get_now, md5 as generator_md5, d2s
 from deploy.config import table_selection_width as TABLE_SW
+from deploy.utils.variable import REPORT_NOT_SELECTION_LIST
 
 
 class SystemConfigReportService:
@@ -246,9 +247,12 @@ class SystemConfigReportService:
         if not models:
             return SuccessStatus(data=[])
 
-        data: List = [
-            {"prop": "", "width": str(TABLE_SW), "type": "selection", "fixed": "left", "align": "center"}   # 默认选择列
-        ]
+        if xtbb in REPORT_NOT_SELECTION_LIST:
+            data: List = []
+        else:
+            data: List = [
+                {"prop": "", "width": str(TABLE_SW), "type": "selection", "fixed": "left", "align": "center"}   # 默认选择列
+            ]
         for model in models:
             if not model: continue
             _d: Dict = dict[str, Any]()

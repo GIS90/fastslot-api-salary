@@ -251,3 +251,4 @@ class DICT_KEY_ALL:
 class XtbReportKey(StrEnum):
     SystemMainUser = "SystemMainUser"
     SystemMainRole = "SystemMainRole"
+    SystemMainMenu = "SystemMainMenu"
