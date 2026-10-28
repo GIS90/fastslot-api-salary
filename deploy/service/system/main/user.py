@@ -128,7 +128,8 @@ class SystemMainUserService:
         fields: Dict = await self.system_main_report_service.report_column_by_xtbb(
             rtx_id=rtx_id,
             xtbb=XtbReportKey.SystemMainUser.value,
-            type_="list"
+            type_="list",
+            is_md5=True
         )
         if not fields:
             return FailureStatus(code=status_code.CODE_102_SUCCESS_NO_COLUMN.value, data=_default_data)

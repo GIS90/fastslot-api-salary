@@ -357,13 +357,15 @@ class SystemConfigReportService:
             self,
             rtx_id: str,
             xtbb: str,
-            type_: Literal["list", "export"]
+            type_: Literal["list", "export"],
+            is_md5: bool = True
     ) -> Dict:
         """
         用于数据展示的字段列
         :param rtx_id: 用户RTD-ID
         :param xtbb: 系统报表
         :param type_: 列类型，list表示列表列，export表示导出列
+        :param is_md5: 是否需要md5标识，默认True
         :return: Dict
             格式：{
                 "column": [],
@@ -384,6 +386,8 @@ class SystemConfigReportService:
         if not models: return {}
 
         column: List = []
+        if is_md5:
+            column.append({"key": "md5", "type": "string"})
         _id_auto: bool = False
         for model in models:
             if not model: continue
