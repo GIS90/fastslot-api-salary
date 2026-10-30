@@ -126,7 +126,7 @@ class XtbUserCurd(BaseCurd):
                 XtbDepartmentModel,
                 XtbUserModel.department == XtbDepartmentModel.md5
             )
-            if content and content != "%%":
+            if content:
                 stmt = stmt.where(
                     or_(
                         XtbUserModel.rtx_id.like(content),

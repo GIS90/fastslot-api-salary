@@ -123,7 +123,7 @@ class XtbXtbbCurd(BaseCurd):
     ) -> Optional[List]:
         try:
             stmt = select(XtbXtbbModel).where(XtbXtbbModel.status != 1)
-            if content and content != "%%":
+            if content:
                 stmt = stmt.where(
                     or_(
                         XtbXtbbModel.name.like(content),

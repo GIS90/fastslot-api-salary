@@ -30,7 +30,7 @@ Life is short, I use python.
 
 ------------------------------------------------
 """
-from typing import Union
+from typing import Union, Dict
 from os.path import splitext as os_path_splitext
 from fastapi import Header, Query
 from typing import Optional, Dict, List
@@ -197,7 +197,10 @@ async def pageable_query_params(
     pageSize: int = Query(default=15, ge=MIN_LENGTH, description="条数"),
     content: str | None = Query(default=None, max_length=MAX_LENGTH, description="非模糊查询"),
 ) -> Dict:
-    return {"page": page, "pageSize": pageSize, "limit": pageSize, "offset": (page - 1) * pageSize, "content": content}
+    __params: Dict = {"page": page, "pageSize": pageSize, "limit": pageSize, "offset": (page - 1) * pageSize }
+    if content:
+        __params["content"] = content
+    return  __params
 
 
 async def pageable_like_params(
@@ -205,7 +208,10 @@ async def pageable_like_params(
     pageSize: int = Query(default=15, ge=MIN_LENGTH, description="条数"),
     content: Optional[str] = Query(default=None, max_length=MAX_LENGTH, description="模糊查询参数"),
 ) -> Dict:
-    return {"page": page, "pageSize": pageSize, "limit": pageSize, "offset": (page - 1) * pageSize, "content": f"%{content}%"}
+    __params: Dict = {"page": page, "pageSize": pageSize, "limit": pageSize, "offset": (page - 1) * pageSize }
+    if content:
+        __params["content"] = f"%{content}%"
+    return  __params
 
 
 async def pageable_model_params(
