@@ -78,7 +78,6 @@ CREATE TABLE `xtb_role`  (
     `md5` varchar(64) not null unique COMMENT '数据唯一标识：MD5-ID',
     `authority` varchar(255) COMMENT '角色权限ID集合，用英文,分割',
     `introduction` text COMMENT '描述',
-    `order_id` int default 0 COMMENT '排序ID',
     `create_rtx` varchar(35) COMMENT '创建用户RTX-ID',
     `create_time` datetime default CURRENT_TIMESTAMP COMMENT '创建时间',
     `update_rtx` varchar(35) COMMENT '更新用户RTX-ID',
@@ -86,7 +85,7 @@ CREATE TABLE `xtb_role`  (
     `delete_rtx` varchar(35) COMMENT '删除用户RTX-ID',
     `delete_time` datetime COMMENT '删除时间',
     `status` bool default False COMMENT '数据状态：1删除；0正常（默认）',
-    `order_id` int COMMENT '排序ID',
+    `order_id` int COMMENT '排序编码',
 
     PRIMARY KEY (`id`),
     UNIQUE INDEX `xtb_role_md5_index`(`md5`) USING HASH COMMENT 'md5唯一索引',
@@ -121,7 +120,7 @@ CREATE TABLE `xtb_menu`  (
     `breadcrumb` bool default true COMMENT '是否Breadcrumb中显示，默认true',
     `shortcut` bool default True COMMENT 'Dashboard快捷入口是否显示，默认true',
     `tag` varchar(10) COMMENT '菜单TAG，用于二级菜单',
-    `order_id` int default 1 COMMENT '排序ID',
+    `order_id` int default 1 COMMENT '排序编码',
     `create_rtx` varchar(35) COMMENT '创建用户RTX-ID',
     `create_time` datetime default CURRENT_TIMESTAMP COMMENT '创建时间',
     `update_rtx` varchar(35) COMMENT '更新用户RTX-ID',
@@ -262,7 +261,7 @@ CREATE TABLE `xtb_xtcs`  (
     `delete_time` datetime COMMENT '删除时间',
     `lock` bool default False COMMENT '锁定状态：1锁定；0非锁定',
     `status` bool default False COMMENT '数据状态：1删除；0正常（默认）',
-    `order_id` int COMMENT '排序ID',
+    `order_id` int COMMENT '排序编码',
 
     PRIMARY KEY (`id`),
     UNIQUE INDEX `xtb_xtcs_md5_index`(`md5`) USING HASH COMMENT 'md5唯一索引'
@@ -302,7 +301,7 @@ CREATE TABLE `csb_enum_key`  (
     `delete_time` datetime COMMENT '删除时间',
     `lock` bool default False COMMENT '锁定状态：1锁定；0非锁定',
     `status` bool default False COMMENT '数据状态：1删除；0正常（默认）',
-    `order_id` int COMMENT '排序ID',
+    `order_id` int COMMENT '排序编码',
 
     PRIMARY KEY (`id`),
     UNIQUE INDEX `index_id`(`id`) USING HASH COMMENT 'id索引'
@@ -341,7 +340,7 @@ CREATE TABLE `csb_enum_value`  (
     `delete_time` datetime COMMENT '删除时间',
     `lock` bool default False COMMENT '锁定状态：1锁定；0非锁定',
     `status` bool default False COMMENT '数据状态：1删除；0正常（默认）',
-    `order_id` int COMMENT '排序ID',
+    `order_id` int COMMENT '排序编码',
 
     PRIMARY KEY (`id`),
     UNIQUE INDEX `index_id`(`id`) USING HASH COMMENT 'id索引'
@@ -487,7 +486,7 @@ CREATE TABLE `xtb_department`  (
     `delete_rtx` varchar(35) COMMENT '删除用户',
     `delete_time` datetime COMMENT '删除时间',
     `status` bool default False COMMENT '数据状态：1删除；0正常（默认）',
-    `order_id` int COMMENT '排序ID',
+    `order_id` int COMMENT '排序编码',
 
   PRIMARY KEY (`id`)
 ) COMMENT='系统表-用户部门表';
@@ -510,8 +509,8 @@ CREATE TABLE `xtb_xtbb`  (
     `name` varchar(35) NOT NULL COMMENT '报表名称',
     `table` varchar(35) NOT NULL COMMENT '数据库表名',
     `md5` varchar(64) NOT NULL UNIQUE COMMENT '数据唯一标识：MD5-ID',
-    `remark` varchar(100) COMMENT '报表说明',
-    `order_id` int default 0 COMMENT '排序ID',
+    `remark` varchar(200) COMMENT '报表说明',
+    `order_id` int default 0 COMMENT '排序编码',
     `create_rtx` varchar(35) COMMENT '创建用户RTX-ID',
     `create_time` datetime default CURRENT_TIMESTAMP COMMENT '创建时间',
     `update_rtx` varchar(35) COMMENT '更新用户RTX-ID',
@@ -558,7 +557,7 @@ CREATE TABLE `xtb_xtbb_field`  (
     `delete_rtx` varchar(35) COMMENT '删除用户RTX-ID',
     `delete_time` datetime COMMENT '删除时间',
     `status` bool default False COMMENT '数据状态：1删除；0正常（默认）',
-    `order_id` int COMMENT '排序ID',
+    `order_id` int COMMENT '排序编码',
 
     PRIMARY KEY (`id`),
     UNIQUE INDEX `xtb_xtbb_field_md5_index`(`md5`) USING HASH COMMENT 'md5索引'

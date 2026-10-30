@@ -47,7 +47,7 @@ class IDField:
 
 
 class RtxIdField:
-    rtx_id: Mapped[str] = mapped_column(name="rtx_id", type_=String(35), nullable=False, comment="RTX-ID唯一标识，有英文+数字组成")
+    rtx_id: Mapped[str] = mapped_column(name="rtx_id", type_=String(35), nullable=False, comment="数据用户RTX-ID唯一标识，有英文+数字组成")
 
 
 class Md5Field:
@@ -64,7 +64,7 @@ class CUDField:
 
 
 class RcUDField:
-    rtx_id: Mapped[str] = mapped_column(name="rtx_id", type_=String(35), nullable=False, comment="RTX-ID唯一标识，有英文+数字组成")
+    rtx_id: Mapped[str] = mapped_column(name="rtx_id", type_=String(35), nullable=False, comment="数据用户RTX-ID唯一标识，有英文+数字组成")
     create_time: Mapped[datetime] = mapped_column(name="create_time", type_=DateTime(), comment="创建时间")
     update_rtx: Mapped[Optional[str]] = mapped_column(name="update_rtx", type_=String(35), comment="更新用户RTX-ID")
     update_time: Mapped[Optional[datetime]] = mapped_column(name="update_time", type_=DateTime(), comment="更新时间")
@@ -80,4 +80,4 @@ class StatusField:
 
 
 class OrderIdFiled:
-    order_id: Mapped[int] = mapped_column(name="order_id", type_=Integer, comment="数据排序ID")
+    order_id: Mapped[int] = mapped_column(name="order_id", type_=Integer, comment="数据排序编码")

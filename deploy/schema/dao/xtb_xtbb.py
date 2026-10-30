@@ -38,20 +38,19 @@ from sqlalchemy import (
 )
 from sqlalchemy.orm import Mapped, mapped_column
 from deploy.schema._dao_base_model import baseModel
-from .common_field import IDField, Md5Field, CUDField, StatusField
+from .common_field import IDField, Md5Field, CUDField, StatusField, OrderIdFiled
 
 
 __all__ = ["XtbXtbbModel"]
 
 
-class XtbXtbbModel(baseModel, IDField, Md5Field, CUDField, StatusField):
+class XtbXtbbModel(baseModel, IDField, Md5Field, CUDField, StatusField, OrderIdFiled):
     __tablename__ = 'xtb_xtbb'
     __table_args__ = ({'comment': '系统表-系统报表'})
 
     name: Mapped[str] = mapped_column(name="name", type_=String(35), comment="报表名称")
     table: Mapped[str] = mapped_column(name="table", type_=String(35), comment="数据库表名")
-    remark: Mapped[str] = mapped_column(name="remark", type_=String(100), comment="报表说明")
-    order_id: Mapped[int] = mapped_column(name="order_id", type_=Integer, default=0, comment="排序ID")
+    remark: Mapped[str] = mapped_column(name="remark", type_=String(200), comment="报表说明")
 
     def __str__(self):
         return f"XtbXtbbModel Class[DB table: {self.__tablename__}], name: {self.name}, table: {self.table}, remark: {self.remark}."
