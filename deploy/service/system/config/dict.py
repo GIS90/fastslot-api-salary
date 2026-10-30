@@ -35,6 +35,7 @@ from typing import Dict, List, Tuple, Literal, Any, Optional, Union
 from sqlalchemy.ext.asyncio import AsyncSession
 from deploy.curd.csb_enum_key import CsbEnumKeyCurd
 from deploy.curd.csb_enum_value import CsbEnumValueCurd
+from deploy.curd.xtb_xtcs import XtbXtcsCurd
 from deploy.service.system.config.xtcs import SystemConfigXtcsService
 from deploy.schema.dao.csb_enum_key import CsbEnumKeyModel
 from deploy.schema.dao.csb_enum_value import CsbEnumValueModel
@@ -44,9 +45,13 @@ from deploy.utils.status_value import (StatusCode as status_code,
 from deploy.utils.converter import model_converter_dict, option_converter_dict, many_model_converter_dict
 from deploy.schema.dto.csb_enum_key import csb_ek_list_fields, csb_ek_detail_fields
 from deploy.schema.dto.csb_enum_value import csb_ev_list_fields, csb_ev_detail_fields, xtb_ev_download_fields
-from deploy.config import (redis_host, redis_port, redis_password, redis_db)
+from deploy.config import (redis_host, redis_port, redis_password, redis_db, redis_expire)
 from deploy.delib.redis_lib import RedisClientLib
 from deploy.utils.utils import format_redis_key, get_now, md5 as generator_md5, kebab_to_camel
+from deploy.utils.enumeration import XtbXtcsKEY
+
+
+_REDIS_EXPIRE_DEFAULT: int = redis_expire
 
 
 class SystemConfigDictService:
@@ -59,7 +64,7 @@ class SystemConfigDictService:
         self.redis_cli = RedisClientLib(host=redis_host, port=redis_port, db=redis_db, password=redis_password)
         self.csb_ek_curd: CsbEnumKeyCurd = CsbEnumKeyCurd()
         self.csb_ev_curd: CsbEnumValueCurd = CsbEnumValueCurd()
-        self.system_config_xtcs_service: SystemConfigXtcsService = SystemConfigXtcsService(db_connection=db_connection)
+        self.xtb_xtcs_curd: XtbXtcsCurd = XtbXtcsCurd()
 
     def __str__(self):
         return "SystemConfigDictService class."
@@ -117,6 +122,29 @@ class SystemConfigDictService:
         return (True, model if response_type == "model"
                         else await model_converter_dict(model=model, fields=fields, default_value="****"))
 
+    async def get_xtcs_redis_expire(self) -> int:
+        """获取系统参数设置的Rides缓存有效期"""
+        # redis
+        redis_key = format_redis_key(
+            key=XtbXtcsKEY.REDIS_CACHE_EXPIRE.value,
+            type_="xtcs",
+            xtcs_response="int"
+        )
+        if self.redis_cli.ping():
+            redis_value = self.redis_cli.get_key(key=redis_key)
+            if redis_value: return int(redis_value)
+        # 数据库
+        model = await self.xtb_xtcs_curd.get_by_key(db=self.db, key=XtbXtcsKEY.REDIS_CACHE_EXPIRE.value, filter_lock=True)
+        if model and getattr(model, "value", None):
+            if self.redis_cli.ping():
+                self.redis_cli.set_key(key=redis_key, value=getattr(model, "value"))
+            return int(getattr(model, "value"))
+        # 默认（单位：分钟）
+        __rv_expire: int = _REDIS_EXPIRE_DEFAULT * 60
+        if self.redis_cli.ping():
+            self.redis_cli.set_key(key=redis_key, value=__rv_expire)
+        return __rv_expire
+
     async def dict_value_by_name_money(
             self,
             name: str,
@@ -154,7 +182,7 @@ class SystemConfigDictService:
         else:
             __ev_value: List = await option_converter_dict(models=models, key_trans_int=key_trans_int, lock_view=True)
         if __ev_value and self.redis_cli.ping():
-            __redis_expire: int = await self.system_config_xtcs_service.get_xtcs_redis_expire() # 默认是秒
+            __redis_expire: int = await self.get_xtcs_redis_expire() # 默认是秒
             self.redis_cli.set_key(
                 key=__ev_redis_key,
                 value=json.dumps(__ev_value),
