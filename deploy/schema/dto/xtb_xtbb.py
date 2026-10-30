@@ -39,7 +39,9 @@ xtb_xtbb_list_fields: List = [
     {"key": "table", "type": ft.STR, "name": "table", "null": False},
     {"key": "md5", "type": ft.STR, "name": "md5", "null": False},
     {"key": "remark", "type": ft.STR, "name": "remark", "null": False},
-    {"key": "order_id", "type": ft.INT, "name": "orderId", "null": True}
+    {"key": "order_id", "type": ft.INT, "name": "orderId", "null": True},
+    {"key": "create_rtx", "type": ft.STR, "name": "createRtx", "null": True},
+    {"key": "create_time", "type": ft.DATETIME, "name": "createTime", "null": True}
 ]
 
 

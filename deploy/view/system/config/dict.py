@@ -186,7 +186,7 @@ async def de_get_by_name(
 
 @router.get('/dict/de.options', summary="DE>通过Key列表获取枚举值")
 async def de_get_by_names(
-    names: List[str] = Query(..., description="枚举Key名称"),
+    names: List[str] = Query(..., description="枚举Key名称列表"),
     token_rtx_id: str = Depends(depend_token_rtx),
     service: SystemConfigDictService = Depends(get_service)
 ) -> Status:

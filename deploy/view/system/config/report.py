@@ -129,14 +129,6 @@ async def field_column(
 # @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @
 
 
-@router.get("/report.field.enum", summary="字段列表-报表字段维护枚举值")
-async def field_enum(
-    token_rtx_id: str = Depends(depend_token_rtx),
-    service: SystemConfigReportService = Depends(get_service)
-) -> Status:
-    return await service.field_enum(rtx_id=token_rtx_id)
-
-
 @router.post("/report.field", summary="新增字段")
 async def field_add(
     params: Annotated[XtbXtbbFieldAddModel, Body()],

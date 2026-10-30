@@ -36,6 +36,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from deploy.curd.csb_enum_key import CsbEnumKeyCurd
 from deploy.curd.csb_enum_value import CsbEnumValueCurd
 from deploy.curd.xtb_xtcs import XtbXtcsCurd
+from deploy.service.system.config.report import SystemConfigReportService
 from deploy.schema.dao.csb_enum_key import CsbEnumKeyModel
 from deploy.schema.dao.csb_enum_value import CsbEnumValueModel
 from deploy.utils.status import Status, SuccessStatus, FailureStatus
@@ -44,10 +45,10 @@ from deploy.utils.status_value import (StatusCode as status_code,
 from deploy.utils.converter import model_converter_dict, option_converter_dict, many_model_converter_dict
 from deploy.schema.dto.csb_enum_key import csb_ek_list_fields, csb_ek_detail_fields
 from deploy.schema.dto.csb_enum_value import csb_ev_list_fields, csb_ev_detail_fields, xtb_ev_download_fields
-from deploy.config import (redis_host, redis_port, redis_password, redis_db, redis_expire)
+from deploy.config import (redis_host, redis_port, redis_password, redis_db, redis_expire, table_default_null as TABLE_DEFAULT_NULL)
 from deploy.delib.redis_lib import RedisClientLib
 from deploy.utils.utils import format_redis_key, get_now, md5 as generator_md5, kebab_to_camel
-from deploy.utils.enumeration import XtbXtcsKEY
+from deploy.utils.enumeration import XtbXtcsKEY, XtbReportKey
 
 
 _REDIS_EXPIRE_DEFAULT: int = redis_expire
@@ -64,6 +65,7 @@ class SystemConfigDictService:
         self.csb_ek_curd: CsbEnumKeyCurd = CsbEnumKeyCurd()
         self.csb_ev_curd: CsbEnumValueCurd = CsbEnumValueCurd()
         self.xtb_xtcs_curd: XtbXtcsCurd = XtbXtcsCurd()
+        self.system_main_report_service: SystemConfigReportService = SystemConfigReportService(db_connection=db_connection)
 
     def __str__(self):
         return "SystemConfigDictService class."
@@ -287,21 +289,29 @@ class SystemConfigDictService:
             name=params.get("content"),
             filter_lock=False
         )
+        _default_data = {
+            "list": [],
+            "page": params.get("page"),
+            "pageSize": params.get("limit"),
+            "total": 0
+        }
         if not models:
-            __data = {
-                "list": [],
-                "page": params.get("page"),
-                "pageSize": params.get("limit"),
-                "total": 0
-            }
-            return FailureStatus(code=status_code.CODE_101_SUCCESS_NO_DATA, data=__data)
+            return FailureStatus(code=status_code.CODE_101_SUCCESS_NO_DATA.value, data=_default_data)
+        fields: Dict = await self.system_main_report_service.report_column_by_xtbb(
+            rtx_id=rtx_id,
+            xtbb=XtbReportKey.SystemConfigDict.value,
+            type_="list",
+            is_md5=True
+        )
+        if not fields:
+            return FailureStatus(code=status_code.CODE_102_SUCCESS_NO_COLUMN.value, data=_default_data)
 
-        id_value: int = params.get("offset") + 1
         data: List = await many_model_converter_dict(
             models=models,
-            fields=csb_ev_list_fields,
-            auto_id=True,
-            auto_id_value=id_value
+            fields=fields.get("column"),
+            default_value=TABLE_DEFAULT_NULL,
+            auto_id=fields.get("id_auto"),
+            auto_id_value=params.get("offset") + 1
         )
         result: Dict = {
             "list": data,
