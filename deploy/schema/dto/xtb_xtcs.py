@@ -40,7 +40,9 @@ xtb_xtcs_list_fields: List = [
     {"key": "remark", "type": ft.STR, "name": "remark", "null": False},
     {"key": "value", "type": ft.STR, "name": "value", "null": False},
     {"key": "lock", "type": ft.BOOL, "name": "lock", "null": True},
-    {"key": "order_id", "type": ft.INT, "name": "orderId", "null": True}
+    {"key": "order_id", "type": ft.INT, "name": "orderId", "null": True},
+    {"key": "create_rtx", "type": ft.STR, "name": "createRtx", "null": True},
+    {"key": "create_time", "type": ft.DATETIME, "name": "createTime", "null": True}
 ]
 
 

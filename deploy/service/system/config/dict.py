@@ -36,7 +36,6 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from deploy.curd.csb_enum_key import CsbEnumKeyCurd
 from deploy.curd.csb_enum_value import CsbEnumValueCurd
 from deploy.curd.xtb_xtcs import XtbXtcsCurd
-from deploy.service.system.config.xtcs import SystemConfigXtcsService
 from deploy.schema.dao.csb_enum_key import CsbEnumKeyModel
 from deploy.schema.dao.csb_enum_value import CsbEnumValueModel
 from deploy.utils.status import Status, SuccessStatus, FailureStatus

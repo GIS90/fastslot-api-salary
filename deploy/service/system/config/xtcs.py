@@ -35,6 +35,7 @@ from typing import Dict, List, Tuple, Literal, Any, Union
 from sqlalchemy.ext.asyncio import AsyncSession
 from deploy.curd.xtb_xtcs import XtbXtcsCurd
 from deploy.schema.dao.xtb_xtcs import XtbXtcsModel
+from deploy.service.system.config.report import SystemConfigReportService
 from deploy.utils.status import Status, SuccessStatus, FailureStatus
 from deploy.utils.status_value import (StatusCode as status_code,
                                        StatusMsg as status_msg)
@@ -42,9 +43,11 @@ from deploy.utils.converter import model_converter_dict, many_model_converter_di
 from deploy.schema.dto.xtb_xtcs import (xtb_xtcs_list_fields, xtb_xtcs_detail_fields,
                                         xtb_xtcs_view_fields, xtb_xtcs_download_fields)
 from deploy.utils.utils import get_now, md5 as generator_md5, d2s, format_redis_key
-from deploy.config import (redis_host, redis_port, redis_password, redis_db)
+from deploy.config import (
+    redis_host, redis_port, redis_password, redis_db, 
+    table_default_null as TABLE_DEFAULT_NULL)
 from deploy.delib.redis_lib import RedisClientLib
-from deploy.utils.enumeration import XtbXtcsKEY
+from deploy.utils.enumeration import XtbXtcsKEY, XtbReportKey
 
 
 class SystemConfigXtcsService:
@@ -56,6 +59,8 @@ class SystemConfigXtcsService:
         self.db: AsyncSession = db_connection
         self.xtb_xtcs_curd: XtbXtcsCurd = XtbXtcsCurd()
         self.redis_cli = RedisClientLib(host=redis_host, port=redis_port, db=redis_db, password=redis_password)
+        self.system_main_report_service: SystemConfigReportService = SystemConfigReportService(db_connection=db_connection)
+
         self.XTCS_INT_LIST = [
             XtbXtcsKEY.REDIS_CACHE_EXPIRE.value
         ]
@@ -102,21 +107,29 @@ class SystemConfigXtcsService:
             limit=params.get("limit"),
             content=params.get("content")
         )
+        _default_data = {
+            "list": [],
+            "page": params.get("page"),
+            "pageSize": params.get("limit"),
+            "total": 0
+        }
         if not models:
-            __data = {
-                "list": [],
-                "page": params.get("page"),
-                "pageSize": params.get("limit"),
-                "total": 0
-            }
-            return FailureStatus(code=status_code.CODE_101_SUCCESS_NO_DATA, data=__data)
+            return FailureStatus(code=status_code.CODE_101_SUCCESS_NO_DATA.value, data=_default_data)
+        fields: Dict = await self.system_main_report_service.report_column_by_xtbb(
+            rtx_id=rtx_id,
+            xtbb=XtbReportKey.SystemConfigXtcs.value,
+            type_="list",
+            is_md5=True
+        )
+        if not fields:
+            return FailureStatus(code=status_code.CODE_102_SUCCESS_NO_COLUMN.value, data=_default_data)
 
-        id_value: int = params.get("offset") + 1
         data: List = await many_model_converter_dict(
             models=models,
-            fields=xtb_xtcs_list_fields,
-            auto_id=True,
-            auto_id_value=id_value
+            fields=fields.get("column"),
+            default_value=TABLE_DEFAULT_NULL,
+            auto_id=fields.get("id_auto"),
+            auto_id_value=params.get("offset") + 1
         )
         result: Dict = {
             "list": data,

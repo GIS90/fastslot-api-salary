@@ -252,3 +252,4 @@ class XtbReportKey(StrEnum):
     SystemMainUser = "SystemMainUser"
     SystemMainRole = "SystemMainRole"
     SystemMainMenu = "SystemMainMenu"
+    SystemConfigXtcs = "SystemConfigXtcs"

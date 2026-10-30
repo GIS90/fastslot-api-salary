@@ -148,7 +148,7 @@ class XtbXtbbFieldCurd(BaseCurd):
                 XtbXtbbFieldModel.xtbb == xtbb
             ))
             stmt = stmt.where(XtbXtbbFieldModel.list == True) if list_ else stmt.where(XtbXtbbFieldModel.export == True)
-            stmt.order_by(asc(XtbXtbbFieldModel.order_id), asc(XtbXtbbFieldModel.create_time))
+            stmt = stmt.order_by(asc(XtbXtbbFieldModel.order_id), asc(XtbXtbbFieldModel.create_time))
             result = await db.execute(stmt)
             return result.scalars().all()
         except Exception as e:
