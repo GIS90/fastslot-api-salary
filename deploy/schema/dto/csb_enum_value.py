@@ -41,7 +41,9 @@ csb_ev_list_fields: List = [
     {"key": "value", "type": ft.STR, "name": "value", "null": False},
     {"key": "remark", "type": ft.STR, "name": "remark", "null": False},
     {"key": "lock", "type": ft.BOOL, "name": "status", "null": True},
-    {"key": "order_id", "type": ft.INT, "name": "orderId", "null": True}
+    {"key": "order_id", "type": ft.INT, "name": "orderId", "null": True},
+    {"key": "create_rtx", "type": ft.STR, "name": "createRtx", "null": True},
+    {"key": "create_time", "type": ft.DATETIME, "name": "createTime", "null": True}
 ]
 
 
