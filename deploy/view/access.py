@@ -129,6 +129,8 @@ async def login(
             "userInfo": {
                 "rtxId": model.get("rtxId"),
                 "userName": model.get("name"),
+                "phone": model.get("phone"),
+                "email": model.get("email"),
                 "avatar": model.get("avatar"),
                 "sex": model.get("sex"),
                 "role": model.get("role"),
