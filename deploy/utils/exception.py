@@ -37,7 +37,8 @@ from sqlalchemy.exc import SQLAlchemyError
 __all__ = [
     "JwtCredentialsException",
     "UserInvalidException",
-    "SQLDBHandleException"
+    "ReportNotColumnException",
+    "SQLDBHandleException",
 ]
 
 
@@ -77,6 +78,16 @@ class UserInvalidException(__FSBaseException):
     """
     def report(self) -> str:
         return f"UserInvalidException: {self.detail}"
+
+
+class ReportNotColumnException(__FSBaseException):
+    """
+    报表导出无列字段异常
+    - 不存在
+    - 已注销
+    """
+    def report(self) -> str:
+        return f"ReportNotColumnException: 导出报表数据{self.detail}"
 
 
 class SQLDBHandleException(SQLAlchemyError):

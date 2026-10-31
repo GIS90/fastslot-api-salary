@@ -54,6 +54,7 @@ from deploy.config import server_user, server_password, server_avatar, table_def
 from deploy.utils.enumeration import XtbXtcsKEY, CsbEnumKEY, FileTypeEnum, XtbReportKey
 from deploy.utils.upload import uploadUtils
 from deploy.delib.excel_lib import ExcelLib
+from deploy.utils.exception import ReportNotColumnException
 
 
 _SERVER_USER_ADMIN: str = server_user
@@ -327,14 +328,21 @@ class SystemMainUserService:
             else FailureStatus(code=status_code.CODE_508_DATA_PART_DELETE,
                                message=f"总数{request_count}，成功删除{query_count}，查询失败{request_count - query_count}")
 
-    async def download(self, params: dict) -> List:
+    async def download(self, rtx_id: str, params: dict) -> List:
         models = await self.xtb_user_curd.download(db=self.db, params=params)
-        data: List = list()
-        data.extend(
-            filter(
-                lambda x: x is not None and x is not {},
-                [await model_converter_dict(model=u, fields=xtb_user_download_fields) for u in models if u]
-            )
+        fields: Dict = await self.system_main_report_service.report_column_by_xtbb(
+            rtx_id=rtx_id,
+            xtbb=XtbReportKey.SystemMainUser.value,
+            type_="export"
+        )
+        if not fields:
+            raise ReportNotColumnException(detail="[系统表-用户表]未配置导出表头")
+        data: List = await many_model_converter_dict(
+            models=models,
+            fields=fields.get("column"),
+            default_value=TABLE_DEFAULT_NULL,
+            auto_id=fields.get("id_auto"),
+            auto_id_value=1
         )
         return data
 

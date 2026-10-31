@@ -395,7 +395,7 @@ class SystemConfigReportService:
             if not model: continue
             _d: Dict = dict()
             _d["key"] = getattr(model, "field", "")
-            _d["name"] = getattr(model, "name_zh", "")
+            _d["name"] = getattr(model, "name_zh", "") if type_ == "list" else getattr(model, "name_ch", "")
             _d["type"] = getattr(model, f"{type_}_type", "")
             _d["null"] = getattr(model, "null", "")
             column.append(_d)

@@ -136,7 +136,7 @@ class ApiDownloadService(object):
             match api:
                 case "SystemMainUser":
                     # 系统>权限>用户管理
-                    __res = await self.system_main_user_service.download(params=new_params)
+                    __res = await self.system_main_user_service.download(rtx_id=rtx_id, params=new_params)
                 case "SystemMainRole":
                     # 系统>权限>角色管理
                     __res = await self.system_main_role_service.download(params=new_params)
