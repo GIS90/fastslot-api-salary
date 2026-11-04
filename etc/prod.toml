@@ -93,5 +93,5 @@ width = 700
 [table]
 selection_width = 100
 default_null = "-"
-
+default_db_id = "id"
 

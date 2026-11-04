@@ -138,6 +138,7 @@ async def many_model_converter_dict(
         fields: List[Dict] = None,
         default_value: str = "-",
         auto_id: bool = True,
+        auto_id_name: str = "id",
         auto_id_value: int = 1,
         *args,
         **kwargs
@@ -159,7 +160,7 @@ async def many_model_converter_dict(
                 default_value=default_value
             )
             if not model_dict: continue
-            model_dict["id"] = auto_id_value
+            model_dict[auto_id_name] = auto_id_value
             auto_id_value += 1
             _model_list.append(model_dict)
         else:

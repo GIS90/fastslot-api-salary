@@ -45,7 +45,7 @@ from datetime import datetime, timedelta
 from pathlib import Path, PurePath
 from fastapi.exceptions import RequestValidationError
 from deploy.utils.enumeration import FileTypeEnum
-from deploy.config import store_cache as STORE_CACHE
+from deploy.config import store_cache as STORE_CACHE, table_default_db_id as TABLE_DEFAULT_DB_ID
 
 """ - - - - - - - - - - - - - - - - - 加密类 - - - - - - - - - - - - - - - - -"""
 
@@ -575,6 +575,18 @@ def list_dict_find(options: List[Dict], key: str, value: Any) -> Union[Dict, Non
     字典列表查找
     """
     return next((item for item in options if item.get(key) == value), None)
+
+
+def xtbb_field_id_value(options: List[Dict]) -> Any:
+    """
+    报表字段查字段ID对应的值
+    """
+    for option in options:
+        if not option: continue
+        for _, v in option.items():
+            if v == TABLE_DEFAULT_DB_ID:
+                return option.get("name")
+    return None
 
 
 def cut_string(content: str, length: Optional[int]) -> str:
