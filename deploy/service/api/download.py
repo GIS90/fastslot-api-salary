@@ -142,7 +142,7 @@ class ApiDownloadService(object):
                     __res = await self.system_main_role_service.download(rtx_id=rtx_id, params=new_params)
                 case "SystemConfigXtcs":
                     # 系统>配置>系统参数
-                    __res = await self.system_config_xtcs_service.download(params=new_params)
+                    __res = await self.system_config_xtcs_service.download(rtx_id=rtx_id, params=new_params)
                 case "SystemOpsDict":
                     # 系统>系统维护>数据字典
                     __res = await self.system_config_csb_enum_v_service.download(params=new_params)

@@ -34,24 +34,12 @@ from typing import List
 from deploy.utils.enumeration import FieldTypeEnum as ft
 
 
-xtb_xtcs_list_fields: List = [
+xtb_xtcs_detail_fields: List = [
     {"key": "key", "type": ft.STR, "name": "key", "null": False},
     {"key": "md5", "type": ft.STR, "name": "md5", "null": False},
     {"key": "remark", "type": ft.STR, "name": "remark", "null": False},
     {"key": "value", "type": ft.STR, "name": "value", "null": False},
-    {"key": "lock", "type": ft.BOOL, "name": "lock", "null": True},
     {"key": "order_id", "type": ft.INT, "name": "orderId", "null": True},
-    {"key": "create_rtx", "type": ft.STR, "name": "createRtx", "null": True},
-    {"key": "create_time", "type": ft.DATETIME, "name": "createTime", "null": True}
-]
-
-
-xtb_xtcs_detail_fields: List = [
-    {"key": "key"},
-    {"key": "md5"},
-    {"key": "remark"},
-    {"key": "value"},
-    {"key": "order_id", "type": ft.INT, "name": "orderId", "null": True}
 ]
 
 
@@ -65,16 +53,4 @@ xtb_xtcs_view_fields: List = [
     {"key": "update_rtx", "type": ft.STR, "name": "updateRtx", "null": True},
     {"key": "update_time", "type": ft.DATETIME, "name": "updateTime", "null": True},
     {"key": "order_id", "type": ft.INT, "name": "orderId", "null": True}
-]
-
-xtb_xtcs_download_fields: List =  [
-    {"key": "id", "type": ft.INT, "name": "序号", "null": True},
-    {"key": "key", "type": ft.STR, "name": "参数名称", "null": False},
-    {"key": "remark", "type": ft.STR, "name": "参数说明", "null": False},
-    {"key": "value", "type": ft.STR, "name": "参数值", "null": False},
-    {"key": "lock", "type": ft.LOCK_TEXT, "name": "状态", "null": True},
-    {"key": "create_rtx", "type": ft.STR, "name": "创建人", "null": True},
-    {"key": "create_time", "type": ft.DATETIME, "name": "创建时间", "null": True},
-    {"key": "update_rtx", "type": ft.STR, "name": "更新人", "null": True},
-    {"key": "update_time", "type": ft.DATETIME, "name": "更新时间", "null": True}
 ]
