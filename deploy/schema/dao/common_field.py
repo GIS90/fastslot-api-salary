@@ -50,6 +50,10 @@ class RtxIdField:
     rtx_id: Mapped[str] = mapped_column(name="rtx_id", type_=String(35), nullable=False, comment="数据用户RTX-ID唯一标识，有英文+数字组成")
 
 
+class CRtxIdField:
+    create_rtx: Mapped[str] = mapped_column(name="create_rtx", type_=String(35), nullable=False, comment="创建用户RTX-ID")
+
+
 class Md5Field:
     md5: Mapped[str] = mapped_column(name="md5", type_=String(64), unique=True, nullable=False, comment="数据唯一标识：MD5-ID")
 
@@ -74,6 +78,7 @@ class RcUDField:
 
 class LockField:
     lock: Mapped[bool] = mapped_column(name="lock", type_=Boolean(), default=False, comment="锁定状态：1锁定；0非锁定")
+
 
 class StatusField:
     status: Mapped[bool] = mapped_column(name="status", type_=Boolean(), default=False, comment="数据状态：1注销/删除；0启用/正常（默认）")

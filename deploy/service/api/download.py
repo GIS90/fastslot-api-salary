@@ -153,7 +153,7 @@ class ApiDownloadService(object):
                     __res = await self.system_config_csb_enum_v_service.download(rtx_id=rtx_id, params=new_params)
                 case "SystemOpsLog":
                     # 系统>维护>系统日志
-                    __res = await self.system_ops_log_service.download(params=new_params)
+                    __res = await self.system_ops_log_service.download(rtx_id=rtx_id, params=new_params)
                 case "SystemOpsTask":
                     # 系统>维护>任务中心
                     __res = await self.system_ops_task_service.download(params=new_params)

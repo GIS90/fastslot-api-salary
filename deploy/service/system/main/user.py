@@ -87,7 +87,7 @@ class SystemMainUserService:
         self.system_main_role_service: SystemMainRoleService = SystemMainRoleService(
             db_connection=db_connection
         )
-        self.system_main_report_service: SystemConfigReportService = (
+        self.system_config_report_service: SystemConfigReportService = (
             SystemConfigReportService(db_connection=db_connection)
         )
         self.upload_utils: uploadUtils = uploadUtils()
@@ -157,7 +157,7 @@ class SystemMainUserService:
             return FailureStatus(
                 code=status_code.CODE_101_SUCCESS_NO_DATA.value, data=_default_data
             )
-        fields: Dict = await self.system_main_report_service.report_column_by_xtbb(
+        fields: Dict = await self.system_config_report_service.report_column_by_xtbb(
             rtx_id=rtx_id,
             xtbb=XtbReportKey.SystemMainUser.value,
             type_="list",
@@ -173,7 +173,7 @@ class SystemMainUserService:
             fields=fields.get("column"),
             default_value=TABLE_DEFAULT_NULL,
             auto_id=fields.get("id_auto"),
-            auto_id_value=params.get("offset") + 1,
+            auto_id_value=params.get("offset") + 1
         )
         result: Dict = {
             "list": data,
@@ -414,7 +414,7 @@ class SystemMainUserService:
 
     async def download(self, rtx_id: str, params: dict) -> List:
         models = await self.xtb_user_curd.download(db=self.db, params=params)
-        fields: Dict = await self.system_main_report_service.report_column_by_xtbb(
+        fields: Dict = await self.system_config_report_service.report_column_by_xtbb(
             rtx_id=rtx_id,
             xtbb=XtbReportKey.SystemMainUser.value,
             type_="export",
@@ -430,7 +430,7 @@ class SystemMainUserService:
             default_value=TABLE_DEFAULT_NULL,
             auto_id=fields.get("id_auto"),
             auto_id_name=__auto_id_name if __auto_id_name else TABLE_DEFAULT_DB_ID,
-            auto_id_value=1,
+            auto_id_value=1
         )
 
         return data

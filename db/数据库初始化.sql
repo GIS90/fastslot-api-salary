@@ -49,7 +49,6 @@ DROP TABLES IF EXISTS `xtb_request`;
 CREATE TABLE `xtb_request`  (
     `id` bigint NOT NULL AUTO_INCREMENT COMMENT '主键，自增ID',
     `md5` varchar(64) NOT NULL unique COMMENT '数据唯一标识：MD5-ID',
-    `rtx_id` varchar(35) COMMENT '请求访问用户RTX-ID',
     `ip` varchar(15) COMMENT '用户请求IP',
     `method` varchar(10) COMMENT '请求方法',
     `params` varchar(100) COMMENT '请求参数',
@@ -58,6 +57,7 @@ CREATE TABLE `xtb_request`  (
     `host_url` varchar(100) COMMENT '请求HOST',
     `url` varchar(255) COMMENT '请求全路径',
     `cost` decimal(10, 4) COMMENT '运行时间',
+    `create_rtx` varchar(35) COMMENT '请求访问用户RTX-ID',
     `create_time` datetime default CURRENT_TIMESTAMP COMMENT '创建时间',
     `create_date` date not null COMMENT '创建日期',
     `delete_rtx` varchar(35) COMMENT '删除用户RTX-ID',

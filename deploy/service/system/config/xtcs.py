@@ -59,7 +59,7 @@ class SystemConfigXtcsService:
         self.db: AsyncSession = db_connection
         self.xtb_xtcs_curd: XtbXtcsCurd = XtbXtcsCurd()
         self.redis_cli = RedisClientLib(host=redis_host, port=redis_port, db=redis_db, password=redis_password)
-        self.system_main_report_service: SystemConfigReportService = SystemConfigReportService(db_connection=db_connection)
+        self.system_config_report_service: SystemConfigReportService = SystemConfigReportService(db_connection=db_connection)
 
         self.XTCS_INT_LIST = [
             XtbXtcsKEY.REDIS_CACHE_EXPIRE.value
@@ -115,7 +115,7 @@ class SystemConfigXtcsService:
         }
         if not models:
             return FailureStatus(code=status_code.CODE_101_SUCCESS_NO_DATA.value, data=_default_data)
-        fields: Dict = await self.system_main_report_service.report_column_by_xtbb(
+        fields: Dict = await self.system_config_report_service.report_column_by_xtbb(
             rtx_id=rtx_id,
             xtbb=XtbReportKey.SystemConfigXtcs.value,
             type_="list",
@@ -259,7 +259,7 @@ class SystemConfigXtcsService:
 
     async def download(self, rtx_id: str, params: dict) -> List:
         models = await self.xtb_xtcs_curd.download(db=self.db, params=params)
-        fields: Dict = await self.system_main_report_service.report_column_by_xtbb(
+        fields: Dict = await self.system_config_report_service.report_column_by_xtbb(
             rtx_id=rtx_id,
             xtbb=XtbReportKey.SystemConfigXtcs.value,
             type_="export",

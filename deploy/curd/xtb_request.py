@@ -78,11 +78,11 @@ class XtbRequestCurd(BaseCurd):
         try:
             stmt = select(func.count(XtbRequestModel.id)).where(XtbRequestModel.status != 1)
             if rtx_id:
-                stmt = stmt.where(XtbRequestModel.rtx_id == rtx_id)
+                stmt = stmt.where(XtbRequestModel.create_rtx == rtx_id)
             if filter_.get("method"):
                 stmt = stmt.where(XtbRequestModel.method.in_(filter_.get("method")))
             if filter_.get("user"):
-                stmt = stmt.where(XtbRequestModel.rtx_id.in_(filter_.get("user")))
+                stmt = stmt.where(XtbRequestModel.create_rtx.in_(filter_.get("user")))
             if filter_.get("content"):
                 stmt = stmt.where(XtbRequestModel.url.like(f"%{filter_.get('content')}%"))
             if filter_.get("dateRange"):
@@ -114,11 +114,11 @@ class XtbRequestCurd(BaseCurd):
         try:
             stmt = select(XtbRequestModel).where(XtbRequestModel.status != 1)
             if rtx_id:
-                stmt = stmt.where(XtbRequestModel.rtx_id == rtx_id)
+                stmt = stmt.where(XtbRequestModel.create_rtx == rtx_id)
             if filter_.get("method"):
                 stmt = stmt.where(XtbRequestModel.method.in_(filter_.get("method")))
             if filter_.get("user"):
-                stmt = stmt.where(XtbRequestModel.rtx_id.in_(filter_.get("user")))
+                stmt = stmt.where(XtbRequestModel.create_rtx.in_(filter_.get("user")))
             if filter_.get("content"):
                 stmt = stmt.where(XtbRequestModel.url.like(f"%{filter_.get('content')}%"))
             if filter_.get("dateRange"):

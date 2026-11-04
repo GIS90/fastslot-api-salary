@@ -44,14 +44,14 @@ from sqlalchemy import (
 )
 from sqlalchemy.orm import Mapped, mapped_column
 from deploy.schema._dao_base_model import baseModel
-from .common_field import IDField, RtxIdField, Md5Field, StatusField
+from .common_field import IDField, CRtxIdField, Md5Field, StatusField
 from typing import Optional
 
 
 __all__ = ["XtbRequestModel"]
 
 
-class XtbRequestModel(baseModel, IDField, RtxIdField, Md5Field, StatusField):
+class XtbRequestModel(baseModel, IDField, CRtxIdField, Md5Field, StatusField):
     __tablename__ = 'xtb_request'
     __table_args__ = ({'comment': '系统表-请求表'})
 

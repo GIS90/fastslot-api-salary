@@ -57,7 +57,7 @@ class SystemMainRoleService:
         self.db: AsyncSession = db_connection
         self.xtb_role_curd: XtbRoleCurd = XtbRoleCurd()
         self.xtb_menu_curd: XtbMenuCurd = XtbMenuCurd()
-        self.system_main_report_service: SystemConfigReportService = SystemConfigReportService(db_connection=db_connection)
+        self.system_config_report_service: SystemConfigReportService = SystemConfigReportService(db_connection=db_connection)
 
     def __str__(self):
         return "SystemMainRoleService class."
@@ -104,7 +104,7 @@ class SystemMainRoleService:
         }
         if not models:
             return FailureStatus(code=status_code.CODE_101_SUCCESS_NO_DATA.value, data=_default_data)
-        fields: Dict = await self.system_main_report_service.report_column_by_xtbb(
+        fields: Dict = await self.system_config_report_service.report_column_by_xtbb(
             rtx_id=rtx_id,
             xtbb=XtbReportKey.SystemMainRole.value,
             type_="list",
@@ -247,7 +247,7 @@ class SystemMainRoleService:
 
     async def download(self, rtx_id: str, params: dict) -> List:
         models = await self.xtb_role_curd.download(db=self.db, params=params)
-        fields: Dict = await self.system_main_report_service.report_column_by_xtbb(
+        fields: Dict = await self.system_config_report_service.report_column_by_xtbb(
             rtx_id=rtx_id,
             xtbb=XtbReportKey.SystemMainRole.value,
             type_="export",

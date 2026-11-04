@@ -75,7 +75,7 @@ class SystemConfigDictService:
         self.csb_ek_curd: CsbEnumKeyCurd = CsbEnumKeyCurd()
         self.csb_ev_curd: CsbEnumValueCurd = CsbEnumValueCurd()
         self.xtb_xtcs_curd: XtbXtcsCurd = XtbXtcsCurd()
-        self.system_main_report_service: SystemConfigReportService = SystemConfigReportService(db_connection=db_connection)
+        self.system_config_report_service: SystemConfigReportService = SystemConfigReportService(db_connection=db_connection)
 
     def __str__(self):
         return "SystemConfigDictService class."
@@ -307,7 +307,7 @@ class SystemConfigDictService:
         }
         if not models:
             return FailureStatus(code=status_code.CODE_101_SUCCESS_NO_DATA.value, data=_default_data)
-        fields: Dict = await self.system_main_report_service.report_column_by_xtbb(
+        fields: Dict = await self.system_config_report_service.report_column_by_xtbb(
             rtx_id=rtx_id,
             xtbb=XtbReportKey.SystemConfigDict.value,
             type_="list",
@@ -427,7 +427,7 @@ class SystemConfigDictService:
 
     async def download(self, rtx_id: str, params: dict) -> List:
         models = await self.csb_ev_curd.download(db=self.db, params=params)
-        fields: Dict = await self.system_main_report_service.report_column_by_xtbb(
+        fields: Dict = await self.system_config_report_service.report_column_by_xtbb(
             rtx_id=rtx_id,
             xtbb=XtbReportKey.SystemConfigDict.value,
             type_="export",
