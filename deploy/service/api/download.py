@@ -139,7 +139,7 @@ class ApiDownloadService(object):
                     __res = await self.system_main_user_service.download(rtx_id=rtx_id, params=new_params)
                 case "SystemMainRole":
                     # 系统>权限>角色管理
-                    __res = await self.system_main_role_service.download(params=new_params)
+                    __res = await self.system_main_role_service.download(rtx_id=rtx_id, params=new_params)
                 case "SystemConfigXtcs":
                     # 系统>配置>系统参数
                     __res = await self.system_config_xtcs_service.download(params=new_params)

@@ -34,43 +34,15 @@ from typing import List
 from deploy.utils.enumeration import FieldTypeEnum as ft
 
 
-xtb_role_list_fields: List = [
-    {"key": "md5", "type": ft.STR, "name": "md5", "null": False},
+xtb_role_detail_fields: List = [
+   {"key": "md5", "type": ft.STR, "name": "md5", "null": False},
     {"key": "engname", "type": ft.STR, "name": "engname", "null": False},
     {"key": "chnname", "type": ft.STR, "name": "chnname", "null": False},
     {"key": "introduction", "type": ft.STR, "name": "introduction", "null": True},
-    {"key": "order_id", "type": ft.INT, "name": "orderId", "null": True},
-    {"key": "create_rtx", "type": ft.STR, "name": "createRtx", "null": True},
-    {"key": "create_time", "type": ft.DATETIME, "name": "createTime", "null": True}
-]
-
-
-xtb_role_detail_fields: List = [
-    {"key": "md5"},
-    {"key": "engname"},
-    {"key": "chnname"},
-    {"key": "introduction"},
     {"key": "order_id", "type": ft.INT, "name": "orderId", "null": True},
     # {"key": "create_rtx", "type": ft.STR, "name": "createRtx", "null": True},
     # {"key": "create_time", "type": ft.DATETIME, "name": "createTime", "null": True},
     # {"key": "update_rtx", "type": ft.STR, "name": "updateRtx", "null": True},
     # {"key": "update_time", "type": ft.DATETIME, "name": "updateTime", "null": True}
-]
-
-
-xtb_role_authority_fields: List = [
-    {"key": "md5"},
-    {"key": "authority", "type": ft.SPLITLIST, "name": "authority", "null": True},
-]
-
-
-xtb_role_download_fields: List = [
-    {"key": "id", "type": ft.INT, "name": "序号", "null": True},
-    {"key": "engname", "type": ft.STR, "name": "角色ID", "null": False},
-    {"key": "chnname", "type": ft.STR, "name": "角色名称", "null": False},
-    {"key": "introduction", "type": ft.STR, "name": "角色介绍", "null": True},
-    {"key": "order_id", "type": ft.INT, "name": "排序ID", "null": True},
-    {"key": "create_rtx", "type": ft.STR, "name": "创建人", "null": True},
-    {"key": "create_time", "type": ft.DATETIME, "name": "创建时间", "null": True}
 ]
 

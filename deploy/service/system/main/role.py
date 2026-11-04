@@ -41,10 +41,11 @@ from deploy.utils.status import Status, SuccessStatus, FailureStatus
 from deploy.utils.status_value import (StatusCode as status_code,
                                        StatusMsg as status_msg)
 from deploy.utils.converter import model_converter_dict, many_model_converter_dict, menu_converter_dict
-from deploy.schema.dto.xtb_role import xtb_role_list_fields, xtb_role_download_fields
-from deploy.utils.utils import get_now, d2s, md5 as generator_md5, build_menu_tree_iterative
-from deploy.config import server_role as SERVER_ROLE_ADMIN, menu_root as MENU_ROOT_ID, table_default_null as TABLE_DEFAULT_NULL
+from deploy.schema.dto.xtb_role import xtb_role_detail_fields
+from deploy.utils.utils import get_now, d2s, md5 as generator_md5, build_menu_tree_iterative, xtbb_field_id_value
+from deploy.config import server_role as SERVER_ROLE_ADMIN, menu_root as MENU_ROOT_ID, table_default_null as TABLE_DEFAULT_NULL, table_default_db_id as TABLE_DEFAULT_DB_ID
 from deploy.utils.enumeration import XtbReportKey
+from deploy.utils.exception import ReportNotColumnException
 
 
 class SystemMainRoleService:
@@ -69,7 +70,7 @@ class SystemMainRoleService:
             md5_id: str,
             status_check: bool = True,
             response_type: Literal["dict", "model"] = "model",
-            fields: List | None = xtb_role_list_fields,
+            fields: List | None = xtb_role_detail_fields,
             admin_check: bool = False
     ) -> Tuple[bool, Any]:
         if not md5_id:
@@ -132,7 +133,7 @@ class SystemMainRoleService:
             md5_id=md5,
             status_check=False,
             response_type="dict",
-            fields=xtb_role_list_fields,
+            fields=xtb_role_detail_fields,
             admin_check=False
         )
         return SuccessStatus(data=data) if __flag else data
@@ -244,16 +245,27 @@ class SystemMainRoleService:
             else FailureStatus(code=status_code.CODE_508_DATA_PART_DELETE,
                                message=f"总数{request_count}，成功删除{query_count}，查询失败{request_count - query_count}")
 
-    async def download(self, params: dict) -> List:
+    async def download(self, rtx_id: str, params: dict) -> List:
         models = await self.xtb_role_curd.download(db=self.db, params=params)
-        data: List = list()
-        _id = 1
-        for u in models:
-            if not u: continue
-            _d = await model_converter_dict(model=u, fields=xtb_role_download_fields)
-            _d["序号"] = _id
-            _id +=  1
-            data.append(_d)
+        fields: Dict = await self.system_main_report_service.report_column_by_xtbb(
+            rtx_id=rtx_id,
+            xtbb=XtbReportKey.SystemMainRole.value,
+            type_="export",
+            is_md5=False,
+        )
+        if not fields:
+            raise ReportNotColumnException(detail="[系统表-用户表]未配置导出表头")
+
+        __auto_id_name: Any = xtbb_field_id_value(options=fields.get("column"))
+        data: List = await many_model_converter_dict(
+            models=models,
+            fields=fields.get("column"),
+            default_value=TABLE_DEFAULT_NULL,
+            auto_id=fields.get("id_auto"),
+            auto_id_name=__auto_id_name if __auto_id_name else TABLE_DEFAULT_DB_ID,
+            auto_id_value=1,
+        )
+
         return data
 
     async def auth(self, rtx_id: str, md5: str) -> Status:
