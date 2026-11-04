@@ -73,6 +73,7 @@ class __XtbXtbbFieldBaseModel(baseModel):
     id_auto: bool = Field(default=True, description="ID自增：1自增；0非自增", alias="idAuto")
     extend: bool = Field(default=False, description="扩展字段：1扩展字段；0非扩展字段", alias="extend")
     filter: str | None = Field(default=None, description="字段筛选字段内容", alias="filter")
+    sortable: bool = Field(default=False, description="排序字段：1支持；0不支持，默认不支持排序", alias="sortable")
     order_id: int | None = Field(default=None, description="排序ID", alias="orderId")
 
 

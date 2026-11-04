@@ -53,6 +53,7 @@ xtb_xtbb_field_list_fields: List = [
     {"key": "id_auto", "type": ft.BOOL, "name": "idAuto", "null": True},
     {"key": "extend", "type": ft.BOOL, "name": "extend", "null": True},
     {"key": "filter", "type": ft.STR, "name": "filter", "null": True},
+    {"key": "sortable", "type": ft.BOOL, "name": "sortable", "null": True},
     {"key": "order_id", "type": ft.INT, "name": "orderId", "null": True},
 ]
 
@@ -76,6 +77,7 @@ xtb_xtbb_field_detail_fields: List = [
     {"key": "id_auto", "type": ft.BOOL, "name": "idAuto", "null": True},
     {"key": "extend", "type": ft.BOOL, "name": "extend", "null": True},
     {"key": "filter"},
+    {"key": "sortable", "type": ft.BOOL, "name": "sortable", "null": True},
     {"key": "order_id", "type": ft.INT, "name": "orderId", "null": True},
 ]
 
@@ -99,6 +101,7 @@ xtb_xtbb_field_view_fields: List = [
     {"key": "id_auto", "type": ft.BOOL, "name": "idAuto", "null": True},
     {"key": "extend", "type": ft.BOOL, "name": "extend", "null": True},
     {"key": "filter"},
+    {"key": "sortable", "type": ft.BOOL, "name": "sortable", "null": True},
     {"key": "order_id", "type": ft.INT, "name": "orderId", "null": True},
     {"key": "create_rtx", "type": ft.STR, "name": "createRtx", "null": True},
     {"key": "create_time", "type": ft.DATETIME, "name": "createTime", "null": True},

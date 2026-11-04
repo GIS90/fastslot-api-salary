@@ -548,6 +548,7 @@ CREATE TABLE `xtb_xtbb_field`  (
     `export_type` varchar(35) NOT NULL COMMENT 'Export字段类型',
     `null` bool default True COMMENT '空值：1允许；0不允许（主要涉及系统数据展示、数据导出）',
     `id_auto` bool default False COMMENT 'ID自增：1自增；0非自增，只对ID字段生效，默认非自增',
+    `sortable` bool default False COMMENT '排序字段：1支持；0不支持，默认不支持排序',
     `extend` bool default False COMMENT '扩展字段：1扩展字段；0非扩展字段，拓展字段只对表头字段有效，默认非扩展字段',
     `filter` text COMMENT '字段筛选字段内容，主要是select、radio、checkbox',
     `create_rtx` varchar(35) COMMENT '创建用户RTX-ID',
