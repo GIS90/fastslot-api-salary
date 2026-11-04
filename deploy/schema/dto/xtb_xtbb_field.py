@@ -80,31 +80,3 @@ xtb_xtbb_field_detail_fields: List = [
     {"key": "sortable", "type": ft.BOOL, "name": "sortable", "null": True},
     {"key": "order_id", "type": ft.INT, "name": "orderId", "null": True},
 ]
-
-
-xtb_xtbb_field_view_fields: List = [
-    {"key": "field"},
-    {"key": "name_zh"},
-    {"key": "name_ch"},
-    {"key": "md5"},
-    {"key": "xtbb"},
-    {"key": "remark"},
-    {"key": "width", "type": ft.FLOAT, "name": "width", "null": True},
-    {"key": "mode", "type": ft.BOOL, "name": "mode", "null": True},
-    {"key": "align"},
-    {"key": "fixed"},
-    {"key": "list", "type": ft.BOOL, "name": "list", "null": True},
-    {"key": "list_type"},
-    {"key": "export", "type": ft.BOOL, "name": "export", "null": True},
-    {"key": "export_type"},
-    {"key": "null", "type": ft.BOOL, "name": "null", "null": True},
-    {"key": "id_auto", "type": ft.BOOL, "name": "idAuto", "null": True},
-    {"key": "extend", "type": ft.BOOL, "name": "extend", "null": True},
-    {"key": "filter"},
-    {"key": "sortable", "type": ft.BOOL, "name": "sortable", "null": True},
-    {"key": "order_id", "type": ft.INT, "name": "orderId", "null": True},
-    {"key": "create_rtx", "type": ft.STR, "name": "createRtx", "null": True},
-    {"key": "create_time", "type": ft.DATETIME, "name": "createTime", "null": True},
-    {"key": "update_rtx", "type": ft.STR, "name": "updateRtx", "null": True},
-    {"key": "update_time", "type": ft.DATETIME, "name": "updateTime", "null": True}
-]

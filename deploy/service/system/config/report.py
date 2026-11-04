@@ -42,13 +42,17 @@ from deploy.utils.status import Status, SuccessStatus, FailureStatus
 from deploy.utils.status_value import (StatusCode as status_code,
                                        StatusMsg as status_msg)
 from deploy.utils.converter import model_converter_dict, many_model_converter_dict
-from deploy.schema.dto.xtb_xtbb import (xtb_xtbb_list_fields, xtb_xtbb_detail_fields,
-                                        xtb_xtbb_view_fields, xtb_xtbb_download_fields)
-from deploy.schema.dto.xtb_xtbb_field import (xtb_xtbb_field_list_fields, xtb_xtbb_field_detail_fields,
-                                             xtb_xtbb_field_view_fields)
-from deploy.utils.utils import get_now, md5 as generator_md5, d2s
-from deploy.config import table_selection_width as TABLE_SW
+from deploy.schema.dto.xtb_xtbb import xtb_xtbb_detail_fields
+from deploy.schema.dto.xtb_xtbb_field import xtb_xtbb_field_list_fields, xtb_xtbb_field_detail_fields
+from deploy.utils.utils import get_now, md5 as generator_md5, d2s, xtbb_field_id_value
+from deploy.config import (
+    table_selection_width as TABLE_SW, 
+    table_default_null as TABLE_DEFAULT_NULL, 
+    table_default_db_id as TABLE_DEFAULT_DB_ID
+)
 from deploy.utils.variable import REPORT_NOT_SELECTION_LIST
+from deploy.utils.exception import ReportNotColumnException
+from deploy.utils.enumeration import XtbReportKey
 
 
 class SystemConfigReportService:
@@ -92,21 +96,33 @@ class SystemConfigReportService:
             limit=params.get("limit"),
             content=params.get("content")
         )
+        _default_data = {
+            "list": [],
+            "page": params.get("page"),
+            "pageSize": params.get("limit"),
+            "total": 0,
+        }
         if not models:
-            __data = {
-                "list": [],
-                "page": params.get("page"),
-                "pageSize": params.get("limit"),
-                "total": 0
-            }
-            return FailureStatus(code=status_code.CODE_101_SUCCESS_NO_DATA, data=__data)
+            return FailureStatus(
+                code=status_code.CODE_101_SUCCESS_NO_DATA.value, data=_default_data
+            )
+        fields: Dict = await self.report_column_by_xtbb(
+            rtx_id=rtx_id,
+            xtbb=XtbReportKey.SystemConfigReport.value,
+            type_="list",
+            is_md5=True,
+        )
+        if not fields:
+            return FailureStatus(
+                code=status_code.CODE_102_SUCCESS_NO_COLUMN.value, data=_default_data
+            )
 
-        id_value: int = params.get("offset") + 1
         data: List = await many_model_converter_dict(
             models=models,
-            fields=xtb_xtbb_list_fields,
-            auto_id=True,
-            auto_id_value=id_value
+            fields=fields.get("column"),
+            default_value=TABLE_DEFAULT_NULL,
+            auto_id=fields.get("id_auto"),
+            auto_id_value=params.get("offset") + 1,
         )
         result: Dict = {
             "list": data,
@@ -186,17 +202,27 @@ class SystemConfigReportService:
             else FailureStatus(code=status_code.CODE_508_DATA_PART_DELETE,
                                message=f"总数{request_count}，成功删除{query_count}，查询失败{request_count - query_count}")
 
-    async def download(self, params: dict) -> List:
+    async def download(self, rtx_id: str, params: dict) -> List:
         models = await self.xtb_xtbb_curd.download(db=self.db, params=params)
-        data: List = list()
-        _id = 1
-        for u in models:
-            if not u: continue
-            _d: Dict | None = await model_converter_dict(model=u, fields=xtb_xtbb_download_fields)
-            if not _d: continue
-            _d["序号"] = _id
-            _id += 1
-            data.append(_d)
+        fields: Dict = await self.report_column_by_xtbb(
+            rtx_id=rtx_id,
+            xtbb=XtbReportKey.SystemConfigReport.value,
+            type_="export",
+            is_md5=False,
+        )
+        if not fields:
+            raise ReportNotColumnException(detail="[系统表-用户表]未配置导出表头")
+
+        __auto_id_name: Any = xtbb_field_id_value(options=fields.get("column"))
+        data: List = await many_model_converter_dict(
+            models=models,
+            fields=fields.get("column"),
+            default_value=TABLE_DEFAULT_NULL,
+            auto_id=fields.get("id_auto"),
+            auto_id_name=__auto_id_name if __auto_id_name else TABLE_DEFAULT_DB_ID,
+            auto_id_value=1,
+        )
+
         return data
 
     # ======================== xtb_xtbb_field ========================

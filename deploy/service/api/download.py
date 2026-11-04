@@ -43,6 +43,7 @@ from deploy.service.system.main.user import SystemMainUserService
 from deploy.service.system.main.role import SystemMainRoleService
 from deploy.service.system.config.xtcs import SystemConfigXtcsService
 from deploy.service.system.config.dict import SystemConfigDictService
+from deploy.service.system.config.report import SystemConfigReportService
 from deploy.service.system.ops.task import SystemOpsTaskService
 from deploy.service.system.ops.log import SystemOpsLogService
 from deploy.service.system.ops.depart import SystemOpsDepartService
@@ -84,6 +85,7 @@ class ApiDownloadService(object):
         self.system_main_user_service: SystemMainUserService = SystemMainUserService(db_connection=db_connection)
         self.system_main_role_service: SystemMainRoleService = SystemMainRoleService(db_connection=db_connection)
         self.system_config_xtcs_service: SystemConfigXtcsService = SystemConfigXtcsService(db_connection=db_connection)
+        self.system_config_report_service: SystemConfigReportService = SystemConfigReportService(db_connection=db_connection)
         self.system_ops_task_service: SystemOpsTaskService = SystemOpsTaskService(db_connection=db_connection)
         self.system_ops_log_service: SystemOpsLogService = SystemOpsLogService(db_connection=db_connection)
         self.system_ops_depart_service: SystemOpsDepartService = SystemOpsDepartService(db_connection=db_connection)
@@ -143,6 +145,9 @@ class ApiDownloadService(object):
                 case "SystemConfigXtcs":
                     # 系统>配置>系统参数
                     __res = await self.system_config_xtcs_service.download(rtx_id=rtx_id, params=new_params)
+                case "SystemConfigReport":
+                    # 系统>配置>系统参数
+                    __res = await self.system_config_report_service.download(rtx_id=rtx_id, params=new_params)
                 case "SystemOpsDict":
                     # 系统>系统维护>数据字典
                     __res = await self.system_config_csb_enum_v_service.download(params=new_params)

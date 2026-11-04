@@ -51,14 +51,14 @@ from deploy.utils.utils import (
     get_now,
     random_string,
     md5 as generator_md5,
-    xtbb_field_id_value,
+    xtbb_field_id_value
 )
 from deploy.config import (
     server_user,
     server_password,
     server_avatar,
     table_default_null as TABLE_DEFAULT_NULL,
-    table_default_db_id as TABLE_DEFAULT_DB_ID,
+    table_default_db_id as TABLE_DEFAULT_DB_ID
 )
 from deploy.utils.enumeration import XtbXtcsKEY, CsbEnumKEY, FileTypeEnum, XtbReportKey
 from deploy.utils.upload import uploadUtils
