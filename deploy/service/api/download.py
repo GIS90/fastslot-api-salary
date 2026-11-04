@@ -148,17 +148,17 @@ class ApiDownloadService(object):
                 case "SystemConfigReport":
                     # 系统>配置>系统参数
                     __res = await self.system_config_report_service.download(rtx_id=rtx_id, params=new_params)
-                case "SystemOpsDict":
-                    # 系统>系统维护>数据字典
-                    __res = await self.system_config_csb_enum_v_service.download(params=new_params)
+                case "SystemConfigDict":
+                    # 系统>配置>数据字典
+                    __res = await self.system_config_csb_enum_v_service.download(rtx_id=rtx_id, params=new_params)
                 case "SystemOpsLog":
-                    # 系统>系统维护>系统日志
+                    # 系统>维护>系统日志
                     __res = await self.system_ops_log_service.download(params=new_params)
                 case "SystemOpsTask":
-                    # 系统>系统维护>任务中心
+                    # 系统>维护>任务中心
                     __res = await self.system_ops_task_service.download(params=new_params)
                 case "SystemOpsDepart":
-                    # 系统>系统维护>部门管理
+                    # 系统>维护>部门管理
                     __res = await self.system_ops_depart_service.download(params=new_params)
                 case _:
                     return FailureStatus(

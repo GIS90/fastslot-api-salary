@@ -188,10 +188,10 @@ class CsbEnumValueCurd(BaseCurd):
         try:
             stmt = select(
                 CsbEnumValueModel.id,
-                CsbEnumKeyModel.key.label("ek_key"),
-                CsbEnumKeyModel.value.label("ek_value"),
-                CsbEnumValueModel.key.label("ev_key"),
-                CsbEnumValueModel.value.label("ev_value"),
+                CsbEnumKeyModel.key.label("name_key"),
+                CsbEnumKeyModel.value.label("name"),
+                CsbEnumValueModel.key.label("key"),
+                CsbEnumValueModel.value.label("value"),
                 CsbEnumValueModel.remark,
                 CsbEnumValueModel.lock,
                 CsbEnumValueModel.order_id,

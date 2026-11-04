@@ -208,10 +208,10 @@ class SystemConfigReportService:
             rtx_id=rtx_id,
             xtbb=XtbReportKey.SystemConfigReport.value,
             type_="export",
-            is_md5=False,
+            is_md5=False
         )
         if not fields:
-            raise ReportNotColumnException(detail="[系统表-用户表]未配置导出表头")
+            raise ReportNotColumnException(detail="[系统表-系统报表]未配置导出表头")
 
         __auto_id_name: Any = xtbb_field_id_value(options=fields.get("column"))
         data: List = await many_model_converter_dict(

@@ -45,10 +45,20 @@ from deploy.utils.status_value import (StatusCode as status_code,
 from deploy.utils.converter import model_converter_dict, option_converter_dict, many_model_converter_dict
 from deploy.schema.dto.csb_enum_key import csb_ek_list_fields, csb_ek_detail_fields
 from deploy.schema.dto.csb_enum_value import csb_ev_list_fields, csb_ev_detail_fields, xtb_ev_download_fields
-from deploy.config import (redis_host, redis_port, redis_password, redis_db, redis_expire, table_default_null as TABLE_DEFAULT_NULL)
+from deploy.config import (
+    redis_host, redis_port, redis_password, redis_db, redis_expire, 
+    table_default_null as TABLE_DEFAULT_NULL,
+    table_default_db_id as TABLE_DEFAULT_DB_ID
+)
 from deploy.delib.redis_lib import RedisClientLib
-from deploy.utils.utils import format_redis_key, get_now, md5 as generator_md5, kebab_to_camel
+from deploy.utils.utils import (
+    format_redis_key, 
+    get_now, md5 as generator_md5, 
+    kebab_to_camel, 
+    xtbb_field_id_value
+)
 from deploy.utils.enumeration import XtbXtcsKEY, XtbReportKey
+from deploy.utils.exception import ReportNotColumnException
 
 
 _REDIS_EXPIRE_DEFAULT: int = redis_expire
@@ -415,16 +425,27 @@ class SystemConfigDictService:
             else FailureStatus(code=status_code.CODE_508_DATA_PART_DELETE,
                                message=f"总数{request_count}，成功删除{query_count}，查询失败{request_count - query_count}")
 
-    async def download(self, params: dict) -> List:
+    async def download(self, rtx_id: str, params: dict) -> List:
         models = await self.csb_ev_curd.download(db=self.db, params=params)
-        data: List = list()
-        _id = 1
-        for u in models:
-            if not u: continue
-            _d = await model_converter_dict(model=u, fields=xtb_ev_download_fields)
-            _d["序号"] = _id
-            _id +=  1
-            data.append(_d)
+        fields: Dict = await self.system_main_report_service.report_column_by_xtbb(
+            rtx_id=rtx_id,
+            xtbb=XtbReportKey.SystemConfigDict.value,
+            type_="export",
+            is_md5=False
+        )
+        if not fields:
+            raise ReportNotColumnException(detail="[参数表-数据字典表]未配置导出表头")
+
+        __auto_id_name: Any = xtbb_field_id_value(options=fields.get("column"))
+        data: List = await many_model_converter_dict(
+            models=models,
+            fields=fields.get("column"),
+            default_value=TABLE_DEFAULT_NULL,
+            auto_id=fields.get("id_auto"),
+            auto_id_name=__auto_id_name if __auto_id_name else TABLE_DEFAULT_DB_ID,
+            auto_id_value=1,
+        )
+
         return data
 
     async def de_get_by_option(self, name: str, rtx_id: str) -> Status:

@@ -418,7 +418,7 @@ class SystemMainUserService:
             rtx_id=rtx_id,
             xtbb=XtbReportKey.SystemMainUser.value,
             type_="export",
-            is_md5=False,
+            is_md5=False
         )
         if not fields:
             raise ReportNotColumnException(detail="[系统表-用户表]未配置导出表头")

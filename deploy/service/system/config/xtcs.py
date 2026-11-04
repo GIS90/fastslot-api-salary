@@ -263,7 +263,7 @@ class SystemConfigXtcsService:
             rtx_id=rtx_id,
             xtbb=XtbReportKey.SystemConfigXtcs.value,
             type_="export",
-            is_md5=False,
+            is_md5=False
         )
         if not fields:
             raise ReportNotColumnException(detail="[系统表-系统参数]未配置导出表头")
