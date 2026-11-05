@@ -291,7 +291,10 @@ class SystemConfigReportService:
                 else:
                     _d["min-width"] = str(model.width)
             if model.filter:
-                _d["filter"] = json.loads(model.filter)
+                try:
+                    _d["filter"] = json.loads(model.filter)
+                except:
+                    _d["filter"] = {}
             if model.fixed:
                 _d["fixed"] = model.fixed
             data.append(_d)

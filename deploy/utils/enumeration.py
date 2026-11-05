@@ -255,5 +255,7 @@ class XtbReportKey(StrEnum):
     SystemConfigXtcs = "SystemConfigXtcs"
     SystemConfigDict = "SystemConfigDict"
     SystemConfigReport = "SystemConfigReport"
+    SystemConfigApi = "SystemConfigApi"
     SystemOpsLog = "SystemOpsLog"
     SystemOpsTask = "SystemOpsTask"
+

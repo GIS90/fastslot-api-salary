@@ -524,7 +524,6 @@ CREATE TABLE `xtb_xtbb`  (
 ) COMMENT='系统表-系统报表';
 
 delete from xtb_xtbb;
---详情见表《xtb_xtbb.sql》
 
 
 -- 系统表-系统报表字段
@@ -564,7 +563,32 @@ CREATE TABLE `xtb_xtbb_field`  (
     UNIQUE INDEX `xtb_xtbb_field_md5_index`(`md5`) USING HASH COMMENT 'md5索引'
 ) COMMENT='系统表-系统报表字段';
 
---详情见表《xtb_xtbb_field.sql》
+-- = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
+DROP TABLES IF EXISTS `xtb_api`;
+CREATE TABLE `xtb_api`  (
+    `id` int NOT NULL AUTO_INCREMENT COMMENT '主键，自增ID',
+    `blueprint` varchar(25) NOT NULL COMMENT 'API接口blueprint',
+    `apiname` varchar(35) NOT NULL COMMENT 'API接口View方法名称',
+    `endpoint` varchar(65) NOT NULL COMMENT 'API接口endpoint',
+    `md5` varchar(64) NOT NULL UNIQUE COMMENT '数据唯一标识：MD5-ID',
+    `path` varchar(65) NOT NULL COMMENT 'API接口path，与request表关联',
+    `method` varchar(35) NOT NULL default 'GET' COMMENT 'API接口请求方式：GET/POST/PUT/PATCH/DELETE',
+    `short` varchar(35) NULL COMMENT 'API接口简述',
+    `long` varchar(255) NULL COMMENT 'API接口详细描述',
+    `create_rtx` varchar(35) COMMENT '创建用户RTX-ID',
+    `create_time` datetime default CURRENT_TIMESTAMP COMMENT '创建时间',
+    `update_rtx` varchar(35) COMMENT '更新用户RTX-ID',
+    `update_time` datetime COMMENT '更新时间',
+    `delete_rtx` varchar(35) COMMENT '删除用户RTX-ID',
+    `delete_time` datetime COMMENT '删除时间',
+    `status` bool default False COMMENT '数据状态：1删除；0正常（默认）',
+    `order_id` int COMMENT '排序编码',
+
+    PRIMARY KEY (`id`),
+    UNIQUE INDEX `index_id`(`id`) USING HASH COMMENT 'id索引'
+) COMMENT='API接口说明表';
+-- 提示词：检索deploy/view下所有.py文件，形成xtb_api表插入的SQL语句
+-- = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
 -- = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
 -- PDF文件记录表
 -- create table
