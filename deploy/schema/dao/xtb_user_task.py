@@ -43,14 +43,14 @@ from sqlalchemy import (
 )
 from sqlalchemy.orm import Mapped, mapped_column
 from deploy.schema._dao_base_model import baseModel
-from .common_field import IDField, Md5Field, StatusField, RtxIdField
+from .common_field import IDField, Md5Field, StatusField, CRtxIdField
 from typing import Optional
 
 
 __all__ = ["XtbUserTaskModel"]
 
 
-class XtbUserTaskModel(baseModel, IDField, RtxIdField, Md5Field, StatusField):
+class XtbUserTaskModel(baseModel, IDField, CRtxIdField, Md5Field, StatusField):
     __tablename__ = 'xtb_user_task'
     __table_args__ = ({'comment': '系统表-用户任务表'})
 

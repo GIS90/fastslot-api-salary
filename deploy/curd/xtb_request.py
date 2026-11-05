@@ -128,7 +128,6 @@ class XtbRequestCurd(BaseCurd):
                     .order_by(desc(XtbRequestModel.id))
                     .offset(offset)
                     .limit(limit))
-
             result = await db.execute(stmt)
             return result.scalars().all()
         except Exception as e:

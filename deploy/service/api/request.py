@@ -78,7 +78,7 @@ class ApiRequestService:
         new_model.md5 = md5_func(
             "%s-%s-%s-%s-%s" % (now, rtx_id, request_body.client.host, path, request_body.method)
         )  # md5
-        new_model.rtx_id = rtx_id
+        new_model.create_rtx = rtx_id
         new_model.ip = request_body.client.host
         if request_body.query_params:
             new_model.params = request_body.query_params

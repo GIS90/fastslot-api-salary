@@ -51,7 +51,7 @@ class RtxIdField:
 
 
 class CRtxIdField:
-    create_rtx: Mapped[str] = mapped_column(name="create_rtx", type_=String(35), nullable=False, comment="创建用户RTX-ID")
+    create_rtx: Mapped[Optional[str]] = mapped_column(name="create_rtx", type_=String(35), comment="创建用户RTX-ID")
 
 
 class Md5Field:

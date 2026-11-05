@@ -156,7 +156,7 @@ class ApiDownloadService(object):
                     __res = await self.system_ops_log_service.download(rtx_id=rtx_id, params=new_params)
                 case "SystemOpsTask":
                     # 系统>维护>任务中心
-                    __res = await self.system_ops_task_service.download(params=new_params)
+                    __res = await self.system_ops_task_service.download(rtx_id=rtx_id, params=new_params)
                 case "SystemOpsDepart":
                     # 系统>维护>部门管理
                     __res = await self.system_ops_depart_service.download(params=new_params)
@@ -180,7 +180,7 @@ class ApiDownloadService(object):
         new_task_model.create_time = start_time
         new_task_model.cost = round(cost, 4)
         new_task_model.update_time = end_time
-        new_task_model.rtx_id = rtx_id
+        new_task_model.create_rtx = rtx_id
         new_task_model.status = False
         await self.xtb_user_task_curd.add(db=self.db, model=new_task_model)
         if __task_status == TS.FAILURE.value:

@@ -448,13 +448,13 @@ insert into csb_enum_value(`name`, `md5`, `key`, `value`, `remark`, `lock`, `sta
 DROP TABLES IF EXISTS `xtb_user_task`;
 CREATE TABLE `xtb_user_task`  (
     `id` int NOT NULL AUTO_INCREMENT COMMENT '主键，自增ID',
-    `rtx_id` varchar(35) COMMENT '创建用户',
     `api` varchar(55) NOT NULL COMMENT 'API接口名称',
     `name` varchar(55) NOT NULL COMMENT '文件名称',
     `data` varchar(35) NOT NULL COMMENT '数据下载类型',
     `md5` varchar(64) NOT NULL COMMENT '唯一标识：MD5-ID',
     `task` varchar(35) NOT NULL COMMENT '任务状态：success failure working',
     `cost` decimal(10, 4) COMMENT '任务数据运行时间',
+    `create_rtx` varchar(35) COMMENT '创建用户',
     `create_time` datetime default CURRENT_TIMESTAMP COMMENT '创建时间',
     `update_time` datetime COMMENT '更新时间',
     `delete_rtx` varchar(35) COMMENT '删除用户RTX-ID',

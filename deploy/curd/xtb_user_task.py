@@ -89,13 +89,13 @@ class XtbUserTaskCurd(BaseCurd):
         try:
             stmt = select(func.count(XtbUserTaskModel.id)).where(XtbUserTaskModel.status != 1)
             if rtx_id:
-                stmt = stmt.where(XtbUserTaskModel.rtx_id == rtx_id)
+                stmt = stmt.where(XtbUserTaskModel.create_rtx == rtx_id)
             if filter_.get("ds"):
                 stmt = stmt.where(XtbUserTaskModel.data.in_(filter_.get("ds")))
             if filter_.get("status"):
                 stmt = stmt.where(XtbUserTaskModel.task.in_(filter_.get("status")))
             if filter_.get("user"):
-                stmt = stmt.where(XtbUserTaskModel.rtx_id.in_(filter_.get("user")))
+                stmt = stmt.where(XtbUserTaskModel.create_rtx.in_(filter_.get("user")))
             if filter_.get("content"):
                 stmt = stmt.where(XtbUserTaskModel.name.like(f"%{filter_.get('content')}%"))
             if filter_.get("dateRange"):
@@ -126,14 +126,14 @@ class XtbUserTaskCurd(BaseCurd):
         if filter_ is None: filter_ = {}
         try:
             stmt = (select(
-                XtbUserTaskModel.rtx_id,
+                XtbUserTaskModel.create_rtx,
                 XtbUserTaskModel.api,
                 XtbUserTaskModel.name,
                 XtbUserTaskModel.md5,
-                XtbUserTaskModel.data,
-                EV1.value.label("data_value"),
-                XtbUserTaskModel.task,
-                EV2.value.label("task_value"),
+                # XtbUserTaskModel.data,
+                EV1.value.label("data"),
+                # XtbUserTaskModel.task,
+                EV2.value.label("task"),
                 XtbUserTaskModel.cost,
                 XtbUserTaskModel.create_time,
                 XtbUserTaskModel.update_time,
@@ -149,13 +149,13 @@ class XtbUserTaskCurd(BaseCurd):
                 EV2.name == CsbEnumKEY.TASK_STATUS.value
             ))
             if rtx_id:
-                stmt = stmt.where(XtbUserTaskModel.rtx_id == rtx_id)
+                stmt = stmt.where(XtbUserTaskModel.create_rtx == rtx_id)
             if filter_.get("ds"):
                 stmt = stmt.where(XtbUserTaskModel.data.in_(filter_.get("ds")))
             if filter_.get("status"):
                 stmt = stmt.where(XtbUserTaskModel.task.in_(filter_.get("status")))
             if filter_.get("user"):
-                stmt = stmt.where(XtbUserTaskModel.rtx_id.in_(filter_.get("user")))
+                stmt = stmt.where(XtbUserTaskModel.create_rtx.in_(filter_.get("user")))
             if filter_.get("content"):
                 stmt = stmt.where(XtbUserTaskModel.name.like(f"%{filter_.get('content')}%"))
             if filter_.get("dateRange"):
@@ -174,14 +174,14 @@ class XtbUserTaskCurd(BaseCurd):
         try:
             stmt = (select(
                 XtbUserTaskModel.id,
-                XtbUserTaskModel.rtx_id,
+                XtbUserTaskModel.create_rtx,
                 XtbUserTaskModel.api,
                 XtbUserTaskModel.name,
                 XtbUserTaskModel.md5,
-                XtbUserTaskModel.data,
-                EV1.value.label("data_value"),
-                XtbUserTaskModel.task,
-                EV2.value.label("task_value"),
+                # XtbUserTaskModel.data,
+                EV1.value.label("data"),
+                # XtbUserTaskModel.task,
+                EV2.value.label("task"),
                 XtbUserTaskModel.cost,
                 XtbUserTaskModel.create_time,
                 XtbUserTaskModel.update_time,

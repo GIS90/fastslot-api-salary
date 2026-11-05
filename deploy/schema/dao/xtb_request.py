@@ -69,7 +69,7 @@ class XtbRequestModel(baseModel, IDField, CRtxIdField, Md5Field, StatusField):
     delete_time: Mapped[Optional[datetime]] = mapped_column(name="delete_time", type_=DateTime(), comment="删除时间")
 
     def __str__(self):
-        return f"XtbRequestModel Class[DB table: {self.__tablename__}], id: {self.id}, rtx_id: {self.rtx_id}, [{self.ip}]-{self.url}."
+        return f"XtbRequestModel Class[DB table: {self.__tablename__}], id: {self.id}, create_rtx: {self.create_rtx}, [{self.ip}]-{self.url}."
 
     def __repr__(self):
         return self.__str__()
