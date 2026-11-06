@@ -36,14 +36,18 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from deploy.curd.xtb_user_avatar import XtbUserAvatarCurd
 from deploy.schema.dao.xtb_user_avatar import XtbUserAvatarModel
-from deploy.schema.dto.xtb_user_avatar import xtb_user_avatar_detail_fields, xtb_user_avatar_list_fields
+from deploy.schema.dto.xtb_user_avatar import xtb_user_avatar_detail_fields
+from deploy.service.system.config.report import SystemConfigReportService
 from deploy.utils.status import Status, SuccessStatus, FailureStatus
 from deploy.utils.status_value import (
     StatusCode as status_code,
 )
 from deploy.utils.converter import model_converter_dict, many_model_converter_dict
 from deploy.utils.utils import get_now, d2s, md5 as generator_md5
-from deploy.config import table_default_null as TABLE_DEFAULT_NULL
+from deploy.utils.enumeration import XtbReportKey
+from deploy.config import table_default_null as TABLE_DEFAULT_NULL, table_default_db_id as TABLE_DEFAULT_DB_ID
+from deploy.utils.exception import ReportNotColumnException
+from deploy.utils.utils import xtbb_field_id_value
 
 
 __all__ = ["SystemOpsAvatarService"]
@@ -57,6 +61,9 @@ class SystemOpsAvatarService:
         """
         self.db: AsyncSession = db_connection
         self.xtb_user_avatar_curd: XtbUserAvatarCurd = XtbUserAvatarCurd()
+        self.system_config_report_service: SystemConfigReportService = (
+            SystemConfigReportService(db_connection=db_connection)
+        )
 
     def __str__(self):
         return "SystemOpsAvatarService class."
@@ -101,11 +108,21 @@ class SystemOpsAvatarService:
         if not models:
             return FailureStatus(code=status_code.CODE_101_SUCCESS_NO_DATA.value, data=_default_data)
 
+        fields: Dict = await self.system_config_report_service.report_column_by_xtbb(
+            rtx_id=rtx_id,
+            xtbb=XtbReportKey.SystemOpsAvatar.value,
+            type_="list",
+            is_md5=True,
+        )
+        if not fields:
+            return FailureStatus(code=status_code.CODE_102_SUCCESS_NO_COLUMN.value, data=_default_data)
+
         data: List = await many_model_converter_dict(
             models=models,
-            fields=xtb_user_avatar_list_fields,
+            fields=fields.get("column"),
             default_value=TABLE_DEFAULT_NULL,
-            auto_id=False
+            auto_id=fields.get("id_auto"),
+            auto_id_value=params.get("offset") + 1,
         )
         result: Dict = {
             "list": data,
@@ -201,3 +218,25 @@ class SystemOpsAvatarService:
         return SuccessStatus() if query_count == request_count \
             else FailureStatus(code=status_code.CODE_508_DATA_PART_DELETE,
                                message=f"总数{request_count}，成功删除{query_count}，查询失败{request_count - query_count}")
+
+    async def download(self, rtx_id: str, params: dict) -> List:
+        models = await self.xtb_user_avatar_curd.download(db=self.db, params=params)
+        fields: Dict = await self.system_config_report_service.report_column_by_xtbb(
+            rtx_id=rtx_id,
+            xtbb=XtbReportKey.SystemOpsAvatar.value,
+            type_="export",
+            is_md5=False,
+        )
+        if not fields:
+            raise ReportNotColumnException(detail="[系统表-头像表]未配置导出表头")
+
+        __auto_id_name: Any = xtbb_field_id_value(options=fields.get("column"))
+        data: List = await many_model_converter_dict(
+            models=models,
+            fields=fields.get("column"),
+            default_value=TABLE_DEFAULT_NULL,
+            auto_id=fields.get("id_auto"),
+            auto_id_name=__auto_id_name if __auto_id_name else TABLE_DEFAULT_DB_ID,
+            auto_id_value=1,
+        )
+        return data

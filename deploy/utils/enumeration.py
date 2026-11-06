@@ -258,4 +258,5 @@ class XtbReportKey(StrEnum):
     SystemConfigApi = "SystemConfigApi"
     SystemOpsLog = "SystemOpsLog"
     SystemOpsTask = "SystemOpsTask"
+    SystemOpsAvatar = "SystemOpsAvatar"
 

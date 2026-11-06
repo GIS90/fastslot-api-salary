@@ -47,6 +47,7 @@ from deploy.service.system.config.report import SystemConfigReportService
 from deploy.service.system.ops.task import SystemOpsTaskService
 from deploy.service.system.ops.log import SystemOpsLogService
 from deploy.service.system.ops.depart import SystemOpsDepartService
+from deploy.service.system.ops.avatar import SystemOpsAvatarService
 from deploy.service.system.config.api import SystemConfigApiService
 
 
@@ -90,6 +91,7 @@ class ApiDownloadService(object):
         self.system_ops_task_service: SystemOpsTaskService = SystemOpsTaskService(db_connection=db_connection)
         self.system_ops_log_service: SystemOpsLogService = SystemOpsLogService(db_connection=db_connection)
         self.system_ops_depart_service: SystemOpsDepartService = SystemOpsDepartService(db_connection=db_connection)
+        self.system_ops_avatar_service: SystemOpsAvatarService = SystemOpsAvatarService(db_connection=db_connection)
         self.system_config_api_service: SystemConfigApiService = SystemConfigApiService(db_connection=db_connection)
 
     def __str__(self):
@@ -162,6 +164,9 @@ class ApiDownloadService(object):
                 case "SystemOpsDepart":
                     # 系统>维护>部门管理
                     __res = await self.system_ops_depart_service.download(params=new_params)
+                case "SystemOpsAvatar":
+                    # 系统>维护>头像管理
+                    __res = await self.system_ops_avatar_service.download(rtx_id=rtx_id, params=new_params)
                 case "SystemConfigApi":
                     # 系统>配置>API管理
                     __res = await self.system_config_api_service.download(rtx_id=rtx_id, params=new_params)
