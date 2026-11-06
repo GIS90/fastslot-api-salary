@@ -42,6 +42,7 @@ from deploy.view.system.main.menu import router as system_mian_menu_router
 from deploy.view.system.ops.task import router as system_ops_task_router
 from deploy.view.system.ops.log import router as system_ops_log_router
 from deploy.view.system.ops.depart import router as system_ops_depart_router
+from deploy.view.system.ops.avatar import router as system_ops_avatar_router
 from deploy.view.system.config.xtcs import router as system_config_xtcs_router
 from deploy.view.system.config.dict import router as system_config_dict_router
 from deploy.view.system.config.report import router as system_config_report_router
@@ -81,6 +82,7 @@ add_routers = [
     system_ops_task_router,
     system_ops_log_router,
     system_ops_depart_router,
+    system_ops_avatar_router,
     system_config_xtcs_router,
     system_config_dict_router,
     system_config_report_router,

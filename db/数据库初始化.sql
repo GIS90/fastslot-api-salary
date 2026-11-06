@@ -320,7 +320,8 @@ insert into csb_enum_key(`key`, `md5`, `value`, `lock`, `status`, `create_rtx`, 
 ('task-status', 'a4115b287aab1804586eb9390841ab6b', '任务状态', False, False, 'admin', 8),
 ('xtbb-field-fixed', '3f9a8c2b7e1d4f6a5c8e2b9d7a3f1c4e', '报表字段固定状态', False, False, 'admin', 9),
 ('xtbb-field-type', 'a7d2f9e4c1b8a3d6f5e2c9b7a4d1f8e3', '报表字段类型', False, False, 'admin', 10),
-('xtbb-field-align', 'e3b0c44298fc1c149afbf4c8996fb924', '报表字段对齐方式', False, False, 'admin', 11);
+('xtbb-field-align', 'e3b0c44298fc1c149afbf4c8996fb924', '报表字段对齐方式', False, False, 'admin', 11),
+('avatar-type', '7f3a9c2e1b8d4f6a0c5e9b2d7a1f3c8e', '头像类型', False, False, 'admin', 12);
 
 -- CSB_ENUM_VALUE枚举 Value表
 -- create table && index
@@ -398,7 +399,19 @@ insert into csb_enum_value(`name`, `md5`, `key`, `value`, `remark`, `lock`, `sta
 ('xtbb-field-type', 'e3b9d6f2a8c4e1b7d3f9a5c2e8b4d1f7', 'lock_text', '锁定文本', '系统报表字段类型 > 持定文本', False, False, 'admin', 14),
 ('xtbb-field-align', 'e3b0c44298fc1c149afbf4c8996fb924', 'center', '居中对齐', '系统报表字段对齐方式 > 居中对齐', False, False, 'admin', 1),
 ('xtbb-field-align', '5d41402abc4b2a76b9719d911017c592', 'left', '左对齐', '系统报表字段对齐方式 > 左对齐', False, False, 'admin', 2),
-('xtbb-field-align', '6f1ed002ab5595859014ebf0951522d9', 'right', '右对齐', '系统报表字段对齐方式 > 右对齐', False, False, 'admin', 3);
+('xtbb-field-align', '6f1ed002ab5595859014ebf0951522d9', 'right', '右对齐', '系统报表字段对齐方式 > 右对齐', False, False, 'admin', 3),
+('avatar-type', 'a1b2c3d4e5f60718293a4b5c6d7e8f90', 'PORTRAIT', '人物', '头像类别：人物肖像（真人照片、自拍等）', False, False, 'admin', 1),
+('avatar-type', 'b2c3d4e5f60718293a4b5c6d7e8f901a', 'LANDSCAPE', '风景', '头像类别：自然风景（山川、湖海、天空等）', False, False, 'admin', 2),
+('avatar-type', 'c3d4e5f60718293a4b5c6d7e8f901a2b', 'ANIMAL', '动物', '头像类别：动物（宠物、野生动物等）', False, False, 'admin', 3),
+('avatar-type', 'd4e5f60718293a4b5c6d7e8f901a2b3c', 'ANIME', '动漫', '头像类别：动漫/二次元形象', False, False, 'admin', 4),
+('avatar-type', 'e5f60718293a4b5c6d7e8f901a2b3c4d', 'CARTOON', '卡通', '头像类别：卡通形象（Q版、插画等）', False, False, 'admin', 5),
+('avatar-type', 'f60718293a4b5c6d7e8f901a2b3c4d5e', 'ABSTRACT', '抽象', '头像类别：抽象图形、几何、艺术化图案', False, False, 'admin', 6),
+('avatar-type', '0718293a4b5c6d7e8f901a2b3c4d5e6f', 'TEXT', '文字', '头像类别：文字/字母/标语类头像', False, False, 'admin', 7),
+('avatar-type', '18293a4b5c6d7e8f901a2b3c4d5e6f70', 'OBJECT', '物品', '头像类别：物品、静物（车、花、食物等）', False, False, 'admin', 8),
+('avatar-type', '293a4b5c6d7e8f901a2b3c4d5e6f7081', 'GAME', '游戏', '头像类别：游戏角色/游戏截图', False, False, 'admin', 9),
+('avatar-type', '3a4b5c6d7e8f901a2b3c4d5e6f708192', 'OTHER', '其他', '头像类别：其他未归类的头像', False, False, 'admin', 10);
+
+
 
 
 
@@ -589,6 +602,35 @@ CREATE TABLE `xtb_api`  (
 ) COMMENT='API接口说明表';
 -- 提示词：检索deploy/view下所有.py文件，形成xtb_api表插入的SQL语句
 -- = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
+-- 系统用户头像表
+DROP TABLES IF EXISTS `xtb_user_avatar`;
+
+CREATE TABLE `xtb_user_avatar`  (
+	`id` int NOT NULL AUTO_INCREMENT COMMENT '主键，自增ID',
+	`name` varchar(35) NOT NULL COMMENT '文件名称',
+	`md5` varchar(64) not null unique COMMENT '数据唯一标识：MD5-ID',
+	`format` VARCHAR(16) DEFAULT 'PNG' COMMENT '格式：PNG/JPG/WebP',
+	`width` INT DEFAULT 0 COMMENT '宽(px)',
+	`height` INT DEFAULT 0 COMMENT '高(px)',
+	`size` BIGINT DEFAULT 0 COMMENT '文件大小(字节)',
+	`type` varchar(35) NULL COMMENT '类型：枚举值avatar-type',
+	`summary` varchar(255) NULL COMMENT '简要',
+	`tag` varchar(55) NULL COMMENT '标签，用英文,分割',
+	`url` varchar(120) NOT NULL COMMENT '存储地址',
+	`or_url` varchar(120) NOT NULL COMMENT '原始图片存储地址，用于图片裁剪覆盖图片信息保留',
+	`count` int DEFAULT 0 COMMENT '设置次数',
+	`create_rtx` varchar(35) COMMENT '创建用户RTX-ID',
+	`create_time` datetime default CURRENT_TIMESTAMP COMMENT '创建时间',
+	`update_rtx` varchar(35) COMMENT '更新用户RTX-ID',
+	`update_time` datetime COMMENT '更新时间',
+	`delete_rtx` varchar(35) COMMENT '删除用户RTX-ID',
+	`delete_time` datetime COMMENT '删除时间',
+	`status` bool default False COMMENT '数据状态：1注销；0启用（默认）',
+
+  PRIMARY KEY (`id`)
+) COMMENT='系统用户头像表';
+
+CREATE UNIQUE INDEX xtb_user_avatar_index ON xtb_user_avatar (`md5`);
 -- = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
 -- PDF文件记录表
 -- create table
