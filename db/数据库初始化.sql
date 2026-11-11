@@ -283,7 +283,8 @@ insert into xtb_xtcs(`key`, `md5`, `remark`, `value`, `create_rtx`, `lock`, `sta
 ('HOME-TIP-MORNING', '16d037c51df631d8c4260f04bdbee199', '系统登录温馨提示：凌晨6点～中午12点', '希望您有一个元气满满的早晨，充满动力地开始新的一天，加油哦！', 'admin', False, False, 11),
 ('HOME-TIP-NOON', 'a6856a3069a3fcb0201dd43a8cc382f0', '系统登录温馨提示：中午12点～下午14点', '忙碌了一上午，确实应该适当休息一下，记得按时吃午饭，补充能量才能更好地完成下午的工作！', 'admin', False, False, 12),
 ('HOME-TIP-AFTERNOON', 'a262837654996d535aa3f3790a6eba4f', '系统登录温馨提示：下午14点～下午18点', '下午是继续推进各项任务的好时间，保持专注和效率，希望您能够保持良好的状态，顺利完成每一天的目标！', 'admin', False, False, 13),
-('HOME-TIP-NIGHT', '2cb3bb4adb5d010267204a7effd2c8da', '系统登录温馨提示：下午18点～凌晨6点', '一天的努力即将结束，回顾今天的成就，为明天做好准备。别忘了放松一下自己，享受美好的夜晚时光，睡觉要有好梦。', 'admin', False, False, 14);
+('HOME-TIP-NIGHT', '2cb3bb4adb5d010267204a7effd2c8da', '系统登录温馨提示：下午18点～凌晨6点', '一天的努力即将结束，回顾今天的成就，为明天做好准备。别忘了放松一下自己，享受美好的夜晚时光，睡觉要有好梦。', 'admin', False, False, 14),
+('AVATAR-ROW-COUNT', '8f14e45fceea167a5a36dedd4bea2543', '用户头像列表每页显示数量', '6', 'admin', False, False, 15);
 -- = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
 -- CSB_ENUM_EKY 枚举Key表
 -- create table && index
