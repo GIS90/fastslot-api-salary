@@ -39,8 +39,8 @@ root_pid = 0
 
 # Redis
 [redis]
-host = "110.40.141.32"
-port = 9777
+host = "127.0.0.1"
+port = 6379
 db = 10
 password = ""
 expire = 240    # 单位：分，默认4小时 = 4 * 60
@@ -76,8 +76,8 @@ temp_api = "/cgi-bin/media/get"
 
 # 存储
 [store]
-# 本地缓存路径【绝对路径】 WIN：E:\_CACHE MacOS：/Users/gaomingliang/Downloads/_CACHE
-cache = "/Users/gaomingliang/Downloads/_CACHE"
+# 本地缓存路径【绝对路径】 WIN（对于Win需要\\或者把\改成/）：D:\\_CACHE | MacOS：/Users/gaomingliang/Downloads/_CACHE
+cache = "D:\\_CACHE"
 # 7牛云存储
 yun_access = "mRF0cKGUJcfv7ry_Wyvc24cDNWEQz9DAKo_UOn0G"
 yun_secret = "xabmlB9zZ_MRwtgofQJzUxINnmcO_VUfkXYILx_Q"

@@ -49,7 +49,7 @@ class __XtbAvatarBaseModel(baseModel):
     width: int = Field(default=0, ge=0, description="宽(px)", alias="width")
     height: int = Field(default=0, ge=0, description="高(px)", alias="height")
     size: int = Field(default=0, ge=0, description="文件大小(字节)", alias="size")
-    status: bool = Field(default=False, description="数据状态：False启用；True停用", alias="status")
+    lock: bool = Field(default=False, description="锁定状态：False启用；True停用", alias="lock")
 
     model_config = {
         "json_schema_extra": {
@@ -64,7 +64,7 @@ class __XtbAvatarBaseModel(baseModel):
                 "width": 512,
                 "height": 512,
                 "size": 102400,
-                "status": False
+                "lock": False
             }
         }
     }
@@ -84,7 +84,7 @@ class XtbAvatarAddModel(__XtbAvatarBaseModel):
                 "width": 512,
                 "height": 512,
                 "size": 102400,
-                "status": False
+                "lock": False
             }
         }
     }
@@ -107,7 +107,7 @@ class XtbAvatarUpdateModel(__XtbAvatarBaseModel):
                 "width": 512,
                 "height": 512,
                 "size": 102400,
-                "status": False
+                "lock": False
             }
         }
     }

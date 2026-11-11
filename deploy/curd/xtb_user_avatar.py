@@ -54,7 +54,7 @@ class XtbUserAvatarCurd(BaseCurd):
 
     @staticmethod
     def _not_deleted():
-        return XtbUserAvatarModel.delete_time.is_(None)
+        return XtbUserAvatarModel.status != True
 
     async def _get_model_by_field(
         self,
@@ -107,7 +107,6 @@ class XtbUserAvatarCurd(BaseCurd):
                 stmt = stmt.where(
                     or_(
                         XtbUserAvatarModel.name.like(content),
-                        XtbUserAvatarModel.type.like(content),
                         XtbUserAvatarModel.tag.like(content),
                         XtbUserAvatarModel.summary.like(content)
                     )

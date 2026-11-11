@@ -40,14 +40,14 @@ from sqlalchemy import (
 )
 from sqlalchemy.orm import Mapped, mapped_column
 from deploy.schema._dao_base_model import baseModel
-from .common_field import IDField, Md5Field, CUDField, StatusField
+from .common_field import IDField, Md5Field, CUDField, StatusField, LockField
 from typing import Optional
 
 
 __all__ = ["XtbUserAvatarModel"]
 
 
-class XtbUserAvatarModel(baseModel, IDField, Md5Field, CUDField, StatusField):
+class XtbUserAvatarModel(baseModel, IDField, Md5Field, CUDField, StatusField, LockField):
     __tablename__ = 'xtb_user_avatar'
     __table_args__ = ({'comment': '系统表-用户头像表'})
 

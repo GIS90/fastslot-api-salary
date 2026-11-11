@@ -143,6 +143,10 @@ store_cache: str = data["store"].get("cache")   # 绝对路径
 if not Path(store_cache).is_absolute():
     store_cache = f"{root_folder}{store_cache}" if store_cache.startswith("/") \
         else f"{root_folder}/{store_cache}"
+if not Path(store_cache).exists():
+    # if not exist, create it
+    Path(store_cache).mkdir(parents=True)
+    printer_warn(content=f"缓存目录[{store_cache}]不存在，系统自动创建", hr=True)
 store_yun_access: str = data["store"].get("yun_access")
 store_yun_secret: str = data["store"].get("yun_secret")
 store_yun_base: str = data["store"].get("yun_base")

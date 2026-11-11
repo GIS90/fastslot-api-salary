@@ -39,7 +39,7 @@ from deploy.service.system.ops.avatar import SystemOpsAvatarService
 from deploy.utils.status import Status
 from deploy.utils.depend import pageable_like_params, depend_token_rtx
 from deploy.schema.po.system_ops_avatar import XtbAvatarAddModel, XtbAvatarUpdateModel
-from deploy.schema.po.x import RequestMd5Models
+from deploy.schema.po.x import RequestMd5Models, RequestMd5StatusModel
 
 
 # router
@@ -74,6 +74,15 @@ async def add(
     service: SystemOpsAvatarService = Depends(get_service)
 ) -> Status:
     return await service.add(rtx_id=token_rtx_id, model=params.model_dump())
+
+
+@router.put("/avatar.lock", summary="锁定（启用/停用）")
+async def lock(
+    params: Annotated[RequestMd5StatusModel, Body()],
+    token_rtx_id: str = Depends(depend_token_rtx),
+    service: SystemOpsAvatarService = Depends(get_service)
+) -> Status:
+    return await service.lock(rtx_id=token_rtx_id, params=params.model_dump())
 
 
 @router.put("/avatar", summary="更新")

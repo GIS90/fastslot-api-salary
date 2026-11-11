@@ -86,7 +86,7 @@ class SystemOpsAvatarService:
         model: XtbUserAvatarModel = await self.xtb_user_avatar_curd.get_by_md5(db=self.db, md5=md5_id)
         if not model:
             return False, FailureStatus(code=status_code.CODE_501_DATA_NOT_EXIST)
-        if status_check and getattr(model, "delete_time", None):
+        if status_check and getattr(model, "status", True):
             return False, FailureStatus(code=status_code.CODE_503_DATA_DELETE_NOT_EDIT)
 
         return (True, model if response_type == "model"
@@ -148,7 +148,7 @@ class SystemOpsAvatarService:
             name=model.get("name"))
         if db_model:
             return FailureStatus(code=status_code.CODE_502_DATA_EXIST_NOT_ADD,
-                                 message="头像名称已存在，请更换")
+                                 message="图片名称已存在，请更换")
 
         # 新增头像
         new_model: XtbUserAvatarModel = await self.xtb_user_avatar_curd.new_model()
@@ -160,6 +160,21 @@ class SystemOpsAvatarService:
         for k, v in model.items():
             setattr(new_model, k, v)
         await self.xtb_user_avatar_curd.add(db=self.db, model=new_model)
+        return SuccessStatus()
+
+    async def lock(self, rtx_id: str, params: Dict) -> Status:
+        """
+        锁定管理（启用/停用），lock=True停用 False启用
+        """
+        __flag, data = await self.__valid_model_by_md5(
+            md5_id=params.get("md5"), status_check=True, response_type="model"
+        )
+        if not __flag: return data
+
+        setattr(data, "lock", params.get("value"))
+        setattr(data, "update_rtx", rtx_id)
+        setattr(data, "update_time", get_now())
+        await self.xtb_user_avatar_curd.update(db=self.db, model=data)
         return SuccessStatus()
 
     async def update(self, rtx_id: str, model: Dict) -> Status:
@@ -228,7 +243,7 @@ class SystemOpsAvatarService:
             is_md5=False,
         )
         if not fields:
-            raise ReportNotColumnException(detail="[系统表-头像表]未配置导出表头")
+            raise ReportNotColumnException(detail="[系统表-用户头像表]未配置导出表头")
 
         __auto_id_name: Any = xtbb_field_id_value(options=fields.get("column"))
         data: List = await many_model_converter_dict(

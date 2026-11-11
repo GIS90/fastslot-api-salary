@@ -47,6 +47,7 @@ xtb_user_avatar_detail_fields: List = [
     {"key": "height", "type": ft.INT, "name": "height", "null": True},
     {"key": "size", "type": ft.INT, "name": "size", "null": True},
     {"key": "count", "type": ft.INT, "name": "count", "null": True},
+    {"key": "lock", "type": ft.BOOL, "name": "lock", "null": True},
     {"key": "status", "type": ft.BOOL, "name": "status", "null": True},
     {"key": "create_rtx", "type": ft.STR, "name": "createRtx", "null": True},
     {"key": "create_time", "type": ft.DATETIME, "name": "createTime", "null": True},

@@ -122,7 +122,7 @@ async def uploads(
     avatar_type: str | None = Form(default=None, description="头像类型（批量上传头像时生效）"),
     avatar_tag: str | None = Form(default=None, description="头像标签（批量上传头像时生效）"),
     avatar_summary: str | None = Form(default=None, description="头像备注（批量上传头像时生效）"),
-    avatar_status: str | None = Form(default=None, description="头像状态：true=停用 / false=启用（批量上传头像时生效）"),
+    avatar_lock: str | None = Form(default=None, description="头像锁定：true=停用 / false=启用（批量上传头像时生效）"),
     token_rtx_id: str = Depends(depend_token_rtx),
     upload_service: ApiUploadService = Depends(get_upload_service)
 ) -> Status:
@@ -130,7 +130,7 @@ async def uploads(
         "type": avatar_type or "",
         "tag": avatar_tag or "",
         "summary": avatar_summary or "",
-        "status": avatar_status.lower() == "true" if avatar_status else False,
+        "lock": avatar_lock.lower() == "true" if avatar_lock else False,
     }
     return await upload_service.uploads(rtx_id=token_rtx_id, upload_type=upload_type, files_=files, avatar_params=__avatar_params)
 

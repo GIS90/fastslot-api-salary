@@ -141,11 +141,12 @@ class ApiUploadService:
         model.width = 0
         model.height = 0
         model.count = 0
-        # 公共属性（类型/标签/备注/状态）
+        # 公共属性（类型/标签/备注/锁定）
         model.type = avatar_params.get("type") or ""
         model.tag = avatar_params.get("tag") or ""
         model.summary = avatar_params.get("summary") or ""
-        model.status = bool(avatar_params.get("status", False))
+        model.lock = bool(avatar_params.get("lock", False))
+        model.status = False
         model.create_rtx = rtx_id
         model.create_time = __now
         await self.xtb_user_avatar_curd.add(db=self.db, model=model)

@@ -619,6 +619,7 @@ CREATE TABLE `xtb_user_avatar`  (
 	`url` varchar(120) NOT NULL COMMENT '存储地址',
 	`or_url` varchar(120) NOT NULL COMMENT '原始图片存储地址，用于图片裁剪覆盖图片信息保留',
 	`count` int DEFAULT 0 COMMENT '设置次数',
+    `lock` bool default False COMMENT '锁定状态：1锁定；0非锁定',
 	`create_rtx` varchar(35) COMMENT '创建用户RTX-ID',
 	`create_time` datetime default CURRENT_TIMESTAMP COMMENT '创建时间',
 	`update_rtx` varchar(35) COMMENT '更新用户RTX-ID',
