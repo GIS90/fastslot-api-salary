@@ -72,7 +72,6 @@ async def model_converter_dict(
             or not fields):
         return None
 
-
     # 验证字段有效性
     valid_fields: List = []
     for field in fields:

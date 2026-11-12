@@ -32,12 +32,14 @@ Life is short, I use python.
 """
 from typing import Optional, List, Any, Dict
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy import select, update, delete, desc, asc, or_, func
+from sqlalchemy import select, update, delete, desc, asc, or_, func, and_
 from sqlalchemy.orm.attributes import InstrumentedAttribute
 
 from deploy.curd.base_curd import BaseCurd
 from deploy.schema.dao.xtb_user_avatar import XtbUserAvatarModel
+from deploy.schema.dao.csb_enum_value import CsbEnumValueModel
 from deploy.utils.exception import SQLDBHandleException
+from deploy.utils.enumeration import CsbEnumKEY
 
 
 __all__ = ["XtbUserAvatarCurd"]
@@ -102,7 +104,35 @@ class XtbUserAvatarCurd(BaseCurd):
         cls, db: AsyncSession, offset: int = 0, limit: int = 15, content: str = None, *args, **kwargs
     ) -> Optional[List]:
         try:
-            stmt = select(XtbUserAvatarModel).where(cls._not_deleted())
+            stmt = select(
+                XtbUserAvatarModel.id,
+                XtbUserAvatarModel.name,
+                XtbUserAvatarModel.md5,
+                XtbUserAvatarModel.format,
+                XtbUserAvatarModel.url,
+                XtbUserAvatarModel.or_url,
+                XtbUserAvatarModel.count,
+                XtbUserAvatarModel.width,
+                XtbUserAvatarModel.height,
+                XtbUserAvatarModel.size,
+                XtbUserAvatarModel.type,
+                CsbEnumValueModel.value.label("type__text"),
+                XtbUserAvatarModel.summary,
+                XtbUserAvatarModel.tag,
+                XtbUserAvatarModel.lock,
+                XtbUserAvatarModel.create_time,
+                XtbUserAvatarModel.create_rtx,
+                XtbUserAvatarModel.update_rtx,
+                XtbUserAvatarModel.update_time,
+                XtbUserAvatarModel.status
+            ).outerjoin(
+                CsbEnumValueModel,
+                and_(
+                    XtbUserAvatarModel.type == CsbEnumValueModel.key,
+                    CsbEnumValueModel.name == CsbEnumKEY.AVATAR_TYPE.value
+                )
+            )
+            stmt = stmt.where(cls._not_deleted())
             if content:
                 stmt = stmt.where(
                     or_(
@@ -113,7 +143,7 @@ class XtbUserAvatarCurd(BaseCurd):
                 )
             stmt = stmt.order_by(desc(XtbUserAvatarModel.create_time), desc(XtbUserAvatarModel.id)).offset(offset).limit(limit)
             result = await db.execute(stmt)
-            return result.scalars().all()
+            return result.mappings().all()
         except Exception as e:
             raise SQLDBHandleException(f"[{cls.__name__}*查询All]{e}")
 
@@ -122,12 +152,40 @@ class XtbUserAvatarCurd(BaseCurd):
             cls, db: AsyncSession, params: Dict, *args, **kwargs
     ) -> Optional[List]:
         try:
-            stmt = select(XtbUserAvatarModel).where(cls._not_deleted())
+            stmt = select(
+                XtbUserAvatarModel.id,
+                XtbUserAvatarModel.name,
+                XtbUserAvatarModel.md5,
+                XtbUserAvatarModel.format,
+                XtbUserAvatarModel.url,
+                XtbUserAvatarModel.or_url,
+                XtbUserAvatarModel.count,
+                XtbUserAvatarModel.width,
+                XtbUserAvatarModel.height,
+                XtbUserAvatarModel.size,
+                XtbUserAvatarModel.type,
+                CsbEnumValueModel.value.label("type__text"),
+                XtbUserAvatarModel.summary,
+                XtbUserAvatarModel.tag,
+                XtbUserAvatarModel.lock,
+                XtbUserAvatarModel.create_time,
+                XtbUserAvatarModel.create_rtx,
+                XtbUserAvatarModel.update_rtx,
+                XtbUserAvatarModel.update_time,
+                XtbUserAvatarModel.status
+            ).outerjoin(
+                CsbEnumValueModel,
+                and_(
+                    XtbUserAvatarModel.type == CsbEnumValueModel.key,
+                    CsbEnumValueModel.name == CsbEnumKEY.AVATAR_TYPE.value
+                )
+            )
+            stmt = stmt.where(cls._not_deleted())
             if params.get("list"):
                 stmt = stmt.where(XtbUserAvatarModel.md5.in_(params.get("list")))
             stmt = stmt.order_by(desc(XtbUserAvatarModel.create_time), desc(XtbUserAvatarModel.id))
             result = await db.execute(stmt)
-            return result.scalars().all()
+            return result.mappings().all()
         except Exception as e:
             raise SQLDBHandleException(f"[{cls.__name__}*下载]{e}")
 

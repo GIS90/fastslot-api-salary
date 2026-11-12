@@ -219,6 +219,7 @@ class CsbEnumKEY(StrEnum):
     TASK_STATUS = "task-status"
     XTBB_FIXED_STATUS = "xtbb-fixed-status"
     XTBB_FIELD_TYPE = "xtbb-field-type"
+    AVATAR_TYPE = "avatar-type"
 
 
 
