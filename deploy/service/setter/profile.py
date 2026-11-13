@@ -35,6 +35,8 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from deploy.curd.xtb_user import XtbUserCurd
 from deploy.curd.xtb_request import XtbRequestCurd
 from deploy.curd.csb_enum_value import CsbEnumValueCurd
+from deploy.curd.xtb_user_avatar import XtbUserAvatarCurd
+from deploy.curd.xtb_user_avatar_favorite import XtbUserAvatarFavoriteCurd
 from deploy.schema.dao.xtb_user import XtbUserModel
 from deploy.service.system.config.dict import SystemConfigDictService
 from deploy.service.system.ops.log import SystemOpsLogService
@@ -62,6 +64,8 @@ class SetterProfileService:
         self.xtb_user_curd: XtbUserCurd = XtbUserCurd()
         self.xtb_request_curd: XtbRequestCurd = XtbRequestCurd()
         self.csb_enum_v_curd: CsbEnumValueCurd = CsbEnumValueCurd()
+        self.xtb_user_avatar_curd: XtbUserAvatarCurd = XtbUserAvatarCurd()
+        self.xtb_user_avatar_favorite_curd: XtbUserAvatarFavoriteCurd = XtbUserAvatarFavoriteCurd()
         self.csb_enum_v_service: SystemConfigDictService = SystemConfigDictService(db_connection=db_connection)
         self.system_ops_log_service: SystemOpsLogService = SystemOpsLogService(db_connection=db_connection)
         self.image_lib: ImageLib = ImageLib()
@@ -165,6 +169,101 @@ class SetterProfileService:
 
     async def profile_log(self, rtx_id: str, params: dict) -> Status:
         return await self.system_ops_log_service.pagination(rtx_id=rtx_id, params=params, _all=False)
+
+    async def __valid_avatar_by_md5(self, md5: str) -> Tuple[bool, Any]:
+        avatar = await self.xtb_user_avatar_curd.get_by_md5(db=self.db, md5=md5)
+        if not avatar:
+            return False, FailureStatus(code=status_code.CODE_501_DATA_NOT_EXIST, message="头像不存在或已删除")
+        if getattr(avatar, "lock", False):
+            return False, FailureStatus(code=status_code.CODE_511_DATA_LOCKED_NOT_EDIT, message="头像已禁用，无法使用")
+        return True, avatar
+
+    async def profile_avatar_market(
+            self, rtx_id: str, params: Dict, type_: str = None, favorite_only: bool = False
+    ) -> Status:
+        __flag, data = await self.__valid_model_by_rtx(
+            rtx_id=rtx_id, status_check=True, response_type="model", admin_check=False
+        )
+        if not __flag: return data
+
+        models = await self.xtb_user_avatar_favorite_curd.market_pagination(
+            db=self.db,
+            rtx_id=rtx_id,
+            offset=params.get("offset"),
+            limit=params.get("limit"),
+            type_=type_,
+            favorite_only=favorite_only,
+        )
+        avatar_list = []
+        for row in models:
+            item = dict(row)
+            item["favorite"] = bool(item.get("favorite"))
+            avatar_list.append(item)
+
+        result = {
+            "list": avatar_list,
+            "page": params.get("page"),
+            "pageSize": params.get("limit"),
+            "total": await self.xtb_user_avatar_favorite_curd.market_count(
+                db=self.db, rtx_id=rtx_id, type_=type_, favorite_only=favorite_only
+            ),
+        }
+        return SuccessStatus(data=result)
+
+    async def profile_avatar_favorite(self, rtx_id: str, model: Dict) -> Status:
+        __flag, user = await self.__valid_model_by_rtx(
+            rtx_id=rtx_id, status_check=True, response_type="model", admin_check=False
+        )
+        if not __flag: return user
+        __flag, avatar = await self.__valid_avatar_by_md5(md5=model.get("md5"))
+        if not __flag: return avatar
+
+        value = model.get("value")
+        favorite = await self.xtb_user_avatar_favorite_curd.get_by_user_avatar(
+            db=self.db, rtx_id=rtx_id, avatar_md5=avatar.md5
+        )
+        result = {"md5": avatar.md5, "favorite": value}
+        if not favorite:
+            if not value:
+                return SuccessStatus(data=result)
+            favorite = await self.xtb_user_avatar_favorite_curd.new_model()
+            favorite.md5 = generator_md5(v=f"{rtx_id}-{avatar.md5}-{get_now()}")
+            favorite.rtx_id = rtx_id
+            favorite.avatar_md5 = avatar.md5
+            favorite.create_rtx = rtx_id
+            favorite.create_time = get_now()
+            favorite.status = False
+            await self.xtb_user_avatar_favorite_curd.add(db=self.db, model=favorite)
+            return SuccessStatus(data=result)
+
+        target_status = not value
+        if favorite.status != target_status:
+            favorite.status = target_status
+            favorite.update_rtx = rtx_id
+            favorite.update_time = get_now()
+            favorite.delete_rtx = None if value else rtx_id
+            favorite.delete_time = None if value else get_now()
+            await self.xtb_user_avatar_favorite_curd.update(db=self.db, model=favorite)
+        return SuccessStatus(data=result)
+
+    async def profile_avatar_set(self, rtx_id: str, md5: str) -> Status:
+        __flag, user = await self.__valid_model_by_rtx(
+            rtx_id=rtx_id, status_check=True, response_type="model", admin_check=False
+        )
+        if not __flag: return user
+        __flag, avatar = await self.__valid_avatar_by_md5(md5=md5)
+        if not __flag: return avatar
+
+        if user.avatar != avatar.url:
+            user.avatar = avatar.url
+            user.update_rtx = rtx_id
+            user.update_time = get_now()
+            avatar.count = (avatar.count or 0) + 1
+            avatar.update_rtx = rtx_id
+            avatar.update_time = get_now()
+            await self.xtb_user_curd.update(db=self.db, model=user)
+            await self.xtb_user_avatar_curd.update(db=self.db, model=avatar)
+        return SuccessStatus(data={"url": avatar.url, "count": avatar.count})
 
     async def profile_avatar(self, rtx_id: str, image_file: UploadFile) -> Status:
         # ======================= 1、data legal check =======================

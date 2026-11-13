@@ -632,7 +632,29 @@ CREATE TABLE `xtb_user_avatar`  (
   PRIMARY KEY (`id`)
 ) COMMENT='系统用户头像表';
 
+-- 系统用户头像收藏表
+DROP TABLE IF EXISTS `xtb_user_avatar_favorite`;
+CREATE TABLE `xtb_user_avatar_favorite` (
+    `id` int NOT NULL AUTO_INCREMENT COMMENT '主键，自增ID',
+    `md5` varchar(64) NOT NULL UNIQUE COMMENT '数据唯一标识：MD5-ID',
+    `rtx_id` varchar(35) NOT NULL COMMENT '收藏用户RTX-ID',
+    `avatar_md5` varchar(64) NOT NULL COMMENT '头像MD5-ID',
+    `create_rtx` varchar(35) COMMENT '创建用户RTX-ID',
+    `create_time` datetime DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+    `update_rtx` varchar(35) COMMENT '更新用户RTX-ID',
+    `update_time` datetime COMMENT '更新时间',
+    `delete_rtx` varchar(35) COMMENT '取消收藏用户RTX-ID',
+    `delete_time` datetime COMMENT '取消收藏时间',
+    `status` bool DEFAULT FALSE COMMENT '收藏状态：1取消收藏；0已收藏',
+
+    PRIMARY KEY (`id`),
+    UNIQUE KEY `uq_user_avatar_favorite` (`rtx_id`, `avatar_md5`),
+    KEY `idx_user_avatar_favorite_md5` (`avatar_md5`)
+) COMMENT='系统表-用户头像收藏表';
+
 CREATE UNIQUE INDEX xtb_user_avatar_index ON xtb_user_avatar (`md5`);
+
+
 -- = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
 -- PDF文件记录表
 -- create table
