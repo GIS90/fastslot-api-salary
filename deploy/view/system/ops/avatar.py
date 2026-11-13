@@ -30,7 +30,7 @@ Life is short, I use python.
 
 ------------------------------------------------
 """
-from typing import Annotated
+from typing import Annotated, Optional
 from fastapi import APIRouter, Depends, Query, Body
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -52,10 +52,16 @@ def get_service(db: AsyncSession = Depends(get_session)) -> SystemOpsAvatarServi
 @router.get("/avatar.list", summary="数据列表")
 async def pagination(
     params: dict = Depends(pageable_like_params),
+    type_: Optional[str] = Query(default=None, alias="type", description="头像分类"),
+    favorite: Optional[str] = Query(default=None, description="是否收藏：不传/空=全部，1=已收藏，0=未收藏"),
+    sort: Optional[str] = Query(default=None, description="排序：count=使用最多，favorite=收藏最多"),
     token_rtx_id: str = Depends(depend_token_rtx),
     service: SystemOpsAvatarService = Depends(get_service)
 ) -> Status:
-    return await service.pagination(rtx_id=token_rtx_id, params=params)
+    favorite_status = 1 if favorite == "1" else (0 if favorite == "0" else None)
+    return await service.pagination(
+        rtx_id=token_rtx_id, params=params, type_=type_, favorite_status=favorite_status, sort_=sort
+    )
 
 
 @router.get("/avatar", summary="通过Md5-Id获取单条数据")

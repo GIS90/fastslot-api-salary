@@ -227,21 +227,23 @@ class SetterProfileService:
             db=self.db, rtx_id=rtx_id, avatar_md5=avatar.md5
         )
         result = {"md5": avatar.md5, "favorite": value, "favoriteCount": avatar.favorite or 0}
+
+        __now: str = get_now()
         if not favorite:
             if not value:
                 return SuccessStatus(data=result)
             favorite = await self.xtb_user_avatar_favorite_curd.new_model()
-            favorite.md5 = generator_md5(v=f"{rtx_id}-{avatar.md5}-{get_now()}")
+            favorite.md5 = generator_md5(v=f"{rtx_id}-{avatar.md5}-{__now}")
             favorite.rtx_id = rtx_id
             favorite.avatar_md5 = avatar.md5
             favorite.create_rtx = rtx_id
-            favorite.create_time = get_now()
+            favorite.create_time = __now
             favorite.status = False
             await self.xtb_user_avatar_favorite_curd.add(db=self.db, model=favorite)
             # 同步头像表收藏次数
             avatar.favorite = (avatar.favorite or 0) + 1
             avatar.update_rtx = rtx_id
-            avatar.update_time = get_now()
+            avatar.update_time = __now
             await self.xtb_user_avatar_curd.update(db=self.db, model=avatar)
             result["favoriteCount"] = avatar.favorite
             return SuccessStatus(data=result)
@@ -250,14 +252,14 @@ class SetterProfileService:
         if favorite.status != target_status:
             favorite.status = target_status
             favorite.update_rtx = rtx_id
-            favorite.update_time = get_now()
+            favorite.update_time = __now
             favorite.delete_rtx = None if value else rtx_id
-            favorite.delete_time = None if value else get_now()
+            favorite.delete_time = None if value else __now
             await self.xtb_user_avatar_favorite_curd.update(db=self.db, model=favorite)
             # 同步头像表收藏次数（收藏+1，取消收藏-1，最小为0）
             avatar.favorite = max(0, (avatar.favorite or 0) + (1 if value else -1))
             avatar.update_rtx = rtx_id
-            avatar.update_time = get_now()
+            avatar.update_time = __now
             await self.xtb_user_avatar_curd.update(db=self.db, model=avatar)
             result["favoriteCount"] = avatar.favorite
         return SuccessStatus(data=result)

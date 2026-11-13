@@ -92,12 +92,18 @@ class SystemOpsAvatarService:
         return (True, model if response_type == "model"
                         else await model_converter_dict(model=model, fields=fields, default_value="****"))
 
-    async def pagination(self, rtx_id: str, params: Dict) -> Status:
+    async def pagination(
+            self, rtx_id: str, params: Dict, type_: str = None,
+            favorite_status: int = None, sort_: str = None
+    ) -> Status:
         models: List[XtbUserAvatarModel] = await self.xtb_user_avatar_curd.pagination(
             db=self.db,
             offset=params.get("offset"),
             limit=params.get("limit"),
-            content=params.get("content")
+            content=params.get("content"),
+            type_=type_,
+            favorite_status=favorite_status,
+            sort_=sort_,
         )
         _default_data = {
             "list": [],
@@ -128,7 +134,9 @@ class SystemOpsAvatarService:
             "list": data,
             "page": params.get("page"),
             "pageSize": params.get("limit"),
-            "total": await self.xtb_user_avatar_curd.count(self.db)
+            "total": await self.xtb_user_avatar_curd.count(
+                self.db, type_=type_, favorite_status=favorite_status, content=params.get("content")
+            )
         }
         return SuccessStatus(data=result)
 

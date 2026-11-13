@@ -90,18 +90,34 @@ class XtbUserAvatarCurd(BaseCurd):
         return await self._get_model_by_field(db, XtbUserAvatarModel.name, name)
 
     @classmethod
-    async def count(cls, db: AsyncSession) -> int:
+    async def count(
+        cls, db: AsyncSession, type_: str = None, favorite_status: int = None, content: str = None, *args, **kwargs
+    ) -> int:
         try:
-            result = await db.execute(
-                select(func.count(XtbUserAvatarModel.id)).where(cls._not_deleted())
-            )
+            stmt = select(func.count(XtbUserAvatarModel.id)).where(cls._not_deleted())
+            if type_:
+                stmt = stmt.where(XtbUserAvatarModel.type == type_)
+            if favorite_status == 1:
+                stmt = stmt.where(XtbUserAvatarModel.favorite > 0)
+            elif favorite_status == 0:
+                stmt = stmt.where(or_(XtbUserAvatarModel.favorite.is_(None), XtbUserAvatarModel.favorite == 0))
+            if content:
+                stmt = stmt.where(
+                    or_(
+                        XtbUserAvatarModel.name.like(content),
+                        XtbUserAvatarModel.tag.like(content),
+                        XtbUserAvatarModel.summary.like(content)
+                    )
+                )
+            result = await db.execute(stmt)
             return result.scalar()
         except Exception as e:
             raise SQLDBHandleException(f"[{cls.__name__}*总数]{e}")
 
     @classmethod
     async def pagination(
-        cls, db: AsyncSession, offset: int = 0, limit: int = 15, content: str = None, *args, **kwargs
+        cls, db: AsyncSession, offset: int = 0, limit: int = 15, content: str = None,
+        type_: str = None, favorite_status: int = None, sort_: str = None, *args, **kwargs
     ) -> Optional[List]:
         try:
             stmt = select(
@@ -134,6 +150,12 @@ class XtbUserAvatarCurd(BaseCurd):
                 )
             )
             stmt = stmt.where(cls._not_deleted())
+            if type_:
+                stmt = stmt.where(XtbUserAvatarModel.type == type_)
+            if favorite_status == 1:
+                stmt = stmt.where(XtbUserAvatarModel.favorite > 0)
+            elif favorite_status == 0:
+                stmt = stmt.where(or_(XtbUserAvatarModel.favorite.is_(None), XtbUserAvatarModel.favorite == 0))
             if content:
                 stmt = stmt.where(
                     or_(
@@ -142,7 +164,17 @@ class XtbUserAvatarCurd(BaseCurd):
                         XtbUserAvatarModel.summary.like(content)
                     )
                 )
-            stmt = stmt.order_by(desc(XtbUserAvatarModel.create_time), desc(XtbUserAvatarModel.id)).offset(offset).limit(limit)
+            if sort_ == "count":
+                stmt = stmt.order_by(
+                    desc(XtbUserAvatarModel.count), desc(XtbUserAvatarModel.create_time), desc(XtbUserAvatarModel.id)
+                )
+            elif sort_ == "favorite":
+                stmt = stmt.order_by(
+                    desc(XtbUserAvatarModel.favorite), desc(XtbUserAvatarModel.create_time), desc(XtbUserAvatarModel.id)
+                )
+            else:
+                stmt = stmt.order_by(desc(XtbUserAvatarModel.create_time), desc(XtbUserAvatarModel.id))
+            stmt = stmt.offset(offset).limit(limit)
             result = await db.execute(stmt)
             return result.mappings().all()
         except Exception as e:
