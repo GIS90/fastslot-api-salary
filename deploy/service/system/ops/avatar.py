@@ -130,6 +130,12 @@ class SystemOpsAvatarService:
             auto_id=fields.get("id_auto"),
             auto_id_value=params.get("offset") + 1,
         )
+        # 确保设置数量/收藏数始终返回数值（报表未配置该字段时也正常展示）
+        model_map: Dict = {m.get("md5"): m for m in models}
+        for row in data:
+            _model = model_map.get(row.get("md5"))
+            row["count"] = int((_model.get("count") if _model else 0) or 0)
+            row["favorite"] = int((_model.get("favorite") if _model else 0) or 0)
         result: Dict = {
             "list": data,
             "page": params.get("page"),

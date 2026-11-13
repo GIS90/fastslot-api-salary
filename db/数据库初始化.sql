@@ -410,8 +410,11 @@ insert into csb_enum_value(`name`, `md5`, `key`, `value`, `remark`, `lock`, `sta
 ('avatar-type', '0718293a4b5c6d7e8f901a2b3c4d5e6f', 'TEXT', '文字', '头像类别：文字/字母/标语类头像', False, False, 'admin', 7),
 ('avatar-type', '18293a4b5c6d7e8f901a2b3c4d5e6f70', 'OBJECT', '物品', '头像类别：物品、静物（车、花、食物等）', False, False, 'admin', 8),
 ('avatar-type', '293a4b5c6d7e8f901a2b3c4d5e6f7081', 'GAME', '游戏', '头像类别：游戏角色/游戏截图', False, False, 'admin', 9),
-('avatar-type', '3a4b5c6d7e8f901a2b3c4d5e6f708192', 'OTHER', '其他', '头像类别：其他未归类的头像', False, False, 'admin', 10);
-
+('avatar-type', '4b5c6d7e8f901a2b3c4d5e6f708192a3', 'ARCHITECTURE', '建筑', '头像类别：建筑/城市景观（楼宇、桥梁、地标等）', False, False, 'admin', 10),
+('avatar-type', '5c6d7e8f901a2b3c4d5e6f708192a3b4', 'FOOD', '美食', '头像类别：美食餐饮（菜肴、甜点、饮品等）', False, False, 'admin', 11),
+('avatar-type', '6d7e8f901a2b3c4d5e6f708192a3b4c5', 'PLANT', '植物', '头像类别：植物花卉（花草、树木、多肉等）', False, False, 'admin', 12),
+('avatar-type', '7e8f901a2b3c4d5e6f708192a3b4c5d6', 'VEHICLE', '交通工具', '头像类别：交通工具（汽车、飞机、船只等）', False, False, 'admin', 13),
+('avatar-type', '3a4b5c6d7e8f901a2b3c4d5e6f708192', 'OTHER', '其他', '头像类别：其他未归类的头像', False, False, 'admin', 14);
 
 
 
