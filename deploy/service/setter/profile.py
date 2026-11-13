@@ -271,12 +271,15 @@ class SetterProfileService:
         if not __flag: return avatar
 
         if user.avatar != avatar.url:
+            _now = get_now()
+            # 用户表
             user.avatar = avatar.url
             user.update_rtx = rtx_id
-            user.update_time = get_now()
+            user.update_time = _now
+            # 头像表
             avatar.count = (avatar.count or 0) + 1
             avatar.update_rtx = rtx_id
-            avatar.update_time = get_now()
+            avatar.update_time = _now
             await self.xtb_user_curd.update(db=self.db, model=user)
             await self.xtb_user_avatar_curd.update(db=self.db, model=avatar)
         return SuccessStatus(data={"url": avatar.url, "count": avatar.count})
