@@ -198,6 +198,7 @@ class SetterProfileService:
         for row in models:
             item = dict(row)
             item["favorite"] = bool(item.get("favorite"))
+            item["favoriteCount"] = item.pop("favorite_count", 0) or 0
             avatar_list.append(item)
 
         result = {
@@ -222,7 +223,7 @@ class SetterProfileService:
         favorite = await self.xtb_user_avatar_favorite_curd.get_by_user_avatar(
             db=self.db, rtx_id=rtx_id, avatar_md5=avatar.md5
         )
-        result = {"md5": avatar.md5, "favorite": value}
+        result = {"md5": avatar.md5, "favorite": value, "favoriteCount": avatar.favorite or 0}
         if not favorite:
             if not value:
                 return SuccessStatus(data=result)
@@ -234,6 +235,12 @@ class SetterProfileService:
             favorite.create_time = get_now()
             favorite.status = False
             await self.xtb_user_avatar_favorite_curd.add(db=self.db, model=favorite)
+            # 同步头像表收藏次数
+            avatar.favorite = (avatar.favorite or 0) + 1
+            avatar.update_rtx = rtx_id
+            avatar.update_time = get_now()
+            await self.xtb_user_avatar_curd.update(db=self.db, model=avatar)
+            result["favoriteCount"] = avatar.favorite
             return SuccessStatus(data=result)
 
         target_status = not value
@@ -244,6 +251,12 @@ class SetterProfileService:
             favorite.delete_rtx = None if value else rtx_id
             favorite.delete_time = None if value else get_now()
             await self.xtb_user_avatar_favorite_curd.update(db=self.db, model=favorite)
+            # 同步头像表收藏次数（收藏+1，取消收藏-1，最小为0）
+            avatar.favorite = max(0, (avatar.favorite or 0) + (1 if value else -1))
+            avatar.update_rtx = rtx_id
+            avatar.update_time = get_now()
+            await self.xtb_user_avatar_curd.update(db=self.db, model=avatar)
+            result["favoriteCount"] = avatar.favorite
         return SuccessStatus(data=result)
 
     async def profile_avatar_set(self, rtx_id: str, md5: str) -> Status:

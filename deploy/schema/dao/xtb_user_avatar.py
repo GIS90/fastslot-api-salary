@@ -62,6 +62,7 @@ class XtbUserAvatarModel(baseModel, IDField, Md5Field, CUDField, StatusField, Lo
     url: Mapped[Optional[str]] = mapped_column(name="url", type_=String(120), comment="存储地址")
     or_url: Mapped[Optional[str]] = mapped_column(name="or_url", type_=String(120), comment="原始图片存储地址")
     count: Mapped[Optional[int]] = mapped_column(name="count", type_=Integer, default=0, comment="设置次数")
+    favorite: Mapped[Optional[int]] = mapped_column(name="favorite", type_=Integer, default=0, comment="收藏次数")
 
     def __str__(self):
         return f"XtbUserAvatarModel Class[DB table: {self.__tablename__}], id: {self.id}, name: {self.name}, md5: {self.md5}."

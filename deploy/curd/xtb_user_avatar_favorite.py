@@ -56,6 +56,7 @@ class XtbUserAvatarFavoriteCurd:
                 XtbUserAvatarModel.summary,
                 XtbUserAvatarModel.tag,
                 XtbUserAvatarModel.count,
+                XtbUserAvatarModel.favorite.label("favorite_count"),
                 XtbUserAvatarFavoriteModel.id.is_not(None).label("favorite"),
             ).outerjoin(
                 XtbUserAvatarFavoriteModel, join_condition
