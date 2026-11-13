@@ -179,7 +179,8 @@ class SetterProfileService:
         return True, avatar
 
     async def profile_avatar_market(
-            self, rtx_id: str, params: Dict, type_: str = None, favorite_only: bool = False
+            self, rtx_id: str, params: Dict, type_: str = None, favorite_status: int = None,
+            sort_: str = None, content: str = None
     ) -> Status:
         __flag, data = await self.__valid_model_by_rtx(
             rtx_id=rtx_id, status_check=True, response_type="model", admin_check=False
@@ -192,7 +193,9 @@ class SetterProfileService:
             offset=params.get("offset"),
             limit=params.get("limit"),
             type_=type_,
-            favorite_only=favorite_only,
+            favorite_status=favorite_status,
+            sort_=sort_,
+            content=content,
         )
         avatar_list = []
         for row in models:
@@ -206,7 +209,7 @@ class SetterProfileService:
             "page": params.get("page"),
             "pageSize": params.get("limit"),
             "total": await self.xtb_user_avatar_favorite_curd.market_count(
-                db=self.db, rtx_id=rtx_id, type_=type_, favorite_only=favorite_only
+                db=self.db, rtx_id=rtx_id, type_=type_, favorite_status=favorite_status, content=content
             ),
         }
         return SuccessStatus(data=result)

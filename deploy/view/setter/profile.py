@@ -88,12 +88,20 @@ async def profile_log(
 async def profile_avatar_market(
         params: dict = Depends(pageable_like_params),
         type_: Optional[str] = Query(default=None, alias="type", description="头像分类"),
-        favorite: bool = Query(default=False, description="仅查询我的收藏"),
+        favorite: Optional[str] = Query(default=None, description="是否收藏：不传/false=全部，true/1=已收藏，0=未收藏"),
+        sort: Optional[str] = Query(default=None, description="排序：count=使用最多，favorite=收藏最多"),
+        content: Optional[str] = Query(default=None, description="名称/标签/描述模糊查询"),
         token_rtx_id: str = Depends(depend_token_rtx),
         profile_service: SetterProfileService = Depends(get_profile_service)
 ) -> Status:
+    # 兼容布尔与数字两种传参：false 表示不筛选，0 表示未收藏
+    favorite_status = None
+    if favorite in ("1", "true", "True"):
+        favorite_status = 1
+    elif favorite == "0":
+        favorite_status = 0
     return await profile_service.profile_avatar_market(
-        rtx_id=token_rtx_id, params=params, type_=type_, favorite_only=favorite
+        rtx_id=token_rtx_id, params=params, type_=type_, favorite_status=favorite_status, sort_=sort, content=content
     )
 
 

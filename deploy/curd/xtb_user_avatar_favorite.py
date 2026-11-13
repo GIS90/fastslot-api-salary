@@ -2,7 +2,7 @@
 """用户头像收藏及头像超市数据操作。"""
 from typing import Optional, List
 
-from sqlalchemy import and_, desc, func, select
+from sqlalchemy import and_, desc, func, or_, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from deploy.schema.dao.xtb_user_avatar import XtbUserAvatarModel
@@ -40,7 +40,9 @@ class XtbUserAvatarFavoriteCurd:
         offset: int = 0,
         limit: int = 24,
         type_: str = None,
-        favorite_only: bool = False,
+        favorite_status: int = None,
+        sort_: str = None,
+        content: str = None,
     ) -> List:
         try:
             join_condition = and_(
@@ -66,11 +68,24 @@ class XtbUserAvatarFavoriteCurd:
             )
             if type_:
                 stmt = stmt.where(XtbUserAvatarModel.type == type_)
-            if favorite_only:
+            if content:
+                like_value = f"%{content}%"
+                stmt = stmt.where(or_(
+                    XtbUserAvatarModel.name.like(like_value),
+                    XtbUserAvatarModel.tag.like(like_value),
+                    XtbUserAvatarModel.summary.like(like_value),
+                ))
+            if favorite_status == 1:
                 stmt = stmt.where(XtbUserAvatarFavoriteModel.id.is_not(None))
-            stmt = stmt.order_by(
-                desc(XtbUserAvatarModel.create_time), desc(XtbUserAvatarModel.id)
-            ).offset(offset).limit(limit)
+            elif favorite_status == 0:
+                stmt = stmt.where(XtbUserAvatarFavoriteModel.id.is_(None))
+            if sort_ == "count":
+                order_by = [desc(XtbUserAvatarModel.count), desc(XtbUserAvatarModel.create_time)]
+            elif sort_ == "favorite":
+                order_by = [desc(XtbUserAvatarModel.favorite), desc(XtbUserAvatarModel.create_time)]
+            else:
+                order_by = [desc(XtbUserAvatarModel.create_time), desc(XtbUserAvatarModel.id)]
+            stmt = stmt.order_by(*order_by).offset(offset).limit(limit)
             result = await db.execute(stmt)
             return result.mappings().all()
         except Exception as e:
@@ -82,7 +97,8 @@ class XtbUserAvatarFavoriteCurd:
         db: AsyncSession,
         rtx_id: str,
         type_: str = None,
-        favorite_only: bool = False,
+        favorite_status: int = None,
+        content: str = None,
     ) -> int:
         try:
             join_condition = and_(
@@ -98,8 +114,17 @@ class XtbUserAvatarFavoriteCurd:
             )
             if type_:
                 stmt = stmt.where(XtbUserAvatarModel.type == type_)
-            if favorite_only:
+            if content:
+                like_value = f"%{content}%"
+                stmt = stmt.where(or_(
+                    XtbUserAvatarModel.name.like(like_value),
+                    XtbUserAvatarModel.tag.like(like_value),
+                    XtbUserAvatarModel.summary.like(like_value),
+                ))
+            if favorite_status == 1:
                 stmt = stmt.where(XtbUserAvatarFavoriteModel.id.is_not(None))
+            elif favorite_status == 0:
+                stmt = stmt.where(XtbUserAvatarFavoriteModel.id.is_(None))
             result = await db.execute(stmt)
             return result.scalar() or 0
         except Exception as e:
