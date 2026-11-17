@@ -30,7 +30,7 @@ Life is short, I use python.
 
 ------------------------------------------------
 """
-from typing import List
+from typing import List, Dict
 from fastapi import APIRouter, Depends, Query, File, UploadFile, Form
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -113,10 +113,10 @@ async def upload(
     return await upload_service.upload(rtx_id=token_rtx_id, upload_type=upload_type, file_=file)
 
 
-@router.post("/uploads",
-             summary="[上传]UploadFile模式多个大文件上传",
+@router.post("/avatar/uploads",
+             summary="[头像上传]UploadFile模式多个大文件上传",
              description="多个大文件上传，UploadFile对象可以获取文件属性，具体参数请查看UploadFile源码，推荐使用")
-async def uploads(
+async def avatar_uploads(
     upload_type: str = Form(..., description="上传类型"),
     files: List[UploadFile] = File(...),
     avatar_type: str | None = Form(default=None, description="头像类型（批量上传头像时生效）"),
