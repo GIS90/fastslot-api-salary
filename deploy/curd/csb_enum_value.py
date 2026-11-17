@@ -104,6 +104,10 @@ class CsbEnumValueCurd(BaseCurd):
                 CsbEnumValueModel.status != 1)
             if filter_lock:
                 stmt = stmt.where(CsbEnumValueModel.lock != True)
+            stmt = stmt.order_by(
+                asc(CsbEnumValueModel.order_id),
+                desc(CsbEnumValueModel.id)
+            )
             result = await db.execute(stmt)
             return result.scalars().all()
         except Exception as e:
@@ -122,6 +126,10 @@ class CsbEnumValueCurd(BaseCurd):
                 CsbEnumValueModel.status != 1)
             if filter_lock:
                 stmt = stmt.where(CsbEnumValueModel.lock != True)
+            stmt = stmt.order_by(
+                asc(CsbEnumValueModel.order_id),
+                desc(CsbEnumValueModel.id)
+            )
             result = await db.execute(stmt)
             return result.scalars().all()
         except Exception as e:

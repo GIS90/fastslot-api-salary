@@ -123,7 +123,7 @@ class XtbApiCurd(BaseCurd):
                         XtbApiModel.long.like(content)
                     )
                 )
-            stmt = stmt.order_by(asc(XtbApiModel.order_id), desc(XtbApiModel.create_time), asc(XtbApiModel.id)).offset(offset).limit(limit)
+            stmt = stmt.order_by(asc(XtbApiModel.order_id), desc(XtbApiModel.create_time)).offset(offset).limit(limit)
             result = await db.execute(stmt)
             return result.scalars().all()
         except Exception as e:
@@ -153,7 +153,7 @@ class XtbApiCurd(BaseCurd):
             stmt = select(XtbApiModel)
             if filter_status:
                 stmt = stmt.where(XtbApiModel.status != 1)
-            stmt = stmt.order_by(desc(XtbApiModel.create_time), asc(XtbApiModel.id))
+            stmt = stmt.order_by(asc(XtbApiModel.order_id), asc(XtbApiModel.create_time))
             result = await db.execute(stmt)
             return result.scalars().all()
         except Exception as e:
