@@ -280,7 +280,7 @@ class SystemConfigXtcsService:
 
         return data
 
-    async def one_by_key(self, rtx_id: str, key: str) -> Status:
+    async def value_by_key(self, rtx_id: str, key: str) -> Status:
         __flag, data = await self.__valid_model_by_md5_or_key(
             query_id=key,
             status_check=True,
@@ -290,6 +290,20 @@ class SystemConfigXtcsService:
             lock_check=True
         )
         return SuccessStatus(data=data) if __flag else data
+
+    async def value_by_keys(self, rtx_id: str, keys: List) -> Status:
+        models = await self.xtb_xtcs_curd.list_by_keys(
+            db=self.db, 
+            key_list=keys,
+            filter_lock=True
+        )
+        if not models:
+            return FailureStatus(code=status_code.CODE_101_SUCCESS_NO_DATA.value)
+        data: Dict = {}
+        for model in models:
+            if not model: continue
+            data[getattr(model, "key")] = getattr(model, "value")
+        return SuccessStatus(data=data)
 
     async def system_info_openapi(self, system_name: str) -> Status:
         _key_list: List = [
