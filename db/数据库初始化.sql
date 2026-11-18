@@ -156,7 +156,7 @@ VALUES
 --   > 通知管理[二级菜单]
 (6, '消息通知', 'SalaryNotify', '/salary/notify', 5, 2, '365fc754afb9cf062b6563eae3894f55', '/salary/notify', FALSE, '', 'BellFilled', TRUE, FALSE, FALSE, 'MENU', TRUE, 1100, 'admin', FALSE, FALSE, ''),
 --   >> [三级级菜单]
-(7, '钉钉绩效', 'SalaryNotifyDtalk', '/salary/notify/dtalk', 6, 3, '735d60bec2c85e6b9b82b40e0bbbcc3f', '/salary/notify/dtalk/index', FALSE, '', '', TRUE, FALSE, FALSE, 'MENU', TRUE, 1101, 'admin', FALSE, TRUE, ''),
+(7, '钉钉通知', 'SalaryNotifyDtalk', '/salary/notify/dtalk', 6, 3, '735d60bec2c85e6b9b82b40e0bbbcc3f', '/salary/notify/dtalk/index', FALSE, '', '', TRUE, FALSE, FALSE, 'MENU', TRUE, 1101, 'admin', FALSE, TRUE, ''),
 (8, '企微通知', 'SalaryNotifyQywx', '/salary/notify/qywx', 6, 3, '288da65f09e781e8406aa6e20ad73843', '/salary/notify/qywx/index', FALSE, '', '', TRUE, FALSE, FALSE, 'MENU', TRUE, 1102, 'admin', FALSE, TRUE, ''),
 (9, '邮件通知', 'SalaryNotifyEmail', '/salary/notify/email', 6, 3, '55c26864748b7cd5e79c3cf71ff54c48', '/salary/notify/email/index', FALSE, '', '', TRUE, FALSE, FALSE, 'MENU', TRUE, 1103, 'admin', FALSE, TRUE, ''),
 (10, '短信通知', 'SalaryNotifyMessage', '/salary/notify/message', 6, 3, '86a3276bf7aebc620b86e3595998d753', '/salary/notify/message/index', FALSE, '', '', TRUE, FALSE, FALSE, 'MENU', TRUE, 1104, 'admin', FALSE, TRUE, ''),
@@ -659,6 +659,73 @@ CREATE TABLE `xtb_user_avatar_favorite` (
 ) COMMENT='系统表-用户头像收藏表';
 
 CREATE UNIQUE INDEX xtb_user_avatar_index ON xtb_user_avatar (`md5`);
+-- = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
+-- 钉钉消息-信息表
+DROP TABLES IF EXISTS `salary_dtalk_message`;
+
+CREATE TABLE `salary_dtalk_message`  (
+    `id` int NOT NULL AUTO_INCREMENT COMMENT '主键，自增ID',
+    `file_name` varchar(80) NOT NULL COMMENT '文件名称',
+    `file_local_url` varchar(120) NULL COMMENT '文件存储本地路径',
+    `file_store_url` varchar(120) NULL COMMENT '文件存储云对象存储位置',
+    `md5` varchar(64) not null unique COMMENT '数据唯一标识：MD5-ID',
+    `robot` varchar(55) NULL COMMENT 'dtalk选择机器人配置md5-id',
+    `count` int NULL default 0 COMMENT '消息文件发送的累积次数',
+    `number` int NULL default 0 COMMENT '消息发送的累积次数',
+    `nsheet` int default 1 COMMENT 'sheet数',
+    `sheet_names` text COMMENT 'Sheets名称列表，以json方式存储',
+    `sheet_columns` text COMMENT 'Sheets列名的集合，以json方式存储',
+    `headers` text COMMENT 'excel的header信息，以json方式存储',
+    `set_sheet` varchar(35) COMMENT '当前设置的sheet选择索引，列表格式',
+    `cur_sheet` varchar(4) COMMENT '当前设置的sheet索引',
+    `set_column` text COMMENT '当前设置的sheet选择索引，表头列表设置，json字符串',
+    `set_title` text COMMENT '每个sheet页码的消息标题',
+    `create_rtx` varchar(35) COMMENT '创建用户RTX-ID',
+    `create_time` datetime default CURRENT_TIMESTAMP COMMENT '创建时间',
+    `update_rtx` varchar(35) COMMENT '更新用户RTX-ID',
+    `update_time` datetime COMMENT '更新时间',
+    `delete_rtx` varchar(35) COMMENT '删除用户RTX-ID',
+    `delete_time` datetime COMMENT '删除时间',
+    `status` bool default False COMMENT '数据状态：1删除；0正常（默认）',
+
+    PRIMARY KEY (`id`)
+) COMMENT='钉钉消息-信息表';
+
+CREATE UNIQUE INDEX salary_dtalk_message_index ON salary_dtalk_message (`md5`);
+-- ----------------------------------------------------------------------------------------------
+-- 钉钉消息-机器人配置表
+DROP TABLES IF EXISTS `salary_dtalk_robot`;
+
+CREATE TABLE `salary_dtalk_robot`  (
+    `id` int NOT NULL AUTO_INCREMENT COMMENT '主键，自增ID',
+    `name` varchar(30) NOT NULL COMMENT '机器人名称',
+    `md5` varchar(64) not null unique COMMENT '数据唯一标识：MD5-ID',
+    `key` varchar(30) NOT NULL COMMENT '机器人APP-KEY',
+    `secret` varchar(70) NOT NULL COMMENT '机器人APP-SECRET',
+    `select` bool DEFAULT False COMMENT '是否当前为选择',
+    `description` varchar(120) COMMENT '描述',
+    `create_rtx` varchar(35) COMMENT '创建用户RTX-ID',
+    `create_time` datetime default CURRENT_TIMESTAMP COMMENT '创建时间',
+    `update_rtx` varchar(35) COMMENT '更新用户RTX-ID',
+    `update_time` datetime COMMENT '更新时间',
+    `delete_rtx` varchar(35) COMMENT '删除用户RTX-ID',
+    `delete_time` datetime COMMENT '删除时间',
+    `status` bool default False COMMENT '数据状态：1删除；0正常（默认）',
+
+    PRIMARY KEY (`id`)
+) COMMENT='钉钉消息-机器人配置表';
+
+CREATE UNIQUE INDEX salary_dtalk_robot_index ON salary_dtalk_robot (`md5`);
+------------------------------------------------------------------------------------------------
+
+-- = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
+-- = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
+-- = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
+-- = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
+-- = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
+-- = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
+-- = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
+
 
 
 -- = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
@@ -693,16 +760,6 @@ CREATE TABLE `tool_office_pdf` (
 ) COMMENT='PDF文件记录表';
 
 CREATE UNIQUE INDEX tool_office_pdf_index ON tool_office_pdf (`md5`);
--- = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
--- = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
--- = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
--- = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
--- = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
--- = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
--- = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
--- = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
-
-
 
 
 
