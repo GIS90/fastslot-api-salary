@@ -113,9 +113,8 @@ class DingtalkLib:
                     return json_res.get("access_token")
         except Exception as e:
             LOG.error('[DingTalk] access token occur Exception: %s' % e)
-        finally:
-            LOG.error('[DingTalk]access token failure, please try again later.')
-            return ''
+        LOG.error('[DingTalk]access token failure, please try again later.')
+        return ''
 
 
     @staticmethod

@@ -99,6 +99,7 @@ class uploadUtils:
         __data: Dict = {
             "name": file_name,
             "local": real_file,
+            "store_name": _store_name,
             "url": qn_result.get("data").get("url")
         }
         return SuccessStatus(data=__data)

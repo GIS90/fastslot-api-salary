@@ -42,6 +42,7 @@ from deploy.utils.enumeration import FileTypeEnum
 from deploy.utils.utils import get_now, d2s, md5 as generator_md5
 from deploy.curd.xtb_user_avatar import XtbUserAvatarCurd
 from deploy.schema.dao.xtb_user_avatar import XtbUserAvatarModel
+from deploy.service.salary.notify.dtalk import SalaryNotifyDtalkService
 from deploy.delib.store_lib import QiNiuStoreLib
 from deploy.config import store_yun_access, store_yun_secret, store_yun_base, store_yun_space
 
@@ -80,6 +81,10 @@ class ApiUploadService:
             file_: UploadFile
             # response_type: Literal["status", "dict"] = "status",
     ) -> Status:
+        # 工资->消息通知->钉钉绩效：上传后解析Excel并写入消息表
+        if upload_type == str(FileTypeEnum.DINGTALK.value):
+            return await SalaryNotifyDtalkService(db_connection=self.db).store_upload(
+                rtx_id=rtx_id, file_=file_)
         return await self.upload_utils.upload(rtx_id=rtx_id, upload_type=upload_type, file_=file_)
 
     async def uploads(self, rtx_id: str, upload_type: str, files_: List[UploadFile],
@@ -91,7 +96,9 @@ class ApiUploadService:
             # 头像批量上传需在文件上传前缓存文件信息（upload后流已被读取）
             __file_name: str = getattr(f, 'filename', '') or ''
             __file_size: int = getattr(f, 'size', 0) or 0
-            result = await self.upload_utils.upload(rtx_id=rtx_id, upload_type=upload_type, file_=f)
+            result = await self.upload_utils.upload(rtx_id=rtx_id, upload_type=upload_type, file_=f) \
+                if upload_type != str(FileTypeEnum.DINGTALK.value) \
+                else await SalaryNotifyDtalkService(db_connection=self.db).store_upload(rtx_id=rtx_id, file_=f)
             if result.dict().get("code") == 100:
                 __success_list += 1
                 # 头像类型：上传成功后自动写入头像库记录

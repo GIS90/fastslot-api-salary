@@ -154,7 +154,7 @@ VALUES
 -- 工资模块[一级菜单]
 (5, '工资', 'Salary', '/salary', 1, 1, 'b083a446a3588547410dbd6c571c2a09', '/salary', FALSE, '', 'Promotion', TRUE, FALSE, FALSE, 'MENU', TRUE, 1000, 'admin', FALSE, FALSE, ''),
 --   > 通知管理[二级菜单]
-(6, '消息通知', 'SalaryNotify', '/salary/notify', 5, 2, '365fc754afb9cf062b6563eae3894f55', '/salary/notify', FALSE, '', 'BellFilled', TRUE, FALSE, FALSE, 'MENU', TRUE, 1100, 'admin', FALSE, FALSE, ''),
+(6, '薪资发放', 'SalaryNotify', '/salary/notify', 5, 2, '365fc754afb9cf062b6563eae3894f55', '/salary/notify', FALSE, '', 'BellFilled', TRUE, FALSE, FALSE, 'MENU', TRUE, 1100, 'admin', FALSE, FALSE, ''),
 --   >> [三级级菜单]
 (7, '钉钉通知', 'SalaryNotifyDtalk', '/salary/notify/dtalk', 6, 3, '735d60bec2c85e6b9b82b40e0bbbcc3f', '/salary/notify/dtalk/index', FALSE, '', '', TRUE, FALSE, FALSE, 'MENU', TRUE, 1101, 'admin', FALSE, TRUE, ''),
 (8, '企微通知', 'SalaryNotifyQywx', '/salary/notify/qywx', 6, 3, '288da65f09e781e8406aa6e20ad73843', '/salary/notify/qywx/index', FALSE, '', '', TRUE, FALSE, FALSE, 'MENU', TRUE, 1102, 'admin', FALSE, TRUE, ''),
@@ -274,19 +274,21 @@ insert into xtb_xtcs(`key`, `md5`, `remark`, `value`, `create_rtx`, `lock`, `sta
 ('REDIS-CACHE-EXPIRE', '4b8edc2094cb917ecb179453e9e472d7', 'Redis数据缓存时间，单位为秒，默认为4小时', '14400', 'admin', False, False, 2),
 ('USER-DEFAULT-PASSWORD', '2560983a81db89c5f8ac7bc59ceec23e', '用户默认密码', 'abcd1234@', 'admin', False, False, 3),
 ('USER-DEFAULT-AVATAR', 'ef2cee999bde28a0f2b2485127d8a389', '用户默认头像', 'http://2lstore.pygo.space/avatars/default.png', 'admin', False, False, 4),
-('USER-IMPORT-URL', '8c303643ae592c91ed5a7c45cd030fc1', '用户上传默认模板URL地址', 'http://2lstore.pygo.space/templates/%E7%B3%BB%E7%BB%9F%E7%94%A8%E6%88%B7%E6%89%B9%E9%87%8F%E5%AF%BC%E5%85%A5%E6%A8%A1%E6%9D%BFV1.0.xlsx', 'admin', False, False, 5),
-('UPLOAD-FILE-MAX', '19a7fd901645cd10a0de9b495d1f6088', '文件上传最大文件数量', '15', 'admin', False, False, 6),
-('UPLOAD-AVATAR-SIZE-MAX', 'a1b2c3d4e5f6g7h8i9j0k1l2m3n4o5p6', '图片上传大小（单位：MB）', '5', 'admin', False, False, 7),
-('UPLOAD-FILE-SIZE-MAX', 'f9e8d7c6b5a4s3d2f1g0h9j8k7l6m5n4', '文件上传大小（单位：MB）', '10', 'admin', False, False, 8),
-('SYSTEM-TITLE', '1700a58b93fe99d9edf8eec318737f1e', '系统登录页信息展示：系统标题', '智行工具平台', 'admin', False, False, 9),
-('SYSTEM-VERSION', '7bf8a92528d9e53f020bb24d80bfb967', '系统登录页信息展示：系统版本', '1.1.2', 'admin', False, False, 10),
-('SYSTEM-FEATURE', 'c827459d2ee5da92adfd826355588039', '系统登录页信息展示：系统特色', '定制化 / 高性能 / 精优雅 / 智运营', 'admin', False, False, 11),
-('SYSTEM-SUMMARY', 'b48ef16d13363753454a38b1ccf255a4', '系统登录页信息展示：系统简述', '智慧前行，合适的工具能让复杂变简单、让重复变高效。总有一款，让工作更轻松，助你提质增效，把时间留给更有价值的事。', 'admin', False, False, 12),
-('HOME-TIP-MORNING', '16d037c51df631d8c4260f04bdbee199', '系统登录温馨提示：凌晨6点～中午12点', '希望您有一个元气满满的早晨，充满动力地开始新的一天，加油哦！', 'admin', False, False, 13),
-('HOME-TIP-NOON', 'a6856a3069a3fcb0201dd43a8cc382f0', '系统登录温馨提示：中午12点～下午14点', '忙碌了一上午，确实应该适当休息一下，记得按时吃午饭，补充能量才能更好地完成下午的工作！', 'admin', False, False, 14),
-('HOME-TIP-AFTERNOON', 'a262837654996d535aa3f3790a6eba4f', '系统登录温馨提示：下午14点～下午18点', '下午是继续推进各项任务的好时间，保持专注和效率，希望您能够保持良好的状态，顺利完成每一天的目标！', 'admin', False, False, 15),
-('HOME-TIP-NIGHT', '2cb3bb4adb5d010267204a7effd2c8da', '系统登录温馨提示：下午18点～凌晨6点', '一天的努力即将结束，回顾今天的成就，为明天做好准备。别忘了放松一下自己，享受美好的夜晚时光，睡觉要有好梦。', 'admin', False, False, 16),
-('AVATAR-ROW-COUNT', '8f14e45fceea167a5a36dedd4bea2543', '用户头像列表每页显示数量', '6', 'admin', False, False, 17);
+('UPLOAD-FILE-MAX', '19a7fd901645cd10a0de9b495d1f6088', '文件上传最大文件数量', '15', 'admin', False, False, 5),
+('UPLOAD-AVATAR-SIZE-MAX', 'a1b2c3d4e5f6g7h8i9j0k1l2m3n4o5p6', '图片上传大小（单位：MB）', '5', 'admin', False, False, 6),
+('UPLOAD-FILE-SIZE-MAX', 'f9e8d7c6b5a4s3d2f1g0h9j8k7l6m5n4', '文件上传大小（单位：MB）', '10', 'admin', False, False, 7),
+('SYSTEM-TITLE', '1700a58b93fe99d9edf8eec318737f1e', '系统登录页信息展示：系统标题', '智行工具平台', 'admin', False, False, 8),
+('SYSTEM-VERSION', '7bf8a92528d9e53f020bb24d80bfb967', '系统登录页信息展示：系统版本', '1.1.2', 'admin', False, False, 9),
+('SYSTEM-FEATURE', 'c827459d2ee5da92adfd826355588039', '系统登录页信息展示：系统特色', '定制化 / 高性能 / 精优雅 / 智运营', 'admin', False, False, 10),
+('SYSTEM-SUMMARY', 'b48ef16d13363753454a38b1ccf255a4', '系统登录页信息展示：系统简述', '智慧前行，合适的工具能让复杂变简单、让重复变高效。总有一款，让工作更轻松，助你提质增效，把时间留给更有价值的事。', 'admin', False, False, 11),
+('HOME-TIP-MORNING', '16d037c51df631d8c4260f04bdbee199', '系统登录温馨提示：凌晨6点～中午12点', '希望您有一个元气满满的早晨，充满动力地开始新的一天，加油哦！', 'admin', False, False, 12),
+('HOME-TIP-NOON', 'a6856a3069a3fcb0201dd43a8cc382f0', '系统登录温馨提示：中午12点～下午14点', '忙碌了一上午，确实应该适当休息一下，记得按时吃午饭，补充能量才能更好地完成下午的工作！', 'admin', False, False, 13),
+('HOME-TIP-AFTERNOON', 'a262837654996d535aa3f3790a6eba4f', '系统登录温馨提示：下午14点～下午18点', '下午是继续推进各项任务的好时间，保持专注和效率，希望您能够保持良好的状态，顺利完成每一天的目标！', 'admin', False, False, 14),
+('HOME-TIP-NIGHT', '2cb3bb4adb5d010267204a7effd2c8da', '系统登录温馨提示：下午18点～凌晨6点', '一天的努力即将结束，回顾今天的成就，为明天做好准备。别忘了放松一下自己，享受美好的夜晚时光，睡觉要有好梦。', 'admin', False, False, 15),
+('AVATAR-ROW-COUNT', '8f14e45fceea167a5a36dedd4bea2543', '用户头像列表每页显示数量', '6', 'admin', False, False, 16),
+('USER-IMPORT-URL', '8c303643ae592c91ed5a7c45cd030fc1', '用户上传默认模板URL地址', 'http://2lstore.pygo.space/templates/%E7%B3%BB%E7%BB%9F%E7%94%A8%E6%88%B7%E6%89%B9%E9%87%8F%E5%AF%BC%E5%85%A5%E6%A8%A1%E6%9D%BFV1.0.xlsx', 'admin', False, False, 17),
+('SALARY-DTALK-FILE-URL', 'e10adc3949ba59abbe56e057f20f883e', '钉钉通知模板下载', 'http://2lstore.pygo.space/templates/%E7%B3%BB%E7%BB%9F%E7%94%A8%E6%88%B7%E6%89%B9%E9%87%8F%E5%AF%BC%E5%85%A5%E6%A8%A1%E6%9D%BFV1.0.xlsx', 'admin', False, False, 18),
+('SALARY-QYWX-FILE-URL', '25f9e794323b453885f5181f1b624d0b', '企业微信通知模板下载', 'http://2lstore.pygo.space/templates/%E7%B3%BB%E7%BB%9F%E7%94%A8%E6%88%B7%E6%89%B9%E9%87%8F%E5%AF%BC%E5%85%A5%E6%A8%A1%E6%9D%BFV1.0.xlsx', 'admin', False, False, 19);
 -- = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
 -- CSB_ENUM_EKY 枚举Key表
 -- create table && index
@@ -666,8 +668,8 @@ DROP TABLES IF EXISTS `salary_dtalk_message`;
 CREATE TABLE `salary_dtalk_message`  (
     `id` int NOT NULL AUTO_INCREMENT COMMENT '主键，自增ID',
     `file_name` varchar(80) NOT NULL COMMENT '文件名称',
-    `file_local_url` varchar(120) NULL COMMENT '文件存储本地路径',
-    `file_store_url` varchar(120) NULL COMMENT '文件存储云对象存储位置',
+    `file_local_url` varchar(150) NULL COMMENT '文件存储本地路径',
+    `file_store_url` varchar(150) NULL COMMENT '文件存储云对象存储位置',
     `md5` varchar(64) not null unique COMMENT '数据唯一标识：MD5-ID',
     `robot` varchar(55) NULL COMMENT 'dtalk选择机器人配置md5-id',
     `count` int NULL default 0 COMMENT '消息文件发送的累积次数',

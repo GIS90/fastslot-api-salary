@@ -48,6 +48,8 @@ from deploy.view.system.config.dict import router as system_config_dict_router
 from deploy.view.system.config.report import router as system_config_report_router
 from deploy.view.system.config.api import router as system_config_api_router
 
+from deploy.view.salary.notify.dtalk import router as salary_notify_dtalk_router
+
 from deploy.view.setter.profile import router as setter_profile_router
 
 
@@ -87,5 +89,6 @@ add_routers = [
     system_config_dict_router,
     system_config_report_router,
     system_config_api_router,
+    salary_notify_dtalk_router,
     setter_profile_router
 ]
