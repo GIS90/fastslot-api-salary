@@ -158,6 +158,7 @@ class FileTypeEnum(IntEnum):
     PDF = 3
     DINGTALK = 4
     USER_IMPORT = 5
+    XTCS = 6
     AVATAR = 100
 
 
@@ -222,6 +223,7 @@ class CsbEnumKEY(StrEnum):
     XTBB_FIXED_STATUS = "xtbb-fixed-status"
     XTBB_FIELD_TYPE = "xtbb-field-type"
     AVATAR_TYPE = "avatar-type"
+    XTCS_TYPE = "xtcs-type"
 
 
 

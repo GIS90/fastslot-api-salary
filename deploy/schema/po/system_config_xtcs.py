@@ -39,6 +39,7 @@ __all__ = ["XtbXtcsAddModel", "XtbXtcsUpdateModel"]
 
 
 class __XtbXtcsBaseModel(baseModel):
+    type: str = Field("VALUE", max_length=35, description="参数类型", alias="type")
     remark: str = Field(..., min_length=1, max_length=35, description="参数说明", alias="remark")
     value: str = Field(..., min_length=1, max_length=255, description="参数值", alias="value")
     order_id: int = Field(..., description="排序编号", alias="orderId")
@@ -46,6 +47,7 @@ class __XtbXtcsBaseModel(baseModel):
     model_config = {
         "json_schema_extra": {
             "example": {
+                "type": "VALUE",
                 "remark": "系统参数说明",
                 "value": "参数值",
                 "order_id": 1

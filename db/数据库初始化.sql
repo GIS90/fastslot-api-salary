@@ -251,6 +251,7 @@ CREATE TABLE `xtb_xtcs`  (
     `id` int NOT NULL AUTO_INCREMENT COMMENT '主键，自增ID',
     `key` varchar(35) NOT NULL COMMENT '参数KEY（大写）',
     `md5` varchar(64) NOT NULL UNIQUE COMMENT '数据唯一标识：MD5-ID',
+    `type` varchar(35) COMMENT '参数类型',
     `remark` varchar(35) COMMENT '参数说明',
     `value` varchar(255) COMMENT '参数值',
     `create_rtx` varchar(35) COMMENT '创建用户RTX-ID',
@@ -326,7 +327,8 @@ insert into csb_enum_key(`key`, `md5`, `value`, `lock`, `status`, `create_rtx`, 
 ('xtbb-field-fixed', '3f9a8c2b7e1d4f6a5c8e2b9d7a3f1c4e', '报表字段固定状态', False, False, 'admin', 9),
 ('xtbb-field-type', 'a7d2f9e4c1b8a3d6f5e2c9b7a4d1f8e3', '报表字段类型', False, False, 'admin', 10),
 ('xtbb-field-align', 'e3b0c44298fc1c149afbf4c8996fb924', '报表字段对齐方式', False, False, 'admin', 11),
-('avatar-type', '7f3a9c2e1b8d4f6a0c5e9b2d7a1f3c8e', '头像类型', False, False, 'admin', 12);
+('avatar-type', '7f3a9c2e1b8d4f6a0c5e9b2d7a1f3c8e', '头像类型', False, False, 'admin', 12),
+('xtcs-type', '8621ffdbc5698829397d97767ac13db3', '系统参数类型', False, False, 'admin', 13);
 
 -- CSB_ENUM_VALUE枚举 Value表
 -- create table && index
@@ -418,7 +420,11 @@ insert into csb_enum_value(`name`, `md5`, `key`, `value`, `remark`, `lock`, `sta
 ('avatar-type', '5c6d7e8f901a2b3c4d5e6f708192a3b4', 'FOOD', '美食', '头像类别：美食餐饮（菜肴、甜点、饮品等）', False, False, 'admin', 11),
 ('avatar-type', '6d7e8f901a2b3c4d5e6f708192a3b4c5', 'PLANT', '植物', '头像类别：植物花卉（花草、树木、多肉等）', False, False, 'admin', 12),
 ('avatar-type', '7e8f901a2b3c4d5e6f708192a3b4c5d6', 'VEHICLE', '交通工具', '头像类别：交通工具（汽车、飞机、船只等）', False, False, 'admin', 13),
-('avatar-type', '3a4b5c6d7e8f901a2b3c4d5e6f708192', 'OTHER', '其他', '头像类别：其他未归类的头像', False, False, 'admin', 14);
+('avatar-type', '3a4b5c6d7e8f901a2b3c4d5e6f708192', 'OTHER', '其他', '头像类别：其他未归类的头像', False, False, 'admin', 14),
+('xtcs-type', 'd8578edf8458ce06fbc5bb76a58c5ca4 ', 'VALUE', '值', '参数类型：值', False, False, 'admin', 1),
+('xtcs-type', '7d793037a0760186574b0282f2f435e7', 'FILE', '文件', '参数类型：文件', False, False, 'admin', 2),
+('xtcs-type', 'e10adc3949ba59abbe56e057f20f883e', 'OTHER', '其他', '参数类型：其他', True, False, 'admin', 3);
+
 
 
 

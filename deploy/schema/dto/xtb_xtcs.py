@@ -37,6 +37,7 @@ from deploy.utils.enumeration import FieldTypeEnum as ft
 xtb_xtcs_detail_fields: List = [
     {"key": "key", "type": ft.STR, "name": "key", "null": False},
     {"key": "md5", "type": ft.STR, "name": "md5", "null": False},
+    {"key": "type", "type": ft.STR, "name": "type", "null": True},
     {"key": "remark", "type": ft.STR, "name": "remark", "null": False},
     {"key": "value", "type": ft.STR, "name": "value", "null": False},
     {"key": "order_id", "type": ft.INT, "name": "orderId", "null": True},
@@ -46,6 +47,7 @@ xtb_xtcs_detail_fields: List = [
 xtb_xtcs_view_fields: List = [
     {"key": "key"},
     {"key": "md5"},
+    {"key": "type"},
     {"key": "remark"},
     {"key": "value"},
     {"key": "create_rtx", "type": ft.STR, "name": "createRtx", "null": True},

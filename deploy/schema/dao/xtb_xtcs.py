@@ -52,6 +52,7 @@ class XtbXtcsModel(baseModel, IDField, Md5Field, CUDField, LockField, StatusFiel
     __table_args__ = ({'comment': '系统表-系统参数'})
 
     key: Mapped[str] = mapped_column(name="key", type_=String(35), comment="参数KEY")
+    type: Mapped[str] = mapped_column(name="type", type_=String(35), comment="参数类型")
     remark: Mapped[str] = mapped_column(name="remark", type_=String(35), comment="参数说明")
     value: Mapped[str] = mapped_column(name="value", type_=String(255), comment="参数值")
 
