@@ -425,7 +425,7 @@ class SalaryNotifyDtalkService:
         }
         return SuccessStatus(data=result)
 
-    async def detail(self, md5: str) -> Status:
+    async def detail(self, rtx_id: str, md5: str) -> Status:
         __flag, data = await self.__valid_model_by_md5(
             query_id=md5, query_type="message", response_type="dict")
         return data if not __flag else SuccessStatus(data=data)
@@ -473,7 +473,7 @@ class SalaryNotifyDtalkService:
         await self.salary_dtalk_message_curd.update(db=self.db, model=model)
         return SuccessStatus(data={"md5": model.md5})
 
-    async def change_sheet(self, md5: str, sheet: str) -> Status:
+    async def change_sheet(self, rtx_id: str, md5: str, sheet: str) -> Status:
         __flag, model = await self.__get_alive_message(md5)
         if not __flag: return model
         cur_sheet: str = str(sheet or "0")
@@ -536,7 +536,7 @@ class SalaryNotifyDtalkService:
             default_value="****"
         )
 
-    async def robot_list(self) -> Status:
+    async def robot_list(self, rtx_id: str) -> Status:
         models = await self.salary_dtalk_robot_curd.option(db=self.db)
         __list: List[Dict] = []
         for index, model in enumerate(models or [], start=1):
@@ -569,7 +569,7 @@ class SalaryNotifyDtalkService:
         await self.db.commit()
         return SuccessStatus(data={"md5": model.md5})
 
-    async def robot_detail(self, md5: str) -> Status:
+    async def robot_detail(self, rtx_id: str, md5: str) -> Status:
         __flag, data = await self.__valid_model_by_md5(
             query_id=md5, query_type="robot", response_type="dict")
         if not __flag:
@@ -630,7 +630,7 @@ class SalaryNotifyDtalkService:
         await self.db.commit()
         return SuccessStatus()
 
-    async def robot_ping(self, md5: str) -> Status:
+    async def robot_ping(self, rtx_id: str, md5: str) -> Status:
         __flag, model = await self.__get_alive_robot(md5)
         if not __flag: return model
         if not model.key or not model.secret:
@@ -647,7 +647,7 @@ class SalaryNotifyDtalkService:
         return SuccessStatus(data={"md5": md5})
 
     # - - - - - - - - - - - - - - - - - - - - 发送 - - - - - - - - - - - - - - - - - - - -
-    async def send_init(self, md5: str) -> Status:
+    async def send_init(self, rtx_id: str, md5: str) -> Status:
         __flag, model = await self.__get_alive_message(md5)
         if not __flag: return model
         robots = await self.salary_dtalk_robot_curd.option(db=self.db)

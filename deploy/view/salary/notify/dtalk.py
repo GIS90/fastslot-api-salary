@@ -71,7 +71,7 @@ async def one(
     token_rtx_id: str = Depends(depend_token_rtx),
     service: SalaryNotifyDtalkService = Depends(get_service)
 ) -> Status:
-    return await service.detail(md5=md5)
+    return await service.detail(rtx_id=token_rtx_id, md5=md5)
 
 
 @router.put("/dtalk", summary="更新设置")
@@ -90,7 +90,7 @@ async def change_sheet(
     token_rtx_id: str = Depends(depend_token_rtx),
     service: SalaryNotifyDtalkService = Depends(get_service)
 ) -> Status:
-    return await service.change_sheet(md5=md5, sheet=sheet)
+    return await service.change_sheet(rtx_id=token_rtx_id, md5=md5, sheet=sheet)
 
 
 @router.delete("/dtalk.soft", summary="单条软删除")
@@ -118,7 +118,7 @@ async def send_init(
     token_rtx_id: str = Depends(depend_token_rtx),
     service: SalaryNotifyDtalkService = Depends(get_service)
 ) -> Status:
-    return await service.send_init(md5=md5)
+    return await service.send_init(rtx_id=token_rtx_id, md5=md5)
 
 
 @router.post("/dtalk.send", summary="发送钉钉消息")
@@ -136,7 +136,7 @@ async def robot_list(
     token_rtx_id: str = Depends(depend_token_rtx),
     service: SalaryNotifyDtalkService = Depends(get_service)
 ) -> Status:
-    return await service.robot_list()
+    return await service.robot_list(rtx_id=token_rtx_id)
 
 
 @router.post("/dtalk/robot", summary="新增机器人")
@@ -154,7 +154,7 @@ async def robot_detail(
     token_rtx_id: str = Depends(depend_token_rtx),
     service: SalaryNotifyDtalkService = Depends(get_service)
 ) -> Status:
-    return await service.robot_detail(md5=md5)
+    return await service.robot_detail(rtx_id=token_rtx_id, md5=md5)
 
 
 @router.put("/dtalk/robot", summary="更新机器人")
@@ -201,4 +201,4 @@ async def robot_ping(
     token_rtx_id: str = Depends(depend_token_rtx),
     service: SalaryNotifyDtalkService = Depends(get_service)
 ) -> Status:
-    return await service.robot_ping(md5=md5)
+    return await service.robot_ping(rtx_id=token_rtx_id, md5=md5)
