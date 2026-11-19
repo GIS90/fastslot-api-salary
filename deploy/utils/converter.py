@@ -32,6 +32,9 @@ Life is short, I use python.
 """
 import datetime
 from typing import Any, List, Dict, Optional
+import json
+from deploy.config import store_yun_base as STORE_YUN_BASE_URL
+from deploy.utils.utils import get_qiniu_abs_file_url
 
 
 __all__ = [
@@ -119,11 +122,17 @@ async def model_converter_dict(
                 case "timestamp" if hasattr(field_value, 'timestamp'):
                     model_dict[field_name] = field_value.timestamp()
                 case "list":
+                    if isinstance(field_value, str):
+                        field_value = json.loads(field_value)
                     model_dict[field_name] = list(field_value)
                 case "dict":
+                    if isinstance(field_value, str):
+                        field_value = json.loads(field_value)
                     model_dict[field_name] = dict(field_value)
                 case "split_list":
                     model_dict[field_name] = [str(x) for x in field_value.split(",")] if field_value else []
+                case "file_store_url":
+                    model_dict[field_name] = get_qiniu_abs_file_url(url=field_value)
                 case _:
                     model_dict[field_name] = str(field_value)
         except:

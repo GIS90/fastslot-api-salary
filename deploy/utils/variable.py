@@ -34,3 +34,7 @@ from deploy.utils.enumeration import XtbReportKey
 
 # 不显示选择列的报表
 REPORT_NOT_SELECTION_LIST: List = [XtbReportKey.SystemMainMenu]
+
+
+# 表格格式
+EXCEL_FORMAT: List[str] = [".xls", ".xlsx"]

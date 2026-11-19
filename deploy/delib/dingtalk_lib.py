@@ -174,5 +174,5 @@ class DingtalkLib:
             msg = '[DingTalk]发送信息 [%s] 异常: %s' % (to_id, error)
             LOG.error(msg)
             return FailureStatus(
-                code=status_code.CODE_902_OTHER_THREE_API_SEND_FAILURE.value,
+                code=status_code.CODE_902_OTHER_THREE_API_EXCEPTION.value,
                 message=msg)

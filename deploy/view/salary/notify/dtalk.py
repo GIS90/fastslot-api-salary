@@ -62,7 +62,7 @@ async def pagination(
     token_rtx_id: str = Depends(depend_token_rtx),
     service: SalaryNotifyDtalkService = Depends(get_service)
 ) -> Status:
-    return await service.pagination(params=params)
+    return await service.pagination(rtx_id=token_rtx_id, params=params)
 
 
 @router.get("/dtalk", summary="通过Md5-Id获取单条数据")
@@ -110,14 +110,6 @@ async def delete_batch(
 ) -> Status:
     return await service.delete_batch(
         rtx_id=token_rtx_id, md5_list=params.model_dump().get("md5"))
-
-
-@router.get("/dtalk.template", summary="模板下载")
-async def template(
-    token_rtx_id: str = Depends(depend_token_rtx),
-    service: SalaryNotifyDtalkService = Depends(get_service)
-) -> Status:
-    return await service.template()
 
 
 @router.get("/dtalk.sendInit", summary="发送初始化")

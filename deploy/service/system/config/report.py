@@ -390,7 +390,8 @@ class SystemConfigReportService:
             rtx_id: str,
             xtbb: str,
             type_: Literal["list", "export"],
-            is_md5: bool = True
+            is_md5: bool = True,
+            is_file_url: bool = False
     ) -> Dict:
         """
         用于数据展示的字段列
@@ -398,6 +399,7 @@ class SystemConfigReportService:
         :param xtbb: 系统报表
         :param type_: 列类型，list表示列表列，export表示导出列
         :param is_md5: 是否需要md5标识，默认True
+        :param is_file_url: 是否需要文件url列标识，默认False
         :return: Dict
             格式：{
                 "column": [],
@@ -420,6 +422,9 @@ class SystemConfigReportService:
         column: List = []
         if is_md5:
             column.append({"key": "md5", "type": "string"})
+        if is_file_url:
+            # 云存储文件url列
+            column.append({"key": "file_store_url", "type": "file_store_url", "name": "url"})
         _id_auto: bool = False
         for model in models:
             if not model: continue

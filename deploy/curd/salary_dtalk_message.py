@@ -67,12 +67,16 @@ class SalaryDtalkMessageCurd(BaseCurd):
 
     @classmethod
     async def pagination(
-            cls, db: AsyncSession, offset: int = 0, limit: int = 15, *args, **kwargs
+            cls, db: AsyncSession, offset: int = 0, limit: int = 15,
+            content: Optional[str] = None, *args, **kwargs
     ) -> Optional[List[SalaryDtalkMessageModel]]:
         try:
             stmt = select(SalaryDtalkMessageModel).where(
                 SalaryDtalkMessageModel.status.is_(False)
-            ).order_by(desc(SalaryDtalkMessageModel.create_time)).offset(offset).limit(limit)
+            )
+            if content:
+                stmt = stmt.where(SalaryDtalkMessageModel.file_name.like("%%%s%%" % content))
+            stmt = stmt.order_by(desc(SalaryDtalkMessageModel.create_time)).offset(offset).limit(limit)
             result = await db.execute(stmt)
             return result.scalars().all()
         except Exception as e:

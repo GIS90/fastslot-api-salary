@@ -265,4 +265,5 @@ class XtbReportKey(StrEnum):
     SystemOpsLog = "SystemOpsLog"
     SystemOpsTask = "SystemOpsTask"
     SystemOpsAvatar = "SystemOpsAvatar"
+    SalaryNotifyDtalk = "SalaryNotifyDtalk"
 

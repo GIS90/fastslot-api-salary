@@ -33,8 +33,7 @@ Life is short, I use python.
 import os
 import json
 import hashlib
-from datetime import datetime
-from typing import Dict, List, Optional, Tuple, Any
+from typing import Dict, List, Optional, Tuple, Any, Literal
 from fastapi import UploadFile
 from sqlalchemy.ext.asyncio import AsyncSession
 from starlette.concurrency import run_in_threadpool
@@ -42,23 +41,29 @@ from starlette.concurrency import run_in_threadpool
 import xlrd
 import openpyxl
 
-from deploy.config import store_yun_base
+from deploy.config import (
+    store_yun_base,
+    table_default_null as TABLE_DEFAULT_NULL,
+    table_default_db_id as TABLE_DEFAULT_DB_ID
+)
 from deploy.curd.salary_dtalk_message import SalaryDtalkMessageCurd
 from deploy.curd.salary_dtalk_robot import SalaryDtalkRobotCurd
 from deploy.schema.dao.salary_dtalk import SalaryDtalkMessageModel, SalaryDtalkRobotModel
+from deploy.service.system.config.report import SystemConfigReportService
 from deploy.utils.status import Status, SuccessStatus, FailureStatus
 from deploy.utils.status_value import StatusCode as status_code
-from deploy.utils.utils import get_now, md5 as generator_md5
-from deploy.utils.enumeration import FileTypeEnum
+from deploy.utils.utils import get_now, md5 as generator_md5, get_qiniu_abs_file_url, xtbb_field_id_value
+from deploy.utils.converter import model_converter_dict, many_model_converter_dict
+from deploy.utils.enumeration import FileTypeEnum, XtbReportKey
+from deploy.schema.dto.salary_dtalk import (
+    salary_dtalk_message_detail_fields,
+    salary_dtalk_robot_detail_fields
+)
+from deploy.utils.exception import ReportNotColumnException
 from deploy.utils.upload import uploadUtils
 from deploy.delib.excel_lib import ExcelLib
+from deploy.utils.variable import EXCEL_FORMAT
 from deploy.delib.dingtalk_lib import DingtalkLib
-
-
-_EXCEL_FORMAT: List[str] = [".xls", ".xlsx"]
-_DTALK_TEMPLATE_URL: str = f"{store_yun_base}/templates/钉钉消息通知模板V1.0.xls"
-_SHEET_NAME_LIMIT: int = 60
-_SHEET_NUM_LIMIT: int = 20
 
 
 class SalaryNotifyDtalkService:
@@ -68,6 +73,7 @@ class SalaryNotifyDtalkService:
         self.db: AsyncSession = db_connection
         self.salary_dtalk_message_curd: SalaryDtalkMessageCurd = SalaryDtalkMessageCurd()
         self.salary_dtalk_robot_curd: SalaryDtalkRobotCurd = SalaryDtalkRobotCurd()
+        self.system_config_report_service: SystemConfigReportService = SystemConfigReportService(db_connection=db_connection)
         self.upload_utils: uploadUtils = uploadUtils()
         self.excel_lib: ExcelLib = ExcelLib()
 
@@ -123,93 +129,70 @@ class SalaryNotifyDtalkService:
     def __sheet_options(self, model: SalaryDtalkMessageModel) -> List[Dict]:
         return [{"key": k, "value": v} for k, v in self.__sheet_names(model).items()]
 
-    def __message_title(self, model: SalaryDtalkMessageModel) -> str:
-        titles = self.__json_dict(model.set_title)
-        sheet_names = self.__sheet_names(model)
-        if not sheet_names and not titles:
-            return "暂无消息标题"
-        __str_title = ""
-        if sheet_names:
-            for k, v in sheet_names.items():
-                __str_title += "【%s】：%s｜" % (v or "Sheet", titles.get(str(k)) or "暂无消息标题")
-        else:
-            for k, v in titles.items():
-                __str_title += "【%s】：%s｜" % (k or "Sheet", v or "暂无消息标题")
-        __str_title = __str_title[0:-1]
-        if len(__str_title) > _SHEET_NAME_LIMIT:
-            __str_title = "%s...具体详情查看设置" % __str_title[0:_SHEET_NAME_LIMIT]
-        return __str_title
-
-    def __url(self, model: SalaryDtalkMessageModel) -> str:
-        return f"{store_yun_base}/{model.file_store_url}" if model.file_store_url else ""
-
-    def __message_list_dict(self, model: SalaryDtalkMessageModel) -> Dict:
-        sheet_names = self.__sheet_names(model)
-        set_sheet_index = self.__set_sheet_index(model)
-        set_sheet_name = ";".join([sheet_names.get(i) or "" for i in set_sheet_index])
-        if len(set_sheet_name) > _SHEET_NAME_LIMIT:
-            set_sheet_name = "%s...具体查看请下载" % set_sheet_name[0:_SHEET_NAME_LIMIT]
-        sheet_name_list = self.__sheet_options(model)
-        if len(sheet_name_list) > _SHEET_NUM_LIMIT:
-            sheet_name_list = sheet_name_list[0:_SHEET_NUM_LIMIT]
-            sheet_name_list.append({"key": "...N", "value": "（具体查看请下载）"})
-        return {
-            "md5": model.md5,
-            "fileName": model.file_name,
-            "setSheetName": set_sheet_name,
-            "sheetNames": sheet_name_list,
-            "nsheet": model.nsheet or 1,
-            "count": model.count or 0,
-            "number": model.number or 0,
-            "setTitle": self.__message_title(model),
-            "createRtx": model.create_rtx or "",
-            "createTime": model.create_time.strftime("%Y-%m-%d %H:%M:%S") if model.create_time else "",
-            "url": self.__url(model),
-        }
-
-    def __message_detail_dict(self, model: SalaryDtalkMessageModel) -> Dict:
+    async def __message_detail_dict(self, model: SalaryDtalkMessageModel) -> Dict:
         titles = self.__json_dict(model.set_title)
         all_columns = self.__json_dict(model.sheet_columns)
         set_columns = self.__json_dict(model.set_column)
         cur_sheet = str(model.cur_sheet or "0")
-        return {
-            "md5": model.md5,
-            "fileName": model.file_name,
+        # DTO字段转换
+        data: Dict = await model_converter_dict(
+            model=model,
+            fields=salary_dtalk_message_detail_fields,
+            default_value=""
+        ) or {}
+        # 业务计算字段
+        data.update({
+            "curSheet": cur_sheet,
+            "nsheet": model.nsheet or 1,
             "sheetNames": self.__sheet_options(model),
             "setSheetIndex": self.__set_sheet_index(model),
-            "curSheet": cur_sheet,
             "setTitle": titles.get(cur_sheet) or "",
             "setColumns": all_columns.get(cur_sheet) or [],
             "setSelectColumn": [str(i) for i in (set_columns.get(cur_sheet) or [])],
-            "nsheet": model.nsheet or 1,
-            "url": self.__url(model),
-        }
+            "url": get_qiniu_abs_file_url(model.file_store_url or ""),
+        })
+        return data
+
+    async def __valid_model_by_md5(
+        self,
+        query_id: str,
+        query_type: Literal["message", "robot"] = "message",
+        status_check: bool = True,
+        response_type: Literal["dict", "model"] = "model",
+    ) -> Tuple[bool, Any]:
+        """统一校验md5对应的数据是否存在、是否已删除（参考system main user service）"""
+        if not query_id:
+            return False, FailureStatus(code=status_code.CODE_4002_REQUEST_PARAMETER_MISS_MD5.value)
+
+        is_message: bool = query_type == "message"
+        model = (
+            await self.salary_dtalk_message_curd.get_by_md5(db=self.db, md5=query_id)
+            if is_message
+            else await self.salary_dtalk_robot_curd.get_by_md5(db=self.db, md5=query_id)
+        )
+        entity: str = "数据" if is_message else "机器人数据"
+        if not model:
+            return False, FailureStatus(
+                code=status_code.CODE_501_DATA_NOT_EXIST.value,
+                message=f"{entity}不存在"
+            )
+        if status_check and getattr(model, "status", False):
+            return False, FailureStatus(
+                code=status_code.CODE_503_DATA_DELETE_NOT_EDIT.value,
+                message=f"{entity}已删除，不允许操作"
+            )
+        if response_type == "dict":
+            return True, (
+                await self.__message_detail_dict(model) if is_message
+                else await self.__robot_dict(model)
+            )
+        return True, model
 
     async def __get_alive_message(self, md5: str) -> Tuple[bool, Any]:
-        if not md5:
-            return False, FailureStatus(code=status_code.CODE_4002_REQUEST_PARAMETER_MISS_MD5.value)
-        model = await self.salary_dtalk_message_curd.get_by_md5(db=self.db, md5=md5)
-        if not model:
-            return False, FailureStatus(code=status_code.CODE_501_DATA_NOT_EXIST.value)
-        if getattr(model, "status", False):
-            return False, FailureStatus(
-                code=status_code.CODE_503_DATA_DELETE_NOT_EDIT.value,
-                message="数据已删除，不允许操作"
-            )
-        return True, model
+        return await self.__valid_model_by_md5(query_id=md5, query_type="message")
 
     async def __get_alive_robot(self, md5: str) -> Tuple[bool, Any]:
-        if not md5:
-            return False, FailureStatus(code=status_code.CODE_4002_REQUEST_PARAMETER_MISS_MD5.value)
-        model = await self.salary_dtalk_robot_curd.get_by_md5(db=self.db, md5=md5)
-        if not model:
-            return False, FailureStatus(code=status_code.CODE_501_DATA_NOT_EXIST.value, message="机器人数据不存在")
-        if getattr(model, "status", False):
-            return False, FailureStatus(
-                code=status_code.CODE_503_DATA_DELETE_NOT_EDIT.value,
-                message="机器人数据已删除，不允许操作"
-            )
-        return True, model
+        return await self.__valid_model_by_md5(query_id=md5, query_type="robot")
 
     @staticmethod
     def __rename_local_file(local_url: str, new_name: str) -> str:
@@ -302,15 +285,16 @@ class SalaryNotifyDtalkService:
 
     @staticmethod
     def __format_message(content: Dict, title: str) -> Dict:
-        title = title or "%s自动化提醒" % get_now()
-        text = "### %s" % title
+        title = title or f"{get_now()}【自动化提醒】"
+        text = f"### {title}"
         for k, v in (content or {}).items():
             if not k and not v:
                 continue
             if isinstance(v, float):
                 v = round(v, 2)
-            text += "  \n  - %s: %s" % (k, v)
-        return {"title": "%s    详情..." % title, "text": text}
+            text += f"  \n  - {k}: {v}"
+        # return {"title": f"{title}    详情...", "text": text}
+        return {"title": title, "text": text}
 
     def __send_by_robot(self, app_key: str, app_secret: str, rows: List[Dict], title: str) -> Tuple[int, int]:
         """同步方法：在线程池中执行钉钉发送，返回(成功数, 失败数)，-1表示Token失败"""
@@ -345,7 +329,7 @@ class SalaryNotifyDtalkService:
     async def store_upload(self, rtx_id: str, file_: UploadFile) -> Status:
         """上传Excel文件并解析入库"""
         file_name = getattr(file_, "filename", "") or ""
-        if os.path.splitext(file_name)[-1].lower() not in _EXCEL_FORMAT:
+        if os.path.splitext(file_name)[-1].lower() not in EXCEL_FORMAT:
             return FailureStatus(code=status_code.CODE_454_REQUEST_FILE_NOT_SUPPORT.value)
         if len(file_name) > 80:
             return FailureStatus(code=status_code.CODE_405_REQUEST_PARAMETER_EXCEED_LEN_MAX.value, message="文件名称长度超出限制")
@@ -396,51 +380,65 @@ class SalaryNotifyDtalkService:
         model.set_column = json.dumps(self.__default_columns(excel_headers.get("columns") or {}), ensure_ascii=False)
         model.set_title = json.dumps({})
         model.create_rtx = rtx_id
-        model.create_time = datetime.now()
+        model.create_time = get_now()
         model.status = False
         await self.salary_dtalk_message_curd.add(db=self.db, model=model)
         return SuccessStatus(data={"name": model.file_name, "md5": md5_value})
 
-    async def pagination(self, params: Dict) -> Status:
-        models = await self.salary_dtalk_message_curd.pagination(
-            db=self.db, offset=params.get("offset"), limit=params.get("limit"))
-        __default_data: Dict = {
-            "list": [], "page": params.get("page"), "pageSize": params.get("limit"), "total": 0
+    async def pagination(self, rtx_id: str, params: Dict) -> Status:
+        models: List[SalaryDtalkMessageModel] = await self.salary_dtalk_message_curd.pagination(
+            db=self.db,
+            offset=params.get("offset"),
+            limit=params.get("limit"),
+            content=params.get("content")
+        )
+        _default_data = {
+            "list": [],
+            "page": params.get("page"),
+            "pageSize": params.get("limit"),
+            "total": 0
         }
         if not models:
-            return FailureStatus(code=status_code.CODE_101_SUCCESS_NO_DATA.value, data=__default_data)
+            return FailureStatus(code=status_code.CODE_101_SUCCESS_NO_DATA.value, data=_default_data)
 
-        __list: List = []
-        for index, model in enumerate(models, start=(params.get("offset") or 0) + 1):
-            item = self.__message_list_dict(model)
-            item["id"] = index
-            __list.append(item)
-        return SuccessStatus(data={
-            "list": __list,
+        fields: Dict = await self.system_config_report_service.report_column_by_xtbb(
+            rtx_id=rtx_id,
+            xtbb=XtbReportKey.SalaryNotifyDtalk.value,
+            type_="list",
+            is_md5=True,
+            is_file_url=True
+        )
+        if not fields:
+            return FailureStatus(code=status_code.CODE_102_SUCCESS_NO_COLUMN.value, data=_default_data)
+        data: List = await many_model_converter_dict(
+            models=models,
+            fields=fields.get("column"),
+            default_value=TABLE_DEFAULT_NULL,
+            auto_id=fields.get("id_auto"),
+            auto_id_value=(params.get("offset") or 0) + 1
+        )
+        result: Dict = {
+            "list": data,
             "page": params.get("page"),
             "pageSize": params.get("limit"),
             "total": await self.salary_dtalk_message_curd.count(self.db)
-        })
+        }
+        return SuccessStatus(data=result)
 
     async def detail(self, md5: str) -> Status:
-        __flag, data = await self.__get_alive_message(md5)
-        if not __flag:
-            return data
-        return SuccessStatus(data=self.__message_detail_dict(data))
-
-    async def template(self) -> Status:
-        return SuccessStatus(data={"url": _DTALK_TEMPLATE_URL})
+        __flag, data = await self.__valid_model_by_md5(
+            query_id=md5, query_type="message", response_type="dict")
+        return data if not __flag else SuccessStatus(data=data)
 
     async def update(self, rtx_id: str, params: Dict) -> Status:
         __flag, model = await self.__get_alive_message(params.get("md5"))
-        if not __flag:
-            return model
+        if not __flag: return model
 
-        name: str = params.get("name") or ""
-        if os.path.splitext(name)[-1].lower() not in _EXCEL_FORMAT:
+        name: str = params.get("name") or f"{get_now()}.xlsx" # 加上默认文件名称
+        if os.path.splitext(name)[-1].lower() not in EXCEL_FORMAT:
             return FailureStatus(
                 code=status_code.CODE_404_REQUEST_PARAMETER_VALUE_ERROR.value,
-                message="文件格式只支持.xls、.xlsx"
+                message=f"文件格式只支持{EXCEL_FORMAT}"
             )
         set_sheet: List = params.get("set_sheet") or []
         if not isinstance(set_sheet, list) or not set_sheet:
@@ -457,6 +455,7 @@ class SalaryNotifyDtalkService:
         cur_sheet: str = str(params.get("sheet") or "0")
 
         if name != model.file_name:
+            # 重命名本地文件
             new_local = self.__rename_local_file(model.file_local_url, name)
             if new_local:
                 model.file_local_url = new_local
@@ -470,14 +469,13 @@ class SalaryNotifyDtalkService:
         set_columns[cur_sheet] = [str(i) for i in column]
         model.set_column = json.dumps(set_columns, ensure_ascii=False)
         model.update_rtx = rtx_id
-        model.update_time = datetime.now()
+        model.update_time = get_now()
         await self.salary_dtalk_message_curd.update(db=self.db, model=model)
         return SuccessStatus(data={"md5": model.md5})
 
     async def change_sheet(self, md5: str, sheet: str) -> Status:
         __flag, model = await self.__get_alive_message(md5)
-        if not __flag:
-            return model
+        if not __flag: return model
         cur_sheet: str = str(sheet or "0")
         titles: Dict = self.__json_dict(model.set_title)
         all_columns: Dict = self.__json_dict(model.sheet_columns)
@@ -491,11 +489,10 @@ class SalaryNotifyDtalkService:
 
     async def delete(self, rtx_id: str, md5: str) -> Status:
         __flag, model = await self.__get_alive_message(md5)
-        if not __flag:
-            return model
+        if not __flag: return model
         model.status = True
         model.delete_rtx = rtx_id
-        model.delete_time = datetime.now()
+        model.delete_time = get_now()
         await self.salary_dtalk_message_curd.update(db=self.db, model=model)
         return SuccessStatus(data={"md5": md5})
 
@@ -509,40 +506,41 @@ class SalaryNotifyDtalkService:
     async def download(self, rtx_id: str, params: Dict) -> List[Dict]:
         models = await self.salary_dtalk_message_curd.list_all(
             db=self.db, md5_list=(params or {}).get("list"))
-        __res: List[Dict] = []
-        for index, model in enumerate(models or [], start=1):
-            item = self.__message_list_dict(model)
-            __res.append({
-                "序号": index,
-                "文件名称": item.get("fileName"),
-                "操作Sheet": item.get("setSheetName"),
-                "Sheet数": item.get("nsheet"),
-                "操作次数": item.get("count"),
-                "发送条数": item.get("number"),
-                "消息标题": item.get("setTitle"),
-                "上传用户RTX": item.get("createRtx"),
-                "创建时间": item.get("createTime"),
-            })
-        return __res
+        fields: Dict = await self.system_config_report_service.report_column_by_xtbb(
+            rtx_id=rtx_id,
+            xtbb=XtbReportKey.SalaryNotifyDtalk.value,
+            type_="export",
+            is_md5=False
+        )
+        if not fields:
+            raise ReportNotColumnException(detail="[钉钉消息通知]未配置导出表头")
+
+        __auto_id_name: Any = xtbb_field_id_value(options=fields.get("column"))
+        data: List = await many_model_converter_dict(
+            models=models,
+            fields=fields.get("column"),
+            default_value=TABLE_DEFAULT_NULL,
+            auto_id=fields.get("id_auto"),
+            auto_id_name=__auto_id_name if __auto_id_name else TABLE_DEFAULT_DB_ID,
+            auto_id_value=1,
+        )
+        return data
 
     # - - - - - - - - - - - - - - - - - - - - 机器人 - - - - - - - - - - - - - - - - - - - -
     @staticmethod
-    def __robot_dict(model: SalaryDtalkRobotModel) -> Dict:
-        return {
-            "md5": model.md5,
-            "name": model.name,
-            "key": model.key,
-            "secret": model.secret,
-            "select": True if model.select else False,
-            "description": model.description or "",
-            "createTime": model.create_time.strftime("%Y-%m-%d %H:%M:%S") if model.create_time else "",
-        }
+    async def __robot_dict(model: SalaryDtalkRobotModel) -> Dict:
+        # DTO字段转换
+        return await model_converter_dict(
+            model=model,
+            fields=salary_dtalk_robot_detail_fields,
+            default_value="****"
+        )
 
     async def robot_list(self) -> Status:
         models = await self.salary_dtalk_robot_curd.option(db=self.db)
         __list: List[Dict] = []
         for index, model in enumerate(models or [], start=1):
-            item = self.__robot_dict(model)
+            item = await self.__robot_dict(model)
             item["id"] = index
             __list.append(item)
         return SuccessStatus(data={"list": __list, "total": len(__list)})
@@ -564,16 +562,19 @@ class SalaryNotifyDtalkService:
         model.select = True if params.get("select") else False
         model.description = params.get("description") or ""
         model.create_rtx = rtx_id
-        model.create_time = datetime.now()
+        model.create_time = get_now()
         model.status = False
         await self.salary_dtalk_robot_curd.add(db=self.db, model=model)
+        # 显式提交，保证接口响应前数据已落库（否则前端紧随的列表刷新会读到旧数据）
+        await self.db.commit()
         return SuccessStatus(data={"md5": model.md5})
 
     async def robot_detail(self, md5: str) -> Status:
-        __flag, model = await self.__get_alive_robot(md5)
+        __flag, data = await self.__valid_model_by_md5(
+            query_id=md5, query_type="robot", response_type="dict")
         if not __flag:
-            return model
-        return SuccessStatus(data=self.__robot_dict(model))
+            return data
+        return SuccessStatus(data=data)
 
     async def robot_update(self, rtx_id: str, params: Dict) -> Status:
         __flag, model = await self.__get_alive_robot(params.get("md5"))
@@ -588,8 +589,10 @@ class SalaryNotifyDtalkService:
         model.description = params.get("description") or ""
         model.select = True if params.get("select") else False
         model.update_rtx = rtx_id
-        model.update_time = datetime.now()
+        model.update_time = get_now()
         await self.salary_dtalk_robot_curd.update(db=self.db, model=model)
+        # 显式提交，保证接口响应前数据已落库（否则前端紧随的列表刷新会读到旧数据）
+        await self.db.commit()
         return SuccessStatus(data={"md5": model.md5})
 
     async def robot_select(self, rtx_id: str, md5: str, select: bool) -> Status:
@@ -600,8 +603,10 @@ class SalaryNotifyDtalkService:
         await self.db.refresh(model)
         model.select = bool(select)
         model.update_rtx = rtx_id
-        model.update_time = datetime.now()
+        model.update_time = get_now()
         await self.salary_dtalk_robot_curd.update(db=self.db, model=model)
+        # 显式提交，保证接口响应前数据已落库（否则前端紧随的列表刷新会读到旧数据）
+        await self.db.commit()
         return SuccessStatus(data={"md5": md5})
 
     async def robot_delete(self, rtx_id: str, md5: str) -> Status:
@@ -610,8 +615,10 @@ class SalaryNotifyDtalkService:
             return model
         model.status = True
         model.delete_rtx = rtx_id
-        model.delete_time = datetime.now()
+        model.delete_time = get_now()
         await self.salary_dtalk_robot_curd.update(db=self.db, model=model)
+        # 显式提交，保证接口响应前数据已落库（否则前端紧随的列表刷新会读到旧数据）
+        await self.db.commit()
         return SuccessStatus(data={"md5": md5})
 
     async def robot_delete_batch(self, rtx_id: str, md5_list: List[str]) -> Status:
@@ -619,12 +626,13 @@ class SalaryNotifyDtalkService:
             return FailureStatus(code=status_code.CODE_403_REQUEST_PARAMETER_NOT_NULL.value)
         await self.salary_dtalk_robot_curd.batch_soft_delete(
             db=self.db, md5_list=md5_list, rtx_id=rtx_id)
+        # 显式提交，保证接口响应前数据已落库（否则前端紧随的列表刷新会读到旧数据）
+        await self.db.commit()
         return SuccessStatus()
 
     async def robot_ping(self, md5: str) -> Status:
         __flag, model = await self.__get_alive_robot(md5)
-        if not __flag:
-            return model
+        if not __flag: return model
         if not model.key or not model.secret:
             return FailureStatus(
                 code=status_code.CODE_505_DATA_INCOMPLETE.value,
@@ -641,8 +649,7 @@ class SalaryNotifyDtalkService:
     # - - - - - - - - - - - - - - - - - - - - 发送 - - - - - - - - - - - - - - - - - - - -
     async def send_init(self, md5: str) -> Status:
         __flag, model = await self.__get_alive_message(md5)
-        if not __flag:
-            return model
+        if not __flag: return model
         robots = await self.salary_dtalk_robot_curd.option(db=self.db)
         robot_index: str = ""
         robot_enums: List[Dict] = []
@@ -667,17 +674,15 @@ class SalaryNotifyDtalkService:
         if not robot_model.key or not robot_model.secret:
             return FailureStatus(
                 code=status_code.CODE_505_DATA_INCOMPLETE.value,
-                message="缺少key或者secret，请完善机器人配置信息"
-            )
+                message="缺少key或者secret，请完善机器人配置信息")
         file_path: str = message_model.file_local_url or ""
         if not file_path or not os.path.exists(file_path):
             return FailureStatus(
                 code=status_code.CODE_451_REQUEST_FILE_NOT_EXIST.value,
-                message="文件不存在，请重新上传"
-            )
+                message="文件不存在，请重新上传")
         sheet_list: List = params.get("sheet") or []
         if not sheet_list:
-            return FailureStatus(code=status_code.CODE_403_REQUEST_PARAMETER_NOT_NULL.value, message="请选择发送的Sheet")
+            return FailureStatus(code=status_code.CODE_403_REQUEST_PARAMETER_NOT_NULL.value, message="请选择发送的Sheet，并配置列和标题")
 
         set_columns: Dict = self.__json_dict(message_model.set_column)
         set_titles: Dict = self.__json_dict(message_model.set_title)
@@ -695,7 +700,7 @@ class SalaryNotifyDtalkService:
             )
             if not rows:
                 item["ok"] = False
-                item["message"] = "文件第%sSheet无数据" % (int(__sheet) + 1)
+                item["message"] = f"文件第{int(__sheet) + 1}Sheet无数据"
                 __results.append(item)
                 continue
             success, failure = await run_in_threadpool(
@@ -712,18 +717,18 @@ class SalaryNotifyDtalkService:
                 )
             __number += success + failure
             item["ok"] = True
-            item["message"] = "成功：%s，失败：%s" % (success, failure)
+            item["message"] = f"成功：{success}，失败：{failure}"
             __results.append(item)
 
         message_model.count = (message_model.count or 0) + 1
         message_model.number = (message_model.number or 0) + __number
         message_model.robot = robot_model.md5
         message_model.update_rtx = rtx_id
-        message_model.update_time = datetime.now()
+        message_model.update_time = get_now()
         await self.salary_dtalk_message_curd.update(db=self.db, model=message_model)
 
         __message_list: List[str] = []
         for item in __results:
             __name = sheet_names.get(item.get("sheet")) or "Sheet"
-            __message_list.append("【%s】：%s" % (__name, item.get("message")))
+            __message_list.append(f"【{__name}】：{item.get('message')}")
         return SuccessStatus(message="；".join(__message_list))

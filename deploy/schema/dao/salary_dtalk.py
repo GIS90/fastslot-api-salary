@@ -81,7 +81,7 @@ class SalaryDtalkRobotModel(baseModel, IDField, Md5Field, CUDField, StatusField)
 
     name: Mapped[str] = mapped_column(name="name", type_=String(30), comment="机器人名称")
     key: Mapped[str] = mapped_column(name="key", type_=String(30), comment="机器人APP-KEY")
-    secret: Mapped[str] = mapped_column(name="secret", type_=String(70), comment="机器人APP-SECRET")
+    secret: Mapped[str] = mapped_column(name="secret", type_=String(80), comment="机器人APP-SECRET")
     select: Mapped[bool] = mapped_column(name="select", type_=Boolean, default=False, comment="是否当前默认：1是；0否（默认）")
     description: Mapped[Optional[str]] = mapped_column(name="description", type_=String(120), comment="描述")
 

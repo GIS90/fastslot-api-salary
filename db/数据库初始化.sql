@@ -710,7 +710,7 @@ CREATE TABLE `salary_dtalk_robot`  (
     `name` varchar(30) NOT NULL COMMENT '机器人名称',
     `md5` varchar(64) not null unique COMMENT '数据唯一标识：MD5-ID',
     `key` varchar(30) NOT NULL COMMENT '机器人APP-KEY',
-    `secret` varchar(70) NOT NULL COMMENT '机器人APP-SECRET',
+    `secret` varchar(80) NOT NULL COMMENT '机器人APP-SECRET',
     `select` bool DEFAULT False COMMENT '是否当前为选择',
     `description` varchar(120) COMMENT '描述',
     `create_rtx` varchar(35) COMMENT '创建用户RTX-ID',

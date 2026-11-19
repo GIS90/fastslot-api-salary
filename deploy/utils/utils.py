@@ -45,7 +45,11 @@ from datetime import datetime, timedelta
 from pathlib import Path, PurePath
 from fastapi.exceptions import RequestValidationError
 from deploy.utils.enumeration import FileTypeEnum
-from deploy.config import store_cache as STORE_CACHE, table_default_db_id as TABLE_DEFAULT_DB_ID
+from deploy.config import (
+    store_cache as STORE_CACHE, 
+    table_default_db_id as TABLE_DEFAULT_DB_ID, 
+    store_yun_base as STORE_YUN_BASE_URL
+)
 
 """ - - - - - - - - - - - - - - - - - 加密类 - - - - - - - - - - - - - - - - -"""
 
@@ -761,3 +765,10 @@ def format_redis_key(
         return  f"kv_{ev_response}_{ev_filter_lock}_{key}"
     else:
         return f"xtcs_{xtcs_response}_{key}"
+
+
+""" - - - - - - - - - - - - - - - - - 云存储类 - - - - - - - - - - - - - - - - -"""
+def get_qiniu_abs_file_url(url: str) -> str:
+    if not url: return ""
+    return  f"{STORE_YUN_BASE_URL}{url}" if url.startswith("/") else f"{STORE_YUN_BASE_URL}/{url}"
+   
