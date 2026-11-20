@@ -72,6 +72,7 @@ class SalaryDtalkRobotAddModel(baseModel):
     name: str = Field(..., min_length=1, max_length=30, description="机器人名称")
     key: str = Field(..., min_length=1, max_length=30, description="机器人APP-KEY")
     secret: str = Field(..., min_length=1, max_length=70, description="机器人APP-SECRET")
+    agent_id: Optional[str] = Field(default="", alias="agentId", max_length=30, description="钉钉应用ID（AgentId）")
     description: Optional[str] = Field(default="", max_length=120, description="描述")
     select: bool = Field(default=False, description="是否设置为默认机器人")
 
@@ -82,6 +83,7 @@ class SalaryDtalkRobotAddModel(baseModel):
                 "name": "薪资机器人",
                 "key": "dingxxxxxxxx",
                 "secret": "SECxxxxxxxx",
+                "agentId": "1000002",
                 "description": "用于发送绩效消息",
                 "select": True
             }
@@ -100,6 +102,7 @@ class SalaryDtalkRobotUpdateModel(SalaryDtalkRobotAddModel):
                 "name": "薪资机器人",
                 "key": "dingxxxxxxxx",
                 "secret": "SECxxxxxxxx",
+                "agentId": "1000002",
                 "description": "用于发送绩效消息",
                 "select": True
             }

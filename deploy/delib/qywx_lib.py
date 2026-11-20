@@ -3,98 +3,64 @@
 """
 ------------------------------------------------
 
-describe: 
-    企业微信消息通知
-    腾讯企业微信官网提供一整套WebHook API接口，内容相当丰富，可以实现内部、第三方等各种各样的功能
-    详情参考reference urls
+describe:
+    企业微信消息通知（应用消息 API 封装）
 
 base_info:
     __author__ = PyGo
     __time__ = 2025/12/7 22:01
-    __version__ = v.1.0.0
+    __version__ = v.1.0.1
     __mail__ = gaoming971366@163.com
     __blog__ = www.pygo.space
     __project__ = fastslot-api-salary
     __file_name__ = qywx_lib.py
 
 usage:
-qywx_lib = QYWXMessageLib(corp_id=企业号标识, secret=管理组凭证密钥, agent_id=机器人应用ID)
-qywx_lib.send_to_user_by_markdown(to_user, message)
+    qywx_lib = QYWXMessageLib(corp_id=企业号标识, secret=应用凭证密钥, agent_id=应用ID)
+    qywx_lib.send(to_user=['userid1'], content={'data': '消息内容'}, stype='markdown')
 
-初始化必须的参数：
-    - corp_id: 企业号标识
-    - secret: 管理组凭证密钥
-    - agent_id: 机器人应用ID
+    初始化必须的参数：
+        - corp_id:  企业号标识（CorpID）
+        - secret:   应用凭证密钥（Secret）
+        - agent_id: 企业应用ID（AgentId）
 
 design:
-    运用requests模拟API请求，这里主要实现了2大请求：
-        - ACCESS TOKEN：认证token获取
-        - SEND MESSAGE：发送消息
+    基于 requests 模拟 API 请求，主要实现：
+        - ACCESS TOKEN：认证 token 获取（带缓存，有效期内复用）
+        - SEND MESSAGE：发送应用消息
+        - RECALL MESSAGE：撤回消息
+        - TEMP MEDIA：临时素材上传
 
 reference urls:
-  - ACCESS TOKEN：https://developer.work.weixin.qq.com/document/path/91039
-  - 发送应用消息：https://developer.work.weixin.qq.com/document/path/90236
-  - 全局错误码：https://developer.work.weixin.qq.com/document/path/90313#10649
-  - 上传临时素材：https://developer.work.weixin.qq.com/document/path/90253
-  - 上传图片：https://developer.work.weixin.qq.com/document/path/90256
-  --------------------------------------------------------------------------------------
-    企业微信API response：
+    - ACCESS TOKEN：https://developer.work.weixin.qq.com/document/path/91039
+    - 发送应用消息：https://developer.work.weixin.qq.com/document/path/90236
+    - 全局错误码：https://developer.work.weixin.qq.com/document/path/90313
+    - 上传临时素材：https://developer.work.weixin.qq.com/document/path/90253
+    - MARKDOWN语法：https://developer.work.weixin.qq.com/document/path/90236
+
+    企业微信 API response：
     {
-      "errcode" : 0,
-      "errmsg" : "ok",
-      "invaliduser" : "userid1|userid2",
-      "invalidparty" : "partyid1|partyid2",
+      "errcode": 0, "errmsg": "ok",
+      "invaliduser": "userid1|userid2",
+      "invalidparty": "partyid1|partyid2",
       "invalidtag": "tagid1|tagid2",
-      "unlicenseduser" : "userid3|userid4",
-      "msgid": "xxxx",
-      "response_code": "xyzxyz"
+      "unlicenseduser": "userid3|userid4",
+      "msgid": "xxxx", "response_code": "xyzxyz"
     }
-  --------------------------------------------------------------------------------------
-
-ACCESS_TOKEN请求方式：POST（HTTPS）
-请求地址： https://qyapi.weixin.qq.com/cgi-bin/message/send?access_token=ACCESS_TOKEN
-
-返回示例：
-    {
-      "errcode" : 0,
-      "errmsg" : "ok",
-      "invaliduser" : "userid1|userid2",
-      "invalidparty" : "partyid1|partyid2",
-      "invalidtag": "tagid1|tagid2",
-      "unlicenseduser" : "userid3|userid4",
-      "msgid": "xxxx",
-      "response_code": "xyzxyz"
-    }
-    - errcode：返回码
-    - errmsg：对返回码的文本描述内容
-    - invaliduser：不合法的userid，不区分大小写，统一转为小写
-    - invalidparty：不合法的partyid
-    - invalidtag：不合法的标签id
-    - unlicenseduser：没有基础接口许可(包含已过期)的userid
-    - msgid：消息id，用于撤回应用消息
-    - response_code：仅消息类型为“按钮交互型”，“投票选择型”和“多项选择型”的模板卡片消息返回，应用可使用response_code调用更新模版卡片消息接口，24小时内有效，且只能使用一次
-
-
-- 错误码查询工具：https://open.work.weixin.qq.com/devtool/query
-- 发消息API参考：https://developer.work.weixin.qq.com/document/path/90236
-- MARKDOWN语法：https://developer.work.weixin.qq.com/document/path/90236#%E6%94%AF%E6%8C%81%E7%9A%84markdown%E8%AF%AD%E6%B3%95
 
 python version:
     python3
 
-
-Enjoy the good life every day！！!
-Life is short, I use python.
-
 ------------------------------------------------
 """
-import json
 import os
-from typing import List, Dict, Optional
+import time
+import threading
+from typing import Any, ClassVar, Dict, List, Optional, Tuple
+from urllib.parse import quote
 
 from deploy.delib.http_lib import HttpLibApi
-from deploy.utils.status import Status, SuccessStatus, FailureStatus
-from deploy.utils.status_value import StatusMsg as status_msg
+from deploy.utils.status import SuccessStatus, FailureStatus
 from deploy.config import (qywx_base, qywx_token_api, qywx_send_api,
                            qywx_recall_api, qywx_upload_api, qywx_temp_api)
 from deploy.utils.utils import get_file_size
@@ -110,8 +76,9 @@ QYWX_TEMP_GET: str = qywx_temp_api
 
 
 class QYWXMessageLib:
+    """企业微信应用消息客户端"""
 
-    types: List = [
+    types: ClassVar[List[str]] = [
         'text',         # 文本
         'image',        # 图片消息
         'voice',        # 语音消息
@@ -119,50 +86,32 @@ class QYWXMessageLib:
         'file',         # 文件消息
         'textcard',     # 文本卡片消息
         'news',         # 图文消息
-        'mpnews',       # 多图文消息（mpnews类型的图文消息，跟普通的图文消息一致，唯一的差异是图文内容存储在企业微信。多次发送mpnews，会被认为是不同的图文，阅读、点赞的统计会被分开计算。）
-        'markdown',     # markdown消息
-        'miniprogram_notice',     # 小程序通知消息
-        'template_card@text_notice',              # 模板卡片消息 > 文本通知型
-        'template_card@news_notice',              # 模板卡片消息 > 图文展示型
-        'template_card@button_interaction',       # 模板卡片消息 > 按钮交互型
-        'template_card@vote_interaction',         # 模板卡片消息 > 投票选择型
-        'template_card@multiple_interaction',     # 模板卡片消息 > 多项选择型
-    ]
-
-    safe_kwagrs_types: List = [
-        'text',   # 文本
-        'image',  # 图片消息
-        'video',  # 视频消息
-        'file',   # 文件消息
-        'mpnews'  # 图文消息
-    ]
-
-    enable_id_trans_kwagrs_types: List = [
-        'text',         # 文本
-        'textcard',     # 文本卡片消息
-        'news',         # 图文消息
         'mpnews',       # 多图文消息
-        'miniprogram_notice',  # 小程序通知消息
-        'template_card@text_notice',              # 模板卡片消息 > 文本通知型
-        'template_card@news_notice',              # 模板卡片消息 > 图文展示型
-        'template_card@button_interaction',       # 模板卡片消息 > 按钮交互型
-        'template_card@vote_interaction',         # 模板卡片消息 > 投票选择型
-        'template_card@multiple_interaction',     # 模板卡片消息 > 多项选择型
+        'markdown',     # markdown消息
+        'miniprogram_notice',                     # 小程序通知消息
+        'template_card@text_notice',              # 模板卡片 > 文本通知型
+        'template_card@news_notice',              # 模板卡片 > 图文展示型
+        'template_card@button_interaction',       # 模板卡片 > 按钮交互型
+        'template_card@vote_interaction',         # 模板卡片 > 投票选择型
+        'template_card@multiple_interaction',     # 模板卡片 > 多项选择型
     ]
 
-    content_types: List = [
-        'text',  # 文本
-        'markdown'  # markdown消息
+    safe_kwargs_types: ClassVar[List[str]] = [
+        'text', 'image', 'video', 'file', 'mpnews'
     ]
 
-    temp_upload_types: List = [
-        'image',     # 图片
-        'voice',     # 语音
-        'video',     # 视频
-        'file',      # 普通文件
+    enable_id_trans_kwargs_types: ClassVar[List[str]] = [
+        'text', 'textcard', 'news', 'mpnews', 'miniprogram_notice',
+        'template_card@text_notice', 'template_card@news_notice',
+        'template_card@button_interaction', 'template_card@vote_interaction',
+        'template_card@multiple_interaction',
     ]
 
-    temp_upload_types_verify: Dict = {
+    content_types: ClassVar[List[str]] = ['text', 'markdown']
+
+    temp_upload_types: ClassVar[List[str]] = ['image', 'voice', 'video', 'file']
+
+    temp_upload_types_verify: ClassVar[Dict[str, Dict[str, Any]]] = {
         'image': {
             'suffix': ['.jpg', '.jpeg', '.png'],
             'size': 10 * 1024 * 1024
@@ -173,13 +122,13 @@ class QYWXMessageLib:
         },
         'video': {
             'suffix': [
-                '.wmv', '.asf', '.asx',    # 微软视频
-                '.rm', '.rmvb',   # Real Player
-                '.mp4',      # MPEG视频
-                '.3gp',      # 手机视频
-                '.m4v', '.mov',   # Apple视频
-                '.mpg', '.mpeg', '.mpe',   # MPEG视频
-                '.avi', '.dat', '.mkv', '.flv', '.vob'  # 其他常见视频
+                '.wmv', '.asf', '.asx',       # 微软视频
+                '.rm', '.rmvb',               # Real Player
+                '.mp4',                       # MPEG视频
+                '.3gp',                       # 手机视频
+                '.m4v', '.mov',               # Apple视频
+                '.mpg', '.mpeg', '.mpe',      # MPEG视频
+                '.avi', '.dat', '.mkv', '.flv', '.vob'
             ],
             'size': 10 * 1024 * 1024
         },
@@ -189,374 +138,253 @@ class QYWXMessageLib:
         }
     }
 
+    # access_token 缓存：{ corp_id + secret: (token, 过期时间戳) }
+    _token_cache: ClassVar[Dict[str, Tuple[str, float]]] = {}
+    _token_lock: ClassVar[threading.Lock] = threading.Lock()
+    # 提前 5 分钟过期，避免边界时刻 token 失效
+    TOKEN_EXPIRE_BUFFER: ClassVar[int] = 300
+
     def __init__(self, corp_id: str, secret: str, agent_id: str) -> None:
         """
-        Initialize parameter
         :param corp_id: 企业号标识
-        :param secret: 管理组凭证密钥
-        :param agent_id: 机器人应用ID
+        :param secret: 应用凭证密钥
+        :param agent_id: 企业应用ID
         """
         self.CORP_ID: str = corp_id
         self.SECRET: str = secret
-        self.AGENT_ID: str = agent_id
+        # 企业微信 API 要求 agentid 为整型，兼容字符串配置
+        try:
+            self.AGENT_ID: Any = int(agent_id)
+        except (TypeError, ValueError):
+            self.AGENT_ID = agent_id
         self.http = HttpLibApi(QYWX_BASE_URL)
-        self.token: str = self.__init_token()   # 每次实例化调用初始化access token
+        self.token: Optional[str] = self.__init_token()
 
     def __str__(self) -> str:
-        return f"[QYWXMessageLib] Class: corp_id: {self.CORP_ID}, agent_id: {self.AGENT_ID}"
+        return f"[QYWXMessageLib] corp_id: {self.CORP_ID}, agent_id: {self.AGENT_ID}"
 
     def __repr__(self) -> str:
         return self.__str__()
 
-    def __init_token(self) -> str:
+    @classmethod
+    def clear_token_cache(cls, corp_id: Optional[str] = None, secret: Optional[str] = None) -> None:
+        """清除 token 缓存；不传参数时清空全部，传参时只清除对应应用"""
+        with cls._token_lock:
+            if corp_id is None:
+                cls._token_cache.clear()
+            else:
+                cls._token_cache.pop(f"{corp_id}:{secret or ''}", None)
+
+    def __init_token(self) -> Optional[str]:
+        """获取 access_token，有效期内复用缓存避免频繁请求
+
+        GET https://qyapi.weixin.qq.com/cgi-bin/gettoken?corpid=ID&corpsecret=SECRET
         """
-        Initialize access token
-        :return: string
+        cache_key = f"{self.CORP_ID}:{self.SECRET}"
+        with self._token_lock:
+            cached = self._token_cache.get(cache_key)
+            if cached and cached[1] > time.time():
+                return cached[0]
 
-        请求方式： GET（HTTPS）
-        请求地址： https://qyapi.weixin.qq.com/cgi-bin/gettoken?corpid=ID&corpsecret=SECRET
-            - ID：企业号标识
-            - SECRET：管理组凭证密钥
-        返回示例：
-            {
-               "errcode": 0,
-               "errmsg": "ok",
-               "access_token": "accesstoken000001",
-               "expires_in": 7200
-            }
-            - errcode：出错返回码，为0表示成功，非0表示调用失败
-            - errmsg：返回码提示语
-            - access_token：获取到的凭证，最长为512字节
-            - expires_in：凭证的有效时间（秒）
-
-        ACCESS TOKEN API参考：https://developer.work.weixin.qq.com/document/path/91039
-
-        TODO
-        7200秒（2小时）后续优化为缓存机制，避免在有效期内频繁调用
-        """
-        params: Dict = {
-            "corpid": self.CORP_ID,
-            "corpsecret": self.SECRET
-        }
-        status, response = self.http.get_json(url=QYWX_ACCESS_TOKEN, params=params)
-        if not status:
+        params: Dict = {"corpid": self.CORP_ID, "corpsecret": self.SECRET}
+        try:
+            status, response = self.http.get_json(url=QYWX_ACCESS_TOKEN, params=params)
+        except Exception as error:
+            LOG.error(f"[QYWXMessageLib]获取token异常：{error}")
             return None
-        return response.get("access_token") \
-            if response.get("errcode") == 0 and response.get("errmsg") == "ok" else None
+
+        if not status or not isinstance(response, dict):
+            LOG.warning("[QYWXMessageLib]获取token请求失败")
+            return None
+        if response.get("errcode") != 0 or response.get("errmsg") != "ok":
+            LOG.warning(f"[QYWXMessageLib]获取token失败：{response.get('errmsg')}")
+            return None
+
+        token = response.get("access_token")
+        if not token:
+            return None
+
+        try:
+            expires_in = int(response.get("expires_in") or 7200)
+        except (TypeError, ValueError):
+            expires_in = 7200
+        with self._token_lock:
+            self._token_cache[cache_key] = (
+                token,
+                time.time() + max(expires_in - self.TOKEN_EXPIRE_BUFFER, 60)
+            )
+        return token
 
     def check_token(self) -> bool:
-        """
-        check access token is or not available
-        :return: bool
-        """
-        return True if self.token \
-            else False
+        """access_token 是否可用"""
+        return bool(self.token)
 
-    def format_content(self, ftype: str = 'text', content: Dict = None) -> Dict:
-        """
-        根据发送消息的类型格式化消息体内容
-        :param ftype: 消息体类型
-        :param content: 消息体内容
-
-        :return: json
-        """
-        new_content: Dict = dict()
-        if not content:
-            return new_content
-        if ftype not in self.types:
-            return new_content
-        # 依据消息类型格式化数据
+    def format_content(self, ftype: str = 'text', content: Optional[Dict] = None) -> Dict:
+        """按消息类型格式化消息体内容"""
+        if not content or ftype not in self.types:
+            return {}
+        data = content.get('data')
+        if data is None or data == "":
+            return {}
         if ftype in self.content_types:
-            new_content['content'] = content.get('data')
-            return new_content
-        elif ftype in self.temp_upload_types:
-            new_content['media_id'] = content.get('data')
-            return new_content
-        else:
-            return new_content
+            # text/markdown 的 content 必须是字符串；
+            # 兼容误传 {"title":..., "text":...} 的情况（钉钉消息体格式）
+            if isinstance(data, dict):
+                data = data.get('text') or data.get('content') or ''
+            return {'content': str(data)}
+        if ftype in self.temp_upload_types:
+            return {'media_id': data}
+        return {}
 
-    def send(self, to_user: List = [], to_party: List = [], to_tag: List = [],
-             content: Dict = {}, stype: str = 'text', **kwargs) -> Status:
+    @staticmethod
+    def _validate_switch(kwargs: Dict, key: str, default: int = 0) -> Tuple[Optional[int], str]:
+        """校验只允许 0/1 的开关参数"""
+        value = kwargs.get(key, default)
+        if value is None:
+            value = default
+        if value not in (0, 1):
+            return None, f'[QYWXMessageLib]{key}参数值不合法，只允许0或者1'
+        return value, ''
+
+    def send(self, to_user: Optional[List] = None, to_party: Optional[List] = None,
+             to_tag: Optional[List] = None, content: Optional[Dict] = None,
+             stype: str = 'text', **kwargs) -> str:
+        """发送应用消息
+
+        :param to_user: 成员ID列表，最多100个；"@all"表示全部成员
+        :param to_party: 部门ID列表，最多100个
+        :param to_tag: 标签ID列表，最多100个
+        :param content: 消息体内容，形如 {'data': '...'}
+        :param stype: 消息类型，默认 text
+        :return: Status.json() 序列化字符串
         """
-        send message to user or part or tag list by the content of data
-        :param to_user: 指定接收消息的成员，成员ID列表，最多支持100个，指定为"@all"，则向该企业应用的全部成员发送
-        :param to_party: 指定接收消息的部门，部门ID列表，最多支持100个，指定为"@all"，则向该企业应用的全部成员发送
-        :param to_tag: 指定接收消息的标签，标签ID列表，最多支持100个，指定为"@all"，则向该企业应用的全部成员发送
-        :param stype: 消息类型，默认text文本类型
-        :param content: 消息体内容
-        :param kwargs: 其他key-value参数
-        :return: json
-
-        请求数据：
-            {
-               "touser" : "UserID1|UserID2|UserID3",
-               "toparty" : "PartyID1|PartyID2",
-               "totag" : "TagID1 | TagID2",
-               "agentid": 1,
-               "msgtype": 消息体类型,
-               消息体类型: {
-                    消息体
-               },
-               safe: 0,
-               enable_id_trans: 0,
-               "enable_duplicate_check": 0,
-               "duplicate_check_interval": 1800
-            }
-        参数说明：
-            参数	         是否必须	            说明
-            touser	        否	            成员ID列表（消息接收者，多个接收者用‘|’分隔，最多支持1000个）。特殊情况：指定为@all，则向关注该企业应用的全部成员发送
-            toparty	        否	            部门ID列表，多个接收者用‘|’分隔，最多支持100个。当touser为@all时忽略本参数
-            totag	        否	            标签ID列表，多个接收者用‘|’分隔，最多支持100个。当touser为@all时忽略本参数
-            agentid	        是	            企业应用的id，整型。企业内部开发，可在应用的设置页面查看；第三方服务商，可通过接口 获取企业授权信息 获取该参数值
-            msgtype	        是	            消息类型
-            content	        是	            消息体
-            enable_id_trans	否	            表示是否开启id转译，0表示否，1表示是，默认0。仅第三方应用需要用到，企业自建应用可以忽略。
-            enable_duplicate_check	否	    表示是否开启重复消息检查，0表示否，1表示是，默认0
-            duplicate_check_
-            interval	否	表示是否重复消息检查的时间间隔，默认1800s，最大不超过4小时
-
-        备注：
-            touser、toparty、totag不能同时为空
-        """
-        """ --------------------- parameters check --------------------- """
         if not self.token:
-            return FailureStatus(
-                903, '[QYWXMessageLib]TOKEN初始化失败', {}).json()
-
+            return FailureStatus(903, '[QYWXMessageLib]TOKEN初始化失败', {}).json()
         if not any([to_user, to_party, to_tag]):
-            return FailureStatus(
-                400, '[QYWXMessageLib]缺少接收用户/部门列表', {}).json()
+            return FailureStatus(400, '[QYWXMessageLib]缺少接收用户/部门列表', {}).json()
         if not content:
-            return FailureStatus(
-                400, '[QYWXMessageLib]缺少消息内容', {}).json()
+            return FailureStatus(400, '[QYWXMessageLib]缺少消息内容', {}).json()
         if stype not in self.types:
+            return FailureStatus(404, '[QYWXMessageLib]消息类型错误', {}).json()
+
+        switches: Dict[str, int] = {}
+        for key in ('safe', 'enable_id_trans', 'enable_duplicate_check'):
+            value, error = self._validate_switch(kwargs, key)
+            if error:
+                return FailureStatus(404, error, {}).json()
+            switches[key] = value
+
+        duplicate_check_interval = kwargs.get('duplicate_check_interval', 1800)
+        if duplicate_check_interval is None:
+            duplicate_check_interval = 1800
+        if not isinstance(duplicate_check_interval, int) \
+                or duplicate_check_interval < 1 or duplicate_check_interval > 4 * 60 * 60:
             return FailureStatus(
-                404, '[QYWXMessageLib]消息类型错误', {}).json()
-        """ ================== 默认参数 ================== """
-        # 表示是否是保密消息，0表示可对外分享，1表示不能分享且内容显示水印，2表示仅限在企业内分享，默认为0；注意仅mpnews类型的消息支持safe值为2，其他消息类型不支持
-        safe = 0         # 默认值
-        if kwargs.get('safe'):
-            safe = kwargs.get('safe')
-            if safe not in (0, 1):
-                return FailureStatus(
-                    404, '[QYWXMessageLib]safe参数值不合法，只允许0或者1', {}).json()
-        # 表示是否开启id转译，0表示否，1表示是，默认0。仅第三方应用需要用到，企业自建应用可以忽略
-        enable_id_trans = 0  # 默认值
-        if kwargs.get('enable_id_trans'):
-            enable_id_trans = kwargs.get('enable_id_trans')
-            if enable_id_trans not in (0, 1):
-                return FailureStatus(
-                    404, '[QYWXMessageLib]enable_id_trans参数值不合法，只允许0或者1', {}).json()
-        # 表示是否开启重复消息检查，0表示否，1表示是，默认0
-        enable_duplicate_check = 0  # 默认值
-        if kwargs.get('enable_duplicate_check'):
-            enable_duplicate_check = kwargs.get('enable_duplicate_check')
-            if enable_duplicate_check not in (0, 1):
-                return FailureStatus(
-                    404, '[QYWXMessageLib]enable_duplicate_check参数值不合法，只允许0或者1', {}).json()
-        # 表示是否重复消息检查的时间间隔，默认1800s，最大不超过4小时
-        duplicate_check_interval = 1800  # 默认值
-        if kwargs.get('duplicate_check_interval'):
-            duplicate_check_interval = kwargs.get('duplicate_check_interval')
-            if duplicate_check_interval < 1 or duplicate_check_interval > 4 * 60 * 60:
-                return FailureStatus(
-                    404, '[QYWXMessageLib]duplicate_check_interval参数值不合法，只允许1秒至4小时之间', {}).json()
-        # 参数 >>>>> 基础data对象参数
-        format_content = self.format_content(ftype=stype, content=content)
-        if not format_content:
-            return FailureStatus(
-                404, '[QYWXMessageLib]格式化的消息体为空', {}).json()
-        # 发送的数据
+                404, '[QYWXMessageLib]duplicate_check_interval参数值不合法，只允许1秒至4小时之间', {}
+            ).json()
+
+        body = self.format_content(ftype=stype, content=content)
+        if not body:
+            return FailureStatus(404, '[QYWXMessageLib]格式化的消息体为空', {}).json()
+
         data = {
             "agentid": self.AGENT_ID,
             "msgtype": stype,
-            stype: format_content,
-            "enable_duplicate_check": enable_duplicate_check,
+            stype: body,
+            "enable_duplicate_check": switches['enable_duplicate_check'],
             "duplicate_check_interval": duplicate_check_interval
         }
-        # 参数 >>>>> 用户
         if to_user:
             data['touser'] = "|".join(to_user)
         if to_party:
             data['toparty'] = "|".join(to_party)
         if to_tag:
             data['totag'] = "|".join(to_tag)
-        # 参数 >>>>> 额外data对象参数
-        if stype in self.safe_kwagrs_types:
-            data['safe'] = safe
-        if stype in self.enable_id_trans_kwagrs_types:
-            data['enable_id_trans'] = enable_id_trans
+        if stype in self.safe_kwargs_types:
+            data['safe'] = switches['safe']
+        if stype in self.enable_id_trans_kwargs_types:
+            data['enable_id_trans'] = switches['enable_id_trans']
 
-        """ 
-        --------------------- request 企业微信 server --------------------- 
-        send main 
-        """
         try:
             url = "%s?access_token=%s" % (QYWX_SEND_MESSAGE, self.token)
             status, response = self.http.post_json(url=url, data=data)
-            if not status:
-                return FailureStatus(
-                    902, response.get('errmsg'), response).json()
+            if not status or not isinstance(response, dict):
+                return FailureStatus(902, '[QYWXMessageLib]发送消息请求失败', {}).json()
             if response.get("errcode") == 0 and response.get("errmsg") == "ok":
                 return SuccessStatus(data=response).json()
-            else:
-                return FailureStatus(
-                    902, response.get('errmsg'), response).json()
+            return FailureStatus(902, response.get('errmsg'), response).json()
         except Exception as error:
-            LOG.error("[QYWXMessageLib]send message occur exception：%s" % error)
+            LOG.error(f"[QYWXMessageLib]发送消息异常：{error}")
             return FailureStatus(902, "[QYWXMessageLib]发送消息异常，请稍后重试", {}).json()
 
-    def sendback(self, message_id: str) -> Status:
-        """
-        撤回24小时内通过发送应用消息接口推送的消息，仅可撤回企业微信端的数据
-
-        :param message_id: 消息ID
-        :return: json
-
-        参数说明：
-            参数	        必须	        说明
-            access_token	是	            access_token
-            msgid	        是	            消息ID
-
-        参考示例：https://developer.work.weixin.qq.com/document/path/94867
-        """
-        """ --------------------- parameters check --------------------- """
+    def sendback(self, message_id: str) -> str:
+        """撤回 24 小时内发送的应用消息（仅企业微信端）"""
         if not self.token:
-            return FailureStatus(
-                903, '[QYWXMessageLib]TOKEN初始化失败', {}).json()
+            return FailureStatus(903, '[QYWXMessageLib]TOKEN初始化失败', {}).json()
         if not message_id:
-            return FailureStatus(
-                400, '[QYWXMessageLib]缺少message_id参数', {}).json()
-
-        # 发送的数据
-        data = {
-            "msgid": message_id
-        }
+            return FailureStatus(400, '[QYWXMessageLib]缺少message_id参数', {}).json()
 
         try:
             url = "%s?access_token=%s" % (QYWX_SEND_BACK, self.token)
-            status, response = self.http.post_json(url=url, data=data)
-            if not status:
-                return FailureStatus(
-                    902, response.get('errmsg'), response).json()
+            status, response = self.http.post_json(url=url, data={"msgid": message_id})
+            if not status or not isinstance(response, dict):
+                return FailureStatus(902, '[QYWXMessageLib]撤回消息请求失败', {}).json()
             if response.get("errcode") == 0 and response.get("errmsg") == "ok":
-                return SuccessStatus(data = response).json()
-            else:
-                return FailureStatus(
-                    902, response.get('errmsg'), response).json()
+                return SuccessStatus(data=response).json()
+            return FailureStatus(902, response.get('errmsg'), response).json()
         except Exception as error:
-            LOG.error("[QYWXMessageLib]sendback message occur exception：%s" % error)
+            LOG.error(f"[QYWXMessageLib]撤回消息异常：{error}")
             return FailureStatus(902, "[QYWXMessageLib]撤回消息异常，请稍后重试", {}).json()
 
-    def _verify_temp_upload_file(self, upload_type: str, upload_name: str, upload_file: str):
-        """
-        :param upload_type: upload type, contain:
-        :param upload_name: upload file name
-        :param upload_file: local exist upload file path
-
-        检查规则：
-          - 图片（image）：10MB，支持JPG,PNG格式
-          - 语音（voice） ：2MB，播放长度不超过60s，仅支持AMR格式
-          - 视频（video） ：10MB，支持MP4格式
-          - 普通文件（file）：20MB
-        """
+    def _verify_temp_upload_file(self, upload_type: str, upload_name: str, upload_file: str) -> Tuple[bool, str]:
+        """校验临时素材的类型、后缀与大小"""
         rule = self.temp_upload_types_verify.get(upload_type)
         if not rule:
             return False, '无此类型文件校验'
 
         if not upload_name:
             upload_name = os.path.split(upload_file)[-1]
-        upload_name_suffix = os.path.splitext(upload_name)[-1]
-
-        if rule.get('suffix') and upload_name_suffix not in rule.get('suffix'):
+        if os.path.splitext(upload_name)[-1].lower() not in rule.get('suffix', []):
             return False, '文件格式不支持'
-        if get_file_size(path=upload_file, unit='B') > rule.get('size'):
+        if get_file_size(path=upload_file, unit='B') > rule.get('size', 0):
             return False, '文件超出大小限制'
         return True, ''
 
-    def temp_upload(self, upload_type: str, upload_name: str, upload_file: str) -> Status:
+    def temp_upload(self, upload_type: str, upload_name: str, upload_file: str) -> str:
+        """上传临时素材，返回 media_id（三天内有效）
+
+        大小限制：图片10MB / 语音2MB / 视频10MB / 普通文件20MB
         """
-        :param upload_type: upload type, contain:
-            > 图片（image）
-            > 语音（voice）
-            > 视频（video）
-            > 普通文件（file）
-        :param upload_name: upload file name
-        :param upload_file: local exist upload file path
-
-        企业微信上传临时素材
-          > 素材上传得到media_id，该media_id仅三天内有效
-          > media_id在同一企业内应用之间可以共享
-
-        大小限制：
-          > 图片（image）：10MB，支持JPG,PNG格式
-          > 语音（voice） ：2MB，播放长度不超过60s，仅支持AMR格式
-          > 视频（video） ：10MB，支持MP4格式
-          > 普通文件（file）：20MB
-
-        请求方式：POST（HTTPS）
-        请求地址：https://qyapi.weixin.qq.com/cgi-bin/media/upload?access_token=ACCESS_TOKEN&type=TYPE
-
-        参数	        必须	    说明
-        access_token	是	        调用接口凭证
-        type	        是	        媒体文件类型，分别有图片（image）、语音（voice）、视频（video），普通文件（file）
-
-        相关URL：
-          > 上传临时素材：https://developer.work.weixin.qq.com/document/path/90253
-          > 上传图片：https://developer.work.weixin.qq.com/document/path/90256
-
-        :return: json data
-        """
-        """ --------------------- parameters check --------------------- """
         if not self.token:
-            return FailureStatus(
-                903, '[QYWXMessageLib]TOKEN初始化失败', {}).json()
-        if not upload_type:
-            return FailureStatus(
-                400,  '[QYWXMessageLib]缺少upload_type参数', {}).json()
-        if upload_type not in self.temp_upload_types:
-            return FailureStatus(
-                404,  '[QYWXMessageLib]upload_type参数不支持请求类型', {}).json()
-        if not upload_file \
-                or not os.path.exists(upload_file) \
-                or not os.path.isfile(upload_file):
-            return FailureStatus(
-                450, '[QYWXMessageLib]缺少上传文件', {}).json()
-        # 无传入文件名称，自动获取上传文件的文件名称
+            return FailureStatus(903, '[QYWXMessageLib]TOKEN初始化失败', {}).json()
+        if not upload_type or upload_type not in self.temp_upload_types:
+            return FailureStatus(404, '[QYWXMessageLib]upload_type参数不支持请求类型', {}).json()
+        if not upload_file or not os.path.isfile(upload_file):
+            return FailureStatus(450, '[QYWXMessageLib]缺少上传文件', {}).json()
+
         if not upload_name:
             upload_name = os.path.split(upload_file)[-1]
+        verified, message = self._verify_temp_upload_file(upload_type, upload_name, upload_file)
+        if not verified:
+            return FailureStatus(454, message, {}).json()
 
-        """ --------------------- upload file suffix check --------------------- """
-        # 上传文件类型检查
-        verify_status, verify_message = self._verify_temp_upload_file(upload_type, upload_name, upload_file)
-        if not verify_status:
-            return FailureStatus(
-                454,  verify_message, {}).json()
-
-        """ --------------------- request 企业微信 server --------------------- """
         try:
-            # read file stream
             with open(upload_file, 'rb') as f:
-                file_content = f.read()
-            files_body = {'media': (upload_name, file_content, 'text/plain')}
+                files_body = {'media': (upload_name, f.read(), 'text/plain')}
             url = "{}?access_token={}&type={}".format(QYWX_TEMP_UPLOAD, self.token, upload_type)
-            upload_name_utf = upload_name.encode('utf-8')
             headers = {
-                'filename': upload_name_utf,
+                'filename': quote(upload_name),
                 'Content-type': 'multipart/form-data;'
             }
             status, response = self.http.post_form(url=url, headers=headers, files=files_body)
-            if not status:
-                return FailureStatus(
-                    902, response.get('errmsg'), response).json()
+            if not status or not isinstance(response, dict):
+                return FailureStatus(902, '[QYWXMessageLib]上传素材请求失败', {}).json()
             if response.get("errcode") == 0 and response.get("errmsg") == "ok":
-                # 附件get地址
-                response['url'] = "{}{}?access_token={}&media_id={}".format(QYWX_BASE_URL, QYWX_TEMP_GET, self.token, response.get('media_id'))
-                return SuccessStatus(data= response).json()
-            else:
-                return Status(
-                    902, response.get('errmsg'), response).json()
+                response['url'] = "{}{}?access_token={}&media_id={}".format(
+                    QYWX_BASE_URL, QYWX_TEMP_GET, self.token, response.get('media_id')
+                )
+                return SuccessStatus(data=response).json()
+            return FailureStatus(902, response.get('errmsg'), response).json()
         except Exception as error:
-            LOG.error("[QYWXMessageLib]temp upload message occur exception：%s" % error)
+            LOG.error(f"[QYWXMessageLib]上传素材异常：{error}")
             return FailureStatus(902, "[QYWXMessageLib]文件上传异常，请稍后重试", {}).json()
-

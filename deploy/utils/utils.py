@@ -386,7 +386,8 @@ def default_file_suffix(upload_type: str):
         FileTypeEnum.EXCEL_MERGE,
         FileTypeEnum.EXCEL_SPLIT,
         FileTypeEnum.DINGTALK,
-        FileTypeEnum.USER_IMPORT
+        FileTypeEnum.USER_IMPORT,
+        FileTypeEnum.QYWX
     ]:
         return ".xlsx"
     elif upload_type in [FileTypeEnum.PDF]:

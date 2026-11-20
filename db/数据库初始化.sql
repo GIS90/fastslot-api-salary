@@ -289,8 +289,9 @@ insert into xtb_xtcs(`key`, `md5`, `remark`, `value`, `type`, `create_rtx`, `loc
 ('HOME-TIP-NIGHT', '2cb3bb4adb5d010267204a7effd2c8da', '系统登录温馨提示：下午18点～凌晨6点', '一天的努力即将结束，回顾今天的成就，为明天做好准备。别忘了放松一下自己，享受美好的夜晚时光，睡觉要有好梦。', 'VALUE', 'admin', False, False, 16),
 ('AVATAR-ROW-COUNT', '8f14e45fceea167a5a36dedd4bea2543', '用户头像列表每页显示数量', '6', 'VALUE', 'admin', False, False, 17),
 ('SALARY-DTALK-FILE-URL', 'e10adc3949ba59abbe56e057f20f883e', '钉钉通知模板下载', 'http://2lstore.pygo.space/templates/%E7%B3%BB%E7%BB%9F%E7%94%A8%E6%88%B7%E6%89%B9%E9%87%8F%E5%AF%BC%E5%85%A5%E6%A8%A1%E6%9D%BFV1.0.xlsx', 'FILE', 'admin', False, False, 18),
-('SALARY-QYWX-FILE-URL', '25f9e794323b453885f5181f1b624d0b', '企业微信通知模板下载', 'http://2lstore.pygo.space/templates/%E7%B3%BB%E7%BB%9F%E7%94%A8%E6%88%B7%E6%89%B9%E9%87%8F%E5%AF%BC%E5%85%A5%E6%A8%A1%E6%9D%BFV1.0.xlsx', 'FILE', 'admin', False, False, 19);
-
+('SALARY-QYWX-FILE-URL', '25f9e794323b453885f5181f1b624d0b', '企业微信通知模板下载', 'http://2lstore.pygo.space/templates/%E7%B3%BB%E7%BB%9F%E7%94%A8%E6%88%B7%E6%89%B9%E9%87%8F%E5%AF%BC%E5%85%A5%E6%A8%A1%E6%9D%BFV1.0.xlsx', 'FILE', 'admin', False, False, 19),
+('SALARY-DTALK-ROBOT', '7df424f3c47c469c8bece5ccd7b89ed6', '钉钉机器人配置说明手册', 'https://open.dingtalk.com/document/dingstart/configure-the-robot-application', 'VALUE', 'admin', False, False, 20),
+('SALARY-QYWX-ROBOT', '046eb386e00548e29bc67bc20702d520', '企业微信机器人配置说明手册', 'https://developer.work.weixin.qq.com/document/path/101805', 'VALUE', 'admin', False, False, 21);
 -- = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
 -- CSB_ENUM_EKY 枚举Key表
 -- create table && index
@@ -444,6 +445,8 @@ insert into csb_enum_value(`name`, `md5`, `key`, `value`, `remark`, `lock`, `sta
 ('file-type', 'b3e251df695d0d1381f356c9a2de6f81', '4', '文本', '文件类型 > 文本文件', 1, 'admin', 4),
 ('file-type', 'e88041819de93ea5fe50d02816b6d443', '5', 'PDF', '文件类型 > PDF文件', 1, 'admin', 5),
 ('file-type', '8ba23dbd99ce1fd1721848806f396a2d', '99', '其他', '文件类型 > 其他类型文件', 1, 'admin', 6),
+
+
 ('qywx-type', '882c0c19dbc420c129e696532e75f027', 'text', '文本消息', '企业微信消息类型 > 文本消息', 1, 'admin', 1),
 ('qywx-type', '3fc72ebfbc1cccb57c0be9755cd05a6a', 'image', '图片消息', '企业微信消息类型 > 图片消息', 1, 'admin', 2),
 ('qywx-type', 'f93a4f42766340e21d84d117f0e8ee2b', 'voice', '语音消息', '企业微信消息类型 > 语音消息', 1, 'admin', 3),
@@ -454,12 +457,12 @@ insert into csb_enum_value(`name`, `md5`, `key`, `value`, `remark`, `lock`, `sta
 ('qywx-type', 'febc81425c4542429956d7cf3477bb46', 'markdown', 'markdown消息', '企业微信消息类型 > markdown消息', 1, 'admin', 9),
 ('qywx-type', '88e59bdf04e4843ca649e33f7872bcbb', 'miniprogram_notice', '小程序通知消息', '企业微信消息类型 > 小程序通知消息', 0, 'admin', 10),
 ('qywx-type', 'd046e3333d903c8962e927571660452f', 'template_card@text_notice', '模板卡片消息 > 文本通知型', '企业微信消息类型 > 模板卡片消息 > 文本通知型', 0, 'admin', 11),
-
 ('qywx-type', '4da311801e0c3b85161223855540be41', 'mpnews', '多图文消息', '企业微信消息类型 > 多图文消息', 0, 'admin', 8),
 ('qywx-type', '684fb803a898eeb2497c6b5e6921e0b6', 'template_card@news_notice', '模板卡片消息 > 图文展示型', '企业微信消息类型 > 模板卡片消息 > 图文展示型', 0, 'admin', 12),
 ('qywx-type', '1848b73595df91d0c29cdf5127897040', 'template_card@button_interaction', '模板卡片消息 > 按钮交互型', '企业微信消息类型 > 模板卡片消息 > 按钮交互型', 0, 'admin', 13),
 ('qywx-type', '16bef9b5ef7a95422d8b355714e92367', 'template_card@vote_interaction', '模板卡片消息 > 投票选择型', '企业微信消息类型 > 模板卡片消息 > 投票选择型', 0, 'admin', 14),
 ('qywx-type', 'a805e896e02b83115987743cff27d507', 'template_card@multiple_interaction', '模板卡片消息 > 多项选择型', '企业微信消息类型 > 模板卡片消息 > 多项选择型', 0, 'admin', 15),
+
 ('db-type', '01a9bf972fa7c09be40d08d668419da1', 'DB2', 'DB2', '数据库类型 > 关系型数据库 > DB2', 1, 'admin', 1),
 ('db-type', 'c555fd735b52b0f37cba6616f5f584d2', 'Oracle', 'Oracle', '数据库类型 > 关系型数据库 > Oracle', 1, 'admin', 2),
 ('db-type', '2f7bde83268fab2083719214e29f620c', 'MySQL', 'MySQL', '数据库类型 > 关系型数据库 > MySQL', 1, 'admin', 3),
@@ -711,6 +714,7 @@ CREATE TABLE `salary_dtalk_robot`  (
     `md5` varchar(64) not null unique COMMENT '数据唯一标识：MD5-ID',
     `key` varchar(30) NOT NULL COMMENT '机器人APP-KEY',
     `secret` varchar(80) NOT NULL COMMENT '机器人APP-SECRET',
+    `agent_id` varchar(30) NOT NULL COMMENT '企业应用ID（AgentId）',
     `select` bool DEFAULT False COMMENT '是否当前为选择',
     `description` varchar(120) COMMENT '描述',
     `create_rtx` varchar(35) COMMENT '创建用户RTX-ID',
@@ -726,7 +730,63 @@ CREATE TABLE `salary_dtalk_robot`  (
 
 CREATE UNIQUE INDEX salary_dtalk_robot_index ON salary_dtalk_robot (`md5`);
 ------------------------------------------------------------------------------------------------
+-- 企业微信消息-信息表
+DROP TABLES IF EXISTS `salary_qywx_message`;
 
+CREATE TABLE `salary_qywx_message`  (
+    `id` int NOT NULL AUTO_INCREMENT COMMENT '主键，自增ID',
+    `file_name` varchar(80) NOT NULL COMMENT '文件名称',
+    `file_local_url` varchar(150) NULL COMMENT '文件存储本地路径',
+    `file_store_url` varchar(150) NULL COMMENT '文件存储云对象存储位置',
+    `md5` varchar(64) not null unique COMMENT '数据唯一标识：MD5-ID',
+    `robot` varchar(55) NULL COMMENT 'qywx选择机器人配置md5-id',
+    `count` int NULL default 0 COMMENT '消息文件发送的累积次数',
+    `number` int NULL default 0 COMMENT '消息发送的累积条数',
+    `nsheet` int default 1 COMMENT 'sheet数',
+    `sheet_names` text COMMENT 'Sheets名称列表，以json方式存储',
+    `sheet_columns` text COMMENT 'Sheets列名的集合，以json方式存储',
+    `headers` text COMMENT 'excel的header信息，以json方式存储',
+    `set_sheet` varchar(35) COMMENT '当前设置的sheet选择索引，列表格式',
+    `cur_sheet` varchar(4) COMMENT '当前设置的sheet索引',
+    `set_column` text COMMENT '当前设置的sheet选择索引，表头列表设置，json字符串',
+    `set_title` text COMMENT '每个sheet页码的消息标题',
+    `create_rtx` varchar(35) COMMENT '创建用户RTX-ID',
+    `create_time` datetime default CURRENT_TIMESTAMP COMMENT '创建时间',
+    `update_rtx` varchar(35) COMMENT '更新用户RTX-ID',
+    `update_time` datetime COMMENT '更新时间',
+    `delete_rtx` varchar(35) COMMENT '删除用户RTX-ID',
+    `delete_time` datetime COMMENT '删除时间',
+    `status` bool default False COMMENT '数据状态：1删除；0正常（默认）',
+
+    PRIMARY KEY (`id`)
+) COMMENT='企业微信消息-信息表';
+
+CREATE UNIQUE INDEX salary_qywx_message_index ON salary_qywx_message (`md5`);
+-- ----------------------------------------------------------------------------------------------
+-- 企业微信消息-机器人配置表
+DROP TABLES IF EXISTS `salary_qywx_robot`;
+
+CREATE TABLE `salary_qywx_robot`  (
+    `id` int NOT NULL AUTO_INCREMENT COMMENT '主键，自增ID',
+    `name` varchar(30) NOT NULL COMMENT '机器人名称',
+    `md5` varchar(64) not null unique COMMENT '数据唯一标识：MD5-ID',
+    `key` varchar(30) NOT NULL COMMENT '企业ID（CorpID）',
+    `secret` varchar(80) NOT NULL COMMENT '应用凭证密钥（Secret）',
+    `agent_id` varchar(30) NOT NULL COMMENT '企业应用ID（AgentId）',
+    `select` bool DEFAULT False COMMENT '是否当前为选择',
+    `description` varchar(120) COMMENT '描述',
+    `create_rtx` varchar(35) COMMENT '创建用户RTX-ID',
+    `create_time` datetime default CURRENT_TIMESTAMP COMMENT '创建时间',
+    `update_rtx` varchar(35) COMMENT '更新用户RTX-ID',
+    `update_time` datetime COMMENT '更新时间',
+    `delete_rtx` varchar(35) COMMENT '删除用户RTX-ID',
+    `delete_time` datetime COMMENT '删除时间',
+    `status` bool default False COMMENT '数据状态：1删除；0正常（默认）',
+
+    PRIMARY KEY (`id`)
+) COMMENT='企业微信消息-机器人配置表';
+
+CREATE UNIQUE INDEX salary_qywx_robot_index ON salary_qywx_robot (`md5`);
 -- = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
 -- = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
 -- = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =

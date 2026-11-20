@@ -56,16 +56,17 @@ class SalaryDtalkRobotCurd(BaseCurd):
 
     @classmethod
     async def get_by_key_secret(
-            cls, db: AsyncSession, key: str, secret: str
+            cls, db: AsyncSession, key: str, secret: str, agent_id: str = ""
     ) -> Optional[SalaryDtalkRobotModel]:
         try:
-            stmt = select(SalaryDtalkRobotModel).where(
-                and_(
-                    SalaryDtalkRobotModel.key == key,
-                    SalaryDtalkRobotModel.secret == secret,
-                    SalaryDtalkRobotModel.status.is_(False)
-                )
-            )
+            conditions = [
+                SalaryDtalkRobotModel.key == key,
+                SalaryDtalkRobotModel.secret == secret,
+                SalaryDtalkRobotModel.status.is_(False)
+            ]
+            if agent_id:
+                conditions.append(SalaryDtalkRobotModel.agent_id == agent_id)
+            stmt = select(SalaryDtalkRobotModel).where(and_(*conditions))
             result = await db.execute(stmt)
             return result.scalar_one_or_none()
         except Exception as e:

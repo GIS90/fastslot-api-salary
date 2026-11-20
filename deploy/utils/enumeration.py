@@ -148,6 +148,7 @@ class fontPrinter(Enum):
     error = fontForeColor.LIGHT_RED_EX.value + fontBackColor.WHITE.value
 
 
+# ----------------------------------------------------------------------------------------------------------
 @unique
 class FileTypeEnum(IntEnum):
     """
@@ -156,10 +157,12 @@ class FileTypeEnum(IntEnum):
     EXCEL_MERGE = 1
     EXCEL_SPLIT = 2
     PDF = 3
-    DINGTALK = 4
+    DINGTALK = 4    # 钉钉消息通知
     USER_IMPORT = 5
-    XTCS = 6
-    AVATAR = 100
+    XTCS = 6    # 系统参数
+    QYWX = 7    # 企业微信消息通知
+    AVATAR = 100    # 用户头像
+# ----------------------------------------------------------------------------------------------------------
 
 
 @unique
@@ -194,6 +197,8 @@ class XtbXtcsKEY(StrEnum):
     USER_DEFAULT_AVATAR = "USER-DEFAULT-AVATAR"
     USER_IMPORT_URL = "USER-IMPORT-URL"
     UPLOAD_FILE_MAX = "UPLOAD-FILE-MAX"
+    UPLOAD_AVATAR_SIZE_MAX = "UPLOAD-AVATAR-SIZE-MAX"
+    UPLOAD_FILE_SIZE_MAX = "UPLOAD-FILE-SIZE-MAX"
     SYSTEM_TITLE = "SYSTEM-TITLE"
     SYSTEM_VERSION = "SYSTEM-VERSION"
     SYSTEM_FEATURE = "SYSTEM-FEATURE"
@@ -205,6 +210,8 @@ class XtbXtcsKEY(StrEnum):
     AVATAR_ROW_COUNT = "AVATAR-ROW-COUNT"
     SALARY_DTALK_FILE_URL = "SALARY-DTALK-FILE-URL"
     SALARY_QYWX_FILE_URL = "SALARY-QYWX-FILE-URL"
+    SALARY_DTALK_ROBOT = "SALARY-DTALK-ROBOT"
+    SALARY_QYWX_ROBOT = "SALARY-QYWX-ROBOT"
 
 
 @unique
@@ -220,7 +227,8 @@ class CsbEnumKEY(StrEnum):
     MENU_LEVEL = "menu-level"
     API_TYPE = "api-type"
     TASK_STATUS = "task-status"
-    XTBB_FIXED_STATUS = "xtbb-fixed-status"
+    XTBB_FIXED_ALIGN = "xtbb-field-align"
+    XTBB_FIXED_FIXED = "xtbb-field-fixed"
     XTBB_FIELD_TYPE = "xtbb-field-type"
     AVATAR_TYPE = "avatar-type"
     XTCS_TYPE = "xtcs-type"
@@ -266,4 +274,5 @@ class XtbReportKey(StrEnum):
     SystemOpsTask = "SystemOpsTask"
     SystemOpsAvatar = "SystemOpsAvatar"
     SalaryNotifyDtalk = "SalaryNotifyDtalk"
+    SalaryNotifyQywx = "SalaryNotifyQywx"
 

@@ -64,6 +64,7 @@ from deploy.utils.upload import uploadUtils
 from deploy.delib.excel_lib import ExcelLib
 from deploy.utils.variable import EXCEL_FORMAT
 from deploy.delib.dingtalk_lib import DingtalkLib
+from deploy.utils.logger import logger as LOG
 
 
 class SalaryNotifyDtalkService:
@@ -302,18 +303,25 @@ class SalaryNotifyDtalkService:
         if not dtalk_api.access_token:
             dtalk_api.close()
             return -1, 0
-        success, failure = 0, 0
-        try:
-            for row in rows:
+        success: List = list()
+        failure: List = list()
+        
+        for row in rows:
+            try:
                 result = dtalk_api.robot2send(
                     message=self.__format_message(content=row.get("data"), title=title),
                     to_id=row.get("id")
                 )
-                if result.dict().get("code") == status_code.CODE_100_SUCCESS.value:
-                    success += 1
+                result_dict = result.dict()
+                if result_dict.get("code") == status_code.CODE_100_SUCCESS.value:
+                    success.append(row.get("id"))
                 else:
-                    failure += 1
-        finally:
+                    LOG.warning(f"[SalaryNotifyDtalkService]发送失败：{result_dict.get('message')}")
+                    failure.append(row.get("id"))
+            except Exception as e:
+                LOG.error(f"[SalaryNotifyDtalkService]发送消息异常：{e}")
+                failure.append(row.get("id"))
+        else:
             dtalk_api.close()
         return success, failure
 
@@ -548,17 +556,20 @@ class SalaryNotifyDtalkService:
     async def robot_add(self, rtx_id: str, params: Dict) -> Status:
         key: str = params.get("key") or ""
         secret: str = params.get("secret") or ""
-        if await self.salary_dtalk_robot_curd.get_by_key_secret(db=self.db, key=key, secret=secret):
+        agent_id: str = str(params.get("agent_id") or "")
+        if await self.salary_dtalk_robot_curd.get_by_key_secret(
+                db=self.db, key=key, secret=secret, agent_id=agent_id):
             return FailureStatus(code=status_code.CODE_502_DATA_EXIST_NOT_ADD.value)
 
         if params.get("select"):
             await self.salary_dtalk_robot_curd.clear_select(db=self.db)
 
         model: SalaryDtalkRobotModel = await self.salary_dtalk_robot_curd.new_model()
-        model.md5 = generator_md5(v=f"{rtx_id}-{key}-{secret}-{get_now()}")
+        model.md5 = generator_md5(v=f"{rtx_id}-{key}-{secret}-{agent_id}-{get_now()}")
         model.name = params.get("name") or ""
         model.key = key
         model.secret = secret
+        model.agent_id = agent_id
         model.select = True if params.get("select") else False
         model.description = params.get("description") or ""
         model.create_rtx = rtx_id
@@ -586,6 +597,7 @@ class SalaryNotifyDtalkService:
         model.name = params.get("name") or ""
         model.key = params.get("key") or ""
         model.secret = params.get("secret") or ""
+        model.agent_id = str(params.get("agent_id") or "")
         model.description = params.get("description") or ""
         model.select = True if params.get("select") else False
         model.update_rtx = rtx_id
@@ -692,7 +704,7 @@ class SalaryNotifyDtalkService:
         __number: int = 0
         for sheet in sheet_list:
             __sheet: str = str(sheet)
-            item: Dict = {"sheet": __sheet}
+            item: Dict = {"sheet": __sheet, "sheetName": sheet_names.get(__sheet, "")}
             rows = self.__read_sheet_rows(
                 file_path=file_path,
                 sheet_index=int(__sheet),
@@ -703,21 +715,29 @@ class SalaryNotifyDtalkService:
                 item["message"] = f"文件第{int(__sheet) + 1}Sheet无数据"
                 __results.append(item)
                 continue
-            success, failure = await run_in_threadpool(
+            success_list, failure_list = await run_in_threadpool(
                 self.__send_by_robot,
                 robot_model.key,
                 robot_model.secret,
                 rows,
                 set_titles.get(__sheet) or ""
             )
-            if success == -1:
+            if success_list == -1:
                 return FailureStatus(
                     code=status_code.CODE_903_OTHER_THREE_API_TOKEN_FAILURE.value,
                     message="钉钉Token初始化失败，请检查KEY或SECRET是否配置正确"
                 )
-            __number += success + failure
-            item["ok"] = True
-            item["message"] = f"成功：{success}，失败：{failure}"
+            success_count, failure_count = len(success_list), len(failure_list)
+            __number += success_count + failure_count
+            item["ok"] = failure_count == 0
+            item["message"] = f"成功：{success_count}，失败：{failure_count}"
+            item["data"] = {
+                "success": success_count,
+                "failure": failure_count,
+                "total": __number,
+                "successList": success_list,
+                "failureList": failure_list
+            }
             __results.append(item)
 
         message_model.count = (message_model.count or 0) + 1
@@ -726,9 +746,5 @@ class SalaryNotifyDtalkService:
         message_model.update_rtx = rtx_id
         message_model.update_time = get_now()
         await self.salary_dtalk_message_curd.update(db=self.db, model=message_model)
-
-        __message_list: List[str] = []
-        for item in __results:
-            __name = sheet_names.get(item.get("sheet")) or "Sheet"
-            __message_list.append(f"【{__name}】：{item.get('message')}")
-        return SuccessStatus(message="；".join(__message_list))
+        
+        return SuccessStatus(data=__results)

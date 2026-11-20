@@ -48,6 +48,7 @@ salary_dtalk_robot_detail_fields: List = [
     {"key": "name", "type": ft.STR, "name": "name", "null": False},
     {"key": "key", "type": ft.STR, "name": "key", "null": False},
     {"key": "secret", "type": ft.STR, "name": "secret", "null": False},
+    {"key": "agent_id", "type": ft.STR, "name": "agentId", "null": True},
     {"key": "select", "type": ft.BOOL, "name": "select", "null": True},
     {"key": "description", "type": ft.STR, "name": "description", "null": True},
     {"key": "create_time", "type": ft.DATETIME, "name": "createTime", "null": True},
