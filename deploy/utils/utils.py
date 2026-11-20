@@ -40,6 +40,7 @@ import hashlib
 import time
 import subprocess
 import platform
+import uuid
 from typing import List, Tuple, Set, Dict, Union, Optional, Any, Literal
 from datetime import datetime, timedelta
 from pathlib import Path, PurePath
@@ -89,6 +90,12 @@ def filename2md5(rtx_id: str = None, file_name: str = None, _type: str = 'file')
     md5_v = md5(_v)
     return md5_v, md5_v + suffix if suffix else md5_v
 
+
+def random_uuid4() -> str:
+    """
+    生成随机uuid
+    """
+    return str(uuid.uuid4())
 
 """ - - - - - - - - - - - - - - - - - 时间、日期 - - - - - - - - - - - - - - - - -"""
 

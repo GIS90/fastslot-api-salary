@@ -52,7 +52,7 @@ from deploy.schema.dao.salary_dtalk import SalaryDtalkMessageModel, SalaryDtalkR
 from deploy.service.system.config.report import SystemConfigReportService
 from deploy.utils.status import Status, SuccessStatus, FailureStatus
 from deploy.utils.status_value import StatusCode as status_code
-from deploy.utils.utils import get_now, md5 as generator_md5, get_qiniu_abs_file_url, xtbb_field_id_value
+from deploy.utils.utils import get_now, md5 as generator_md5, get_qiniu_abs_file_url, xtbb_field_id_value, random_uuid4
 from deploy.utils.converter import model_converter_dict, many_model_converter_dict
 from deploy.utils.enumeration import FileTypeEnum, XtbReportKey
 from deploy.schema.dto.salary_dtalk import (
@@ -265,12 +265,14 @@ class SalaryNotifyDtalkService:
     def __rename_local_file(local_url: str, new_name: str) -> str:
         if not local_url or not new_name or not os.path.exists(local_url):
             return ""
-        new_path = os.path.join(os.path.dirname(local_url), new_name)
-        if os.path.exists(new_path):
-            return ""
+        new_file = os.path.join(os.path.dirname(local_url), new_name)
+        if os.path.exists(path=new_file):
+            __new_names = os.path.splitext(new_name)
+            __new_name = f"{__new_names[0]}-{random_uuid4()}-{__new_names[1]}"
+            new_file = os.path.join(os.path.dirname(local_url), __new_name)
         try:
-            os.rename(local_url, new_path)
-            return new_path
+            os.rename(local_url, new_file)
+            return new_file
         except Exception:
             return ""
 
