@@ -675,7 +675,7 @@ CREATE UNIQUE INDEX xtb_user_avatar_index ON xtb_user_avatar (`md5`);
 -- 钉钉消息-信息表
 DROP TABLES IF EXISTS `salary_dtalk_message`;
 
-CREATE TABLE `salary_dtalk_message`  (
+CREATE TABLE `salary_qywx_message`  (
     `id` int NOT NULL AUTO_INCREMENT COMMENT '主键，自增ID',
     `file_name` varchar(80) NOT NULL COMMENT '文件名称',
     `file_local_url` varchar(150) NULL COMMENT '文件存储本地路径',
@@ -692,6 +692,8 @@ CREATE TABLE `salary_dtalk_message`  (
     `cur_sheet` varchar(4) COMMENT '当前设置的sheet索引',
     `set_column` text COMMENT '当前设置的sheet选择索引，表头列表设置，json字符串',
     `set_title` text COMMENT '每个sheet页码的消息标题',
+    `success` text COMMENT '发送成功人员名单',
+    `failure` text COMMENT '发送失败人员名单',
     `create_rtx` varchar(35) COMMENT '创建用户RTX-ID',
     `create_time` datetime default CURRENT_TIMESTAMP COMMENT '创建时间',
     `update_rtx` varchar(35) COMMENT '更新用户RTX-ID',
@@ -729,7 +731,7 @@ CREATE TABLE `salary_dtalk_robot`  (
 ) COMMENT='钉钉消息-机器人配置表';
 
 CREATE UNIQUE INDEX salary_dtalk_robot_index ON salary_dtalk_robot (`md5`);
-------------------------------------------------------------------------------------------------
+-- ----------------------------------------------------------------------------------------------
 -- 企业微信消息-信息表
 DROP TABLES IF EXISTS `salary_qywx_message`;
 
@@ -750,6 +752,8 @@ CREATE TABLE `salary_qywx_message`  (
     `cur_sheet` varchar(4) COMMENT '当前设置的sheet索引',
     `set_column` text COMMENT '当前设置的sheet选择索引，表头列表设置，json字符串',
     `set_title` text COMMENT '每个sheet页码的消息标题',
+    `success` text COMMENT '发送成功人员名单',
+    `failure` text COMMENT '发送失败人员名单',
     `create_rtx` varchar(35) COMMENT '创建用户RTX-ID',
     `create_time` datetime default CURRENT_TIMESTAMP COMMENT '创建时间',
     `update_rtx` varchar(35) COMMENT '更新用户RTX-ID',

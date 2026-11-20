@@ -30,7 +30,7 @@ Life is short, I use python.
 
 ------------------------------------------------
 """
-from typing import List, Optional
+from typing import Any, List, Optional
 from pydantic import Field
 
 from deploy.schema._po_base_model import baseModel
@@ -42,6 +42,7 @@ __all__ = [
     "SalaryDtalkRobotUpdateModel",
     "SalaryDtalkRobotSelectModel",
     "SalaryDtalkSendModel",
+    "SalaryDtalkResendModel",
 ]
 
 
@@ -137,6 +138,26 @@ class SalaryDtalkSendModel(baseModel):
                 "md5": "AAAAAAAAAA",
                 "robot": "BBBBBBBBBB",
                 "sheet": ["0"]
+            }
+        }
+    }
+
+
+class SalaryDtalkResendModel(baseModel):
+    md5: str = Field(..., min_length=1, max_length=64, description="钉钉消息数据Md5-Id")
+    robot: str = Field(..., min_length=1, max_length=64, description="机器人配置Md5-Id")
+    users: Any = Field(default_factory=list, description="按Sheet分组的重发人员，支持 [{sheet, users}] 或 {sheet: [users]}，为空则重发全部失败人员")
+
+    model_config = {
+        "populate_by_name": True,
+        "json_schema_extra": {
+            "example": {
+                "md5": "AAAAAAAAAA",
+                "robot": "BBBBBBBBBB",
+                "users": [
+                    {"sheet": "0", "users": ["user001"]},
+                    {"sheet": "1", "users": ["user002"]}
+                ]
             }
         }
     }

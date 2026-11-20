@@ -96,6 +96,72 @@ class SalaryNotifyDtalkService:
             return {}
 
     @staticmethod
+    def __json_list(value: Optional[str]) -> List[str]:
+        if not value:
+            return []
+        try:
+            result = json.loads(value)
+            return [str(i) for i in result] if isinstance(result, list) else []
+        except Exception:
+            return []
+
+    @staticmethod
+    def __parse_user_map(value: Optional[str]) -> Dict[str, List[str]]:
+        """解析人员名单：兼容 {"0": [...]} 分组格式与旧扁平数组格式"""
+        if not value:
+            return {}
+        try:
+            result = json.loads(value)
+        except Exception:
+            return {}
+        if isinstance(result, dict):
+            return {
+                str(sheet): [str(uid) for uid in users]
+                for sheet, users in result.items()
+                if isinstance(users, list)
+            }
+        if isinstance(result, list):
+            return {"0": [str(uid) for uid in result]}
+        return {}
+
+    @staticmethod
+    def __resend_target_map(
+        users: Any,
+        failure_map: Dict[str, List[str]],
+        sheets: List[str]
+    ) -> Dict[str, List[str]]:
+        """解析提交的重发人员，按 Sheet 过滤，确保只重发对应 Sheet 的失败人员"""
+        target_map: Dict[str, List[str]] = {}
+        if not users:
+            target_map = {sheet: list(failure_map.get(sheet) or []) for sheet in sheets}
+        elif isinstance(users, dict):
+            for sheet, items in users.items():
+                target_map[str(sheet)] = [str(i) for i in (items or []) if i]
+        elif isinstance(users, list):
+            if users and all(isinstance(item, dict) for item in users if item is not None):
+                for item in users:
+                    if not item:
+                        continue
+                    sheet = str(item.get("sheet") or item.get("sheetIndex") or "")
+                    if not sheet:
+                        continue
+                    target_map[sheet] = [str(i) for i in (item.get("users") or []) if i]
+            else:
+                flat_ids = {str(i) for i in users if i}
+                target_map = {
+                    sheet: [uid for uid in (failure_map.get(sheet) or []) if uid in flat_ids]
+                    for sheet in sheets
+                }
+
+        result: Dict[str, List[str]] = {}
+        for sheet, items in target_map.items():
+            allowed = set(failure_map.get(sheet) or [])
+            filtered = list(dict.fromkeys(str(i) for i in items if str(i) in allowed))
+            if filtered:
+                result[sheet] = filtered
+        return result
+
+    @staticmethod
     def __file_md5(file_path: str) -> str:
         if not file_path or not os.path.exists(file_path):
             return ""
@@ -676,6 +742,40 @@ class SalaryNotifyDtalkService:
             "robotEnums": robot_enums
         })
 
+    async def resend_init(self, rtx_id: str, md5: str) -> Status:
+        """重发初始化：加载配置中的 Sheet、各 Sheet 失败名单及机器人选项"""
+        __flag, model = await self.__get_alive_message(md5)
+        if not __flag: return model
+        robots = await self.salary_dtalk_robot_curd.option(db=self.db)
+        robot_index: str = ""
+        robot_enums: List[Dict] = []
+        for robot in robots or []:
+            robot_enums.append({"key": robot.md5, "value": robot.name})
+            if robot.md5 == (model.robot or "") or (not model.robot and robot.select):
+                robot_index = robot.md5
+        sheet_names: Dict = self.__sheet_names(model)
+        failure_map: Dict[str, List[str]] = self.__parse_user_map(model.failure)
+        sheets: List[str] = self.__set_sheet_index(model)
+        failure_users: Dict[str, List[str]] = {
+            sheet: list(failure_map.get(sheet) or []) for sheet in sheets
+        }
+        failure_groups: List[Dict] = [
+            {
+                "sheet": sheet,
+                "sheetName": sheet_names.get(sheet, ""),
+                "users": failure_users[sheet]
+            }
+            for sheet in sheets
+        ]
+        return SuccessStatus(data={
+            "sheetIndex": sheets,
+            "sheetNames": self.__sheet_options(model),
+            "failureUsers": failure_users,
+            "failureGroups": failure_groups,
+            "robotIndex": robot_index,
+            "robotEnums": robot_enums
+        })
+
     async def send(self, rtx_id: str, params: Dict) -> Status:
         __flag, message_model = await self.__get_alive_message(params.get("md5"))
         if not __flag:
@@ -702,6 +802,9 @@ class SalaryNotifyDtalkService:
 
         __results: List[Dict] = []
         __number: int = 0
+        # 按 Sheet 索引分组存储，解决多 Sheet 重复人员无法区分的问题
+        __success_map: Dict[str, List[str]] = {}
+        __failure_map: Dict[str, List[str]] = {}
         for sheet in sheet_list:
             __sheet: str = str(sheet)
             item: Dict = {"sheet": __sheet, "sheetName": sheet_names.get(__sheet, "")}
@@ -729,6 +832,8 @@ class SalaryNotifyDtalkService:
                 )
             success_count, failure_count = len(success_list), len(failure_list)
             __number += success_count + failure_count
+            __success_map[__sheet] = list(success_list)
+            __failure_map[__sheet] = list(failure_list)
             item["ok"] = failure_count == 0
             item["message"] = f"成功：{success_count}，失败：{failure_count}"
             item["data"] = {
@@ -743,8 +848,118 @@ class SalaryNotifyDtalkService:
         message_model.count = (message_model.count or 0) + 1
         message_model.number = (message_model.number or 0) + __number
         message_model.robot = robot_model.md5
+        message_model.success = json.dumps(__success_map, ensure_ascii=False)
+        message_model.failure = json.dumps(__failure_map, ensure_ascii=False)
         message_model.update_rtx = rtx_id
         message_model.update_time = get_now()
         await self.salary_dtalk_message_curd.update(db=self.db, model=message_model)
         
         return SuccessStatus(data=__results)
+
+    async def resend(self, rtx_id: str, params: Dict) -> Status:
+        """按 Sheet + 人员重发失败名单，并更新分组成功/失败记录"""
+        __flag, message_model = await self.__get_alive_message(params.get("md5"))
+        if not __flag: return message_model
+        __flag, robot_model = await self.__get_alive_robot(params.get("robot"))
+        if not __flag: return robot_model
+        if not robot_model.key or not robot_model.secret:
+            return FailureStatus(code=status_code.CODE_505_DATA_INCOMPLETE.value,
+                                 message="缺少key或secret，请完善机器人配置信息")
+
+        sheets: List[str] = self.__set_sheet_index(message_model)
+        success_map: Dict[str, List[str]] = self.__parse_user_map(message_model.success)
+        failure_map: Dict[str, List[str]] = self.__parse_user_map(message_model.failure)
+        if not any(failure_map.get(sheet) for sheet in sheets):
+            return FailureStatus(code=status_code.CODE_101_SUCCESS_NO_DATA.value,
+                                 message="暂无失败人员可重发")
+        target_map: Dict[str, List[str]] = self.__resend_target_map(
+            users=params.get("users"), failure_map=failure_map, sheets=sheets)
+        if not target_map:
+            return FailureStatus(code=status_code.CODE_101_SUCCESS_NO_DATA.value,
+                                 message="所选人员不在对应Sheet的失败名单中")
+
+        file_path: str = message_model.file_local_url or ""
+        if not file_path or not os.path.exists(file_path):
+            return FailureStatus(code=status_code.CODE_451_REQUEST_FILE_NOT_EXIST.value,
+                                 message="文件不存在，请重新上传")
+
+        set_columns: Dict = self.__json_dict(message_model.set_column)
+        set_titles: Dict = self.__json_dict(message_model.set_title)
+        sheet_names: Dict = self.__sheet_names(message_model)
+
+        rows_by_sheet: Dict[str, List[Dict]] = {}
+        for sheet_key, target_ids in target_map.items():
+            try:
+                sheet_index = int(sheet_key)
+            except Exception:
+                continue
+            rows = self.__read_sheet_rows(
+                file_path=file_path, sheet_index=sheet_index,
+                columns=set_columns.get(sheet_key) or []
+            )
+            id_set = set(target_ids)
+            matched = [row for row in rows if str(row.get("id")) in id_set]
+            if matched:
+                rows_by_sheet[sheet_key] = matched
+        if not rows_by_sheet:
+            return FailureStatus(code=status_code.CODE_101_SUCCESS_NO_DATA.value,
+                                 message="未在文件中找到失败人员对应的数据行")
+
+        __results: List[Dict] = []
+        resent_ok: List[str] = []
+        resent_fail: List[str] = []
+        __number: int = 0
+        for sheet_key, rows in rows_by_sheet.items():
+            success_list, failure_list = await run_in_threadpool(
+                self.__send_by_robot, robot_model.key, robot_model.secret,
+                rows, set_titles.get(sheet_key) or ""
+            )
+            if success_list == -1:
+                return FailureStatus(
+                    code=status_code.CODE_903_OTHER_THREE_API_TOKEN_FAILURE.value,
+                    message="钉钉Token初始化失败，请检查配置"
+                )
+            resent_ok.extend(success_list)
+            resent_fail.extend(failure_list)
+            __number += len(success_list) + len(failure_list)
+
+            ok_set = {str(uid) for uid in success_list}
+            fail_set = {str(uid) for uid in failure_list}
+            old_success = list(success_map.get(sheet_key) or [])
+            old_failure = list(failure_map.get(sheet_key) or [])
+            success_map[sheet_key] = list(dict.fromkeys(
+                old_success + [str(uid) for uid in success_list]
+            ))
+            failure_map[sheet_key] = [
+                uid for uid in old_failure if uid not in ok_set
+            ]
+            for uid in old_failure:
+                if uid in fail_set and uid not in failure_map[sheet_key]:
+                    failure_map[sheet_key].append(uid)
+
+            __results.append({
+                "sheet": sheet_key,
+                "sheetName": sheet_names.get(sheet_key, ""),
+                "ok": len(failure_list) == 0,
+                "message": f"成功：{len(success_list)}，失败：{len(failure_list)}",
+                "data": {
+                    "success": len(success_list),
+                    "failure": len(failure_list),
+                    "total": __number,
+                    "successList": success_list,
+                    "failureList": failure_list
+                }
+            })
+
+        message_model.success = json.dumps(success_map, ensure_ascii=False)
+        message_model.failure = json.dumps(failure_map, ensure_ascii=False)
+        message_model.robot = robot_model.md5
+        message_model.number = (message_model.number or 0) + __number
+        message_model.update_rtx = rtx_id
+        message_model.update_time = get_now()
+        await self.salary_dtalk_message_curd.update(db=self.db, model=message_model)
+
+        return SuccessStatus(
+            message=f"重发完成，成功 {len(resent_ok)} 人，仍失败 {len(resent_fail)} 人",
+            data=__results
+        )

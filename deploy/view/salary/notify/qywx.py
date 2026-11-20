@@ -31,7 +31,8 @@ from deploy.schema.po.salary_notify_qywx import (
     SalaryQywxRobotAddModel,
     SalaryQywxRobotUpdateModel,
     SalaryQywxRobotSelectModel,
-    SalaryQywxSendModel
+    SalaryQywxSendModel,
+    SalaryQywxResendModel
 )
 from deploy.schema.po.x import RequestMd5Models
 
@@ -117,6 +118,24 @@ async def send(
     service: SalaryNotifyQywxService = Depends(get_service)
 ) -> Status:
     return await service.send(rtx_id=token_rtx_id, params=params.model_dump())
+
+
+@router.get("/qywx.resendInit", summary="重发失败人员初始化")
+async def resend_init(
+    md5: str = Depends(md5_params),
+    token_rtx_id: str = Depends(depend_token_rtx),
+    service: SalaryNotifyQywxService = Depends(get_service)
+) -> Status:
+    return await service.resend_init(rtx_id=token_rtx_id, md5=md5)
+
+
+@router.post("/qywx.resend", summary="重发失败人员")
+async def resend(
+    params: Annotated[SalaryQywxResendModel, Body()],
+    token_rtx_id: str = Depends(depend_token_rtx),
+    service: SalaryNotifyQywxService = Depends(get_service)
+) -> Status:
+    return await service.resend(rtx_id=token_rtx_id, params=params.model_dump())
 
 
 # - - - - - - - - - - - - - - - - - - - - 机器人配置 - - - - - - - - - - - - - - - - - - - -

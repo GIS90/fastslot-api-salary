@@ -28,6 +28,8 @@ salary_qywx_message_detail_fields: List = [
     {"key": "file_name", "type": ft.STR, "name": "fileName", "null": False},
     {"key": "cur_sheet", "type": ft.STR, "name": "curSheet", "null": True},
     {"key": "nsheet", "type": ft.INT, "name": "nsheet", "null": True},
+    {"key": "success", "type": ft.STR, "name": "success", "null": True},
+    {"key": "failure", "type": ft.STR, "name": "failure", "null": True},
 ]
 
 # 企业微信机器人-详情字段

@@ -55,6 +55,8 @@ class SalaryQywxMessageModel(baseModel, IDField, Md5Field, CUDField, StatusField
     cur_sheet: Mapped[Optional[str]] = mapped_column(name="cur_sheet", type_=String(4), comment="当前设置的sheet索引")
     set_column: Mapped[Optional[str]] = mapped_column(name="set_column", type_=Text, comment="当前设置的sheet表头列表设置JSON")
     set_title: Mapped[Optional[str]] = mapped_column(name="set_title", type_=Text, comment="每个sheet的消息标题JSON")
+    success: Mapped[Optional[str]] = mapped_column(name="success", type_=Text, comment="发送成功人员名单，JSON字符串")
+    failure: Mapped[Optional[str]] = mapped_column(name="failure", type_=Text, comment="发送失败人员名单，JSON字符串")
 
     def __str__(self):
         return f"SalaryQywxMessageModel Class[DB table: {self.__tablename__}], id: {self.id}, md5: {self.md5}."

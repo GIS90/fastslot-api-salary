@@ -43,7 +43,8 @@ from deploy.schema.po.salary_notify_dtalk import (
     SalaryDtalkRobotAddModel,
     SalaryDtalkRobotUpdateModel,
     SalaryDtalkRobotSelectModel,
-    SalaryDtalkSendModel
+    SalaryDtalkSendModel,
+    SalaryDtalkResendModel
 )
 from deploy.schema.po.x import RequestMd5Models
 
@@ -128,6 +129,24 @@ async def send(
     service: SalaryNotifyDtalkService = Depends(get_service)
 ) -> Status:
     return await service.send(rtx_id=token_rtx_id, params=params.model_dump())
+
+
+@router.get("/dtalk.resendInit", summary="重发失败人员初始化")
+async def resend_init(
+    md5: str = Depends(md5_params),
+    token_rtx_id: str = Depends(depend_token_rtx),
+    service: SalaryNotifyDtalkService = Depends(get_service)
+) -> Status:
+    return await service.resend_init(rtx_id=token_rtx_id, md5=md5)
+
+
+@router.post("/dtalk.resend", summary="重发失败人员")
+async def resend(
+    params: Annotated[SalaryDtalkResendModel, Body()],
+    token_rtx_id: str = Depends(depend_token_rtx),
+    service: SalaryNotifyDtalkService = Depends(get_service)
+) -> Status:
+    return await service.resend(rtx_id=token_rtx_id, params=params.model_dump())
 
 
 # - - - - - - - - - - - - - - - - - - - - 机器人配置 - - - - - - - - - - - - - - - - - - - -
