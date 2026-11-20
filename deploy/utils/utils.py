@@ -404,6 +404,23 @@ def default_file_suffix(upload_type: str):
     else:
         return ".未知"
 
+
+def rename_local_file(local_file: str, new_file_name: str) -> str:
+        if (not local_file 
+            or not new_file_name 
+            or not os.path.exists(local_file)):
+            return ""
+        new_file = os.path.join(os.path.dirname(local_file), new_file_name)
+        if os.path.exists(path=new_file):
+            __new_names = os.path.splitext(new_file_name)
+            __new_name = f"{__new_names[0]}-{random_uuid4()}-{__new_names[1]}"
+            new_file = os.path.join(os.path.dirname(local_file), __new_name)
+        try:
+            os.rename(local_file, new_file)
+            return new_file
+        except Exception:
+            return ""
+
 """ - - - - - - - - - - - - - - - - - 参数校验类 - - - - - - - - - - - - - - - - -"""
 
 

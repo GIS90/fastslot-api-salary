@@ -52,7 +52,10 @@ from deploy.schema.dao.salary_dtalk import SalaryDtalkMessageModel, SalaryDtalkR
 from deploy.service.system.config.report import SystemConfigReportService
 from deploy.utils.status import Status, SuccessStatus, FailureStatus
 from deploy.utils.status_value import StatusCode as status_code
-from deploy.utils.utils import get_now, md5 as generator_md5, get_qiniu_abs_file_url, xtbb_field_id_value, random_uuid4
+from deploy.utils.utils import (
+    get_now, md5 as generator_md5, get_qiniu_abs_file_url, xtbb_field_id_value, 
+    random_uuid4, rename_local_file
+)
 from deploy.utils.converter import model_converter_dict, many_model_converter_dict
 from deploy.utils.enumeration import FileTypeEnum, XtbReportKey
 from deploy.schema.dto.salary_dtalk import (
@@ -260,21 +263,6 @@ class SalaryNotifyDtalkService:
 
     async def __get_alive_robot(self, md5: str) -> Tuple[bool, Any]:
         return await self.__valid_model_by_md5(query_id=md5, query_type="robot")
-
-    @staticmethod
-    def __rename_local_file(local_url: str, new_name: str) -> str:
-        if not local_url or not new_name or not os.path.exists(local_url):
-            return ""
-        new_file = os.path.join(os.path.dirname(local_url), new_name)
-        if os.path.exists(path=new_file):
-            __new_names = os.path.splitext(new_name)
-            __new_name = f"{__new_names[0]}-{random_uuid4()}-{__new_names[1]}"
-            new_file = os.path.join(os.path.dirname(local_url), __new_name)
-        try:
-            os.rename(local_url, new_file)
-            return new_file
-        except Exception:
-            return ""
 
     def __read_headers(self, file_path: str) -> Dict:
         """读取Excel的Sheet与表头信息：xlrd仅支持.xls，.xlsx使用openpyxl"""
@@ -532,7 +520,7 @@ class SalaryNotifyDtalkService:
 
         if name != model.file_name:
             # 重命名本地文件
-            new_local = self.__rename_local_file(model.file_local_url, name)
+            new_local = rename_local_file(local_file=model.file_local_url, new_file_name=name)
             if new_local:
                 model.file_local_url = new_local
             model.file_name = name
