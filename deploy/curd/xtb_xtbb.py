@@ -94,6 +94,22 @@ class XtbXtbbCurd(BaseCurd):
     ) -> Optional[XtbXtbbModel]:
         return await self._get_model_by_field(db, XtbXtbbModel.name, name, filter_lock)
 
+    async def get_by_key_not_md5(
+            self,
+            db: AsyncSession,
+            key: str,
+            md5: str
+    ) -> Optional[XtbXtbbModel]:
+        try:
+            stmt = select(XtbXtbbModel).where(
+                XtbXtbbModel.name == key,
+                XtbXtbbModel.md5 != md5,
+                XtbXtbbModel.status != 1)
+            result = await db.execute(stmt)
+            return result.scalar_one_or_none()
+        except Exception as e:
+            raise SQLDBHandleException(f"[{self.__class__.__name__}*查询One]{e}")
+
     @classmethod
     async def count(cls, db: AsyncSession) -> int:
         try:

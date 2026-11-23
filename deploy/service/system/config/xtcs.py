@@ -101,7 +101,7 @@ class SystemConfigXtcsService:
                         else await model_converter_dict(model=model, fields=fields, default_value="****"))
 
     async def pagination(self, rtx_id: str, params: Dict) -> Status:
-        models: List[XtbXtcsModel] = await self.xtb_xtcs_curd.pagination(
+        models: List[XtbXtcsModel] | None = await self.xtb_xtcs_curd.pagination(
             db=self.db,
             offset=params.get("offset"),
             limit=params.get("limit"),
@@ -124,7 +124,7 @@ class SystemConfigXtcsService:
         if not fields:
             return FailureStatus(code=status_code.CODE_102_SUCCESS_NO_COLUMN.value, data=_default_data)
 
-        data: List = await many_model_converter_dict(
+        data: List[Dict] | None = await many_model_converter_dict(
             models=models,
             fields=fields.get("column"),
             default_value=TABLE_DEFAULT_NULL,
@@ -204,9 +204,18 @@ class SystemConfigXtcsService:
             query_id=_md5, status_check=True, response_type="model", query_type="md5", lock_check=True
         )
         if not __flag: return data
+        if model.get("key"):
+            _model = await self.xtb_xtcs_curd.get_by_key_not_md5(
+                db=self.db,
+                key=model["key"],
+                md5=_md5,
+                filter_lock=False
+            )
+            if _model:
+                return FailureStatus(code=status_code.CODE_502_DATA_EXIST_NOT_ADD, message="参数名称已存在，请更换")
+            del model["key"]
 
         del model["md5"]
-        if model.get("key"): del model["key"]
         model["update_rtx"] = rtx_id
         model["update_time"] = get_now()
         for k, v in model.items():
@@ -269,7 +278,7 @@ class SystemConfigXtcsService:
             raise ReportNotColumnException(detail="[系统表-系统参数]未配置导出表头")
 
         __auto_id_name: Any = xtbb_field_id_value(options=fields.get("column"))
-        data: List = await many_model_converter_dict(
+        data: List[Dict] | None = await many_model_converter_dict(
             models=models,
             fields=fields.get("column"),
             default_value=TABLE_DEFAULT_NULL,

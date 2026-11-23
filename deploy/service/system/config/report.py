@@ -166,10 +166,18 @@ class SystemConfigReportService:
             md5=_md5, status_check=True, response_type="model"
         )
         if not __flag: return data
+        if model.get("name"):
+            _model = await self.xtb_xtbb_curd.get_by_key_not_md5(
+                db=self.db,
+                key=model["name"],
+                md5=_md5
+            )
+            if _model:
+                return FailureStatus(code=status_code.CODE_502_DATA_EXIST_NOT_ADD, message="参数名称已存在，请更换")
+            del model["name"]
 
         # 不可用更新字段
-        del model["md5"]
-        del model["name"]
+        if _md5: del model["md5"]
         model["update_rtx"] = rtx_id
         model["update_time"] = get_now()
         for k, v in model.items():

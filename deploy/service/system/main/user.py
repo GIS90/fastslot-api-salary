@@ -298,7 +298,7 @@ class SystemMainUserService:
         if db_model:
             return FailureStatus(
                 code=status_code.CODE_502_DATA_EXIST_NOT_ADD,
-                message="用户账号已存在，请更换",
+                message="用户账号已存在，请进行更换",
             )
 
         new_model: XtbUserModel = await self.xtb_user_curd.new_model()
@@ -326,8 +326,7 @@ class SystemMainUserService:
         if not __flag:
             return data
 
-        if model.get("rtx_id"):
-            del model["rtx_id"]
+        if model.get("rtx_id"): del model["rtx_id"]
         model["role"] = ",".join(model.get("role")) if model.get("role") else ""
         model["update_rtx"] = rtx_id
         model["update_time"] = get_now()

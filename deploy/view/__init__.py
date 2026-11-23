@@ -34,8 +34,9 @@ from deploy.view.root import router as root_router
 from deploy.view.access import router as access_router
 from deploy.view.api import router as api_router
 
+# 工具模块
 from deploy.view.tool.office.pdf2word import router as tool_office_pdf2word
-
+# 系统模块
 from deploy.view.system.main.user import router as system_main_user_router
 from deploy.view.system.main.role import router as system_mian_role_router
 from deploy.view.system.main.menu import router as system_mian_menu_router
@@ -47,11 +48,11 @@ from deploy.view.system.config.xtcs import router as system_config_xtcs_router
 from deploy.view.system.config.dict import router as system_config_dict_router
 from deploy.view.system.config.report import router as system_config_report_router
 from deploy.view.system.config.api import router as system_config_api_router
-
+# 工资模块
 from deploy.view.salary.notify.dtalk import router as salary_notify_dtalk_router
 from deploy.view.salary.notify.qywx import router as salary_notify_qywx_router
 from deploy.view.salary.notify.email import router as salary_notify_email_router
-
+# 设置模块
 from deploy.view.setter.profile import router as setter_profile_router
 
 
@@ -64,9 +65,11 @@ View根据系统设计的api进行模块划分，其中有3个比较特殊（不
 功能模块
   工具
     文档工具：[pdf2word]PDF转WORD
-  系统
+  [salary]工资
+    发薪通知：[dtalk]钉钉通知 [qywx]企业微信通知 [email]邮件通知
+  [system]系统
     权限管理：[user]用户管理 [role]角色管理 [menu]菜单管理
-    系统维护：[task]任务中心 [log]系统日志 [depart]部门管理
+    系统维护：[task]任务中心 [log]系统日志 [depart]部门管理 [avatar]头像管理
     系统配置：[xtcs]参数配置 [dict]数据字典 [report]报表配置 [api]API管理
   设置
     [profile]个人中心

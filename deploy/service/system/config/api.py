@@ -85,7 +85,7 @@ class SystemConfigApiService:
                         else await model_converter_dict(model=model, fields=fields, default_value="****"))
 
     async def pagination(self, rtx_id: str, params: Dict) -> Status:
-        models: List[XtbApiModel] = await self.xtb_api_curd.pagination(
+        models: List[XtbApiModel] | None = await self.xtb_api_curd.pagination(
             db=self.db,
             offset=params.get("offset"),
             limit=params.get("limit"),
@@ -108,7 +108,7 @@ class SystemConfigApiService:
         if not fields:
             return FailureStatus(code=status_code.CODE_102_SUCCESS_NO_COLUMN.value, data=_default_data)
 
-        data: List = await many_model_converter_dict(
+        data: List | None = await many_model_converter_dict(
             models=models,
             fields=fields.get("column"),
             default_value=TABLE_DEFAULT_NULL,
@@ -221,7 +221,7 @@ class SystemConfigApiService:
             raise ReportNotColumnException(detail="[系统表-API接口说明表]未配置导出表头")
 
         __auto_id_name: Any = xtbb_field_id_value(options=fields.get("column"))
-        data: List = await many_model_converter_dict(
+        data: List | None = await many_model_converter_dict(
             models=models,
             fields=fields.get("column"),
             default_value=TABLE_DEFAULT_NULL,

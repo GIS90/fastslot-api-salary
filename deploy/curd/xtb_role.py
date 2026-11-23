@@ -79,6 +79,22 @@ class XtbRoleCurd(BaseCurd):
     async def get_by_engname(self, db: AsyncSession, engname: str):
         return await self._get_model_by_field(db, XtbRoleModel.engname, engname)
 
+    async def get_by_key_not_md5(
+            self,
+            db: AsyncSession,
+            key: str,
+            md5: str
+    ) -> Optional[XtbRoleModel]:
+        try:
+            stmt = select(XtbRoleModel).where(
+                XtbRoleModel.engname == key,
+                XtbRoleModel.md5 != md5,
+                XtbRoleModel.status != 1)
+            result = await db.execute(stmt)
+            return result.scalar_one_or_none()
+        except Exception as e:
+            raise SQLDBHandleException(f"[{self.__class__.__name__}*查询One]{e}")
+
     @classmethod
     async def count(cls, db: AsyncSession) -> int:
         try:

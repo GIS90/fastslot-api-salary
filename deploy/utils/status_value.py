@@ -58,13 +58,14 @@ StatusMsg = {
     207: "无效用户",
     208: "用户未分配系统菜单权限，请联系管理员",
     209: "缺少用户名/密码",
+    210: "用户未初始化密码，请联系管理员",
 
     # ** token **
     250: "没有发现用户TOKEN",
     251: "用户TOKEN验证失败",
     252: "用户TOKEN与RTX-ID不匹配",
     253: "用户TOKEN已过期",
-    254: "生成用户TOKEN失败",
+    254: "生成用户TOKEN失败，请联系管理员",
 
     # ** request method **
     300: "请求方式错误",
@@ -153,6 +154,7 @@ class StatusCode(IntEnum):
     CODE_207_USER_INVALID = 207
     CODE_208_USER_MENU_INVALID = 208
     CODE_209_MISS_USER_PASSWORD = 209
+    CODE_210_NOT_INITIAL_USER_PASSWORD = 210
 
     # ** token **
     CODE_250_TOKEN_NOT_FOUND = 250

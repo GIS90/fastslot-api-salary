@@ -90,7 +90,7 @@ class SystemMainRoleService:
                         else await model_converter_dict(model=model, fields=fields, default_value="****"))
 
     async def pagination(self, rtx_id: str, params: Dict) -> Status:
-        models: List[XtbRoleModel] = await self.xtb_role_curd.pagination(
+        models: List[XtbRoleModel] | None = await self.xtb_role_curd.pagination(
             db=self.db,
             offset=params.get("offset"),
             limit=params.get("limit"),
@@ -188,6 +188,15 @@ class SystemMainRoleService:
             md5_id=_md5, status_check=True, response_type="model", admin_check=True
         )
         if not __flag: return data
+        if model.get("engname"):
+            _model = await self.xtb_role_curd.get_by_key_not_md5(
+                db=self.db,
+                key=model["engname"],
+                md5=_md5
+            )
+            if _model:
+                return FailureStatus(code=status_code.CODE_502_DATA_EXIST_NOT_ADD, message="参数名称已存在，请更换")
+            del model["engname"]
 
         del model["md5"]
         model["update_rtx"] = rtx_id

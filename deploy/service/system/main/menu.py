@@ -213,8 +213,8 @@ class SystemMainMenuService:
             md5_id=_md5, status_check=False, response_type="model", root_check=False
         )
         if not __flag: return data
-        del model["md5"]
-        del model["id"]
+        if _md5: del model["md5"]
+        if model.get("id"): del model["id"]
         model["update_rtx"] = rtx_id
         model["update_time"] = get_now()
         model["cache"] = model.get("isKeepAlive")

@@ -38,7 +38,7 @@ from deploy.curd.database import get_session
 from deploy.schema.po.access import O2LUserLogin
 from deploy.utils.status import Status, SuccessStatus, FailureStatus
 from deploy.utils.status_value import StatusCode as Status_code
-from deploy.config import redis_host, redis_port, redis_db, redis_password, redis_expire
+from deploy.config import redis_host, redis_port, redis_db, redis_password, redis_expire, server_user as SERVER_ADMIN_USER
 from deploy.utils.token import encode_access_token
 from deploy.delib.redis_lib import RedisClientLib
 from deploy.utils.depend import __get_token_rtx
@@ -63,9 +63,9 @@ APIs：
 """
 
 
-@router.post('/login',
+@router.post(path='/login',
              summary="[ACCESS]Login登录",
-             description="后端APIs的login登录API，参数位username、password，用来登录获取用户信息、JWT-Token"
+             description="后端APIs的login登录API，参数位username、password、t24，用来登录获取用户信息、JWT-Token"
              )
 async def login(
         body_data: O2LUserLogin,
@@ -77,18 +77,18 @@ async def login(
     :param body_data: [dict]查询请求参数
     :return: JSONResponse
     """
-    username = getattr(body_data, "username", None)
-    password = getattr(body_data, "password", None)
-    t24 = getattr(body_data, "t24", False)  # 默认不支持24hToken
-    # 缺少登录参数
-    if not username \
-            or not password:
+    username: str | None = getattr(body_data, "username", None)
+    password: str | None = getattr(body_data, "password", None)
+    t24: bool = getattr(body_data, "t24", False)  # 默认不支持24hToken
+    # 缺少登录用户参数
+    if (not username
+            or not password):
         return FailureStatus(
             code=Status_code.CODE_209_MISS_USER_PASSWORD.value)
 
     # 用户信息核对
     # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-    username = username.strip()     # 去空格
+    username: str = username.strip()     # 去空格
     model: Dict = await user_service.login_by_rtx_id(rtx_id=username)
     # >>> 用户不存在
     if not model:
@@ -100,13 +100,17 @@ async def login(
             code=Status_code.CODE_203_LOGIN_USER_OFF.value)
 
     # >>> check password[前端md5加密 数据库md5加密]
-    password_md5_hash = model.get('password')
+    password_md5_hash: str | None = model.get('password')
+    if not password_md5_hash:
+        return FailureStatus(
+            code=Status_code.CODE_210_NOT_INITIAL_USER_PASSWORD.value)
     if password != password_md5_hash:
         return FailureStatus(
             code=Status_code.CODE_204_LOGIN_USER_PASSWORD_ERROR.value)
 
-    # >>> user is not admin && role is null
-    if model.get("rtx_id") != 'admin' and not model.get("role"):
+    # >>> 用户无绑定角色信息，不允许登录
+    if (model.get("rtx_id") != SERVER_ADMIN_USER
+            and not model.get("role")):
         return FailureStatus(
             code=Status_code.CODE_208_USER_MENU_INVALID.value)
     # 删除密码
@@ -114,7 +118,7 @@ async def login(
         del model['password']
     # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-    # = = = = = = = = = = = = = = = = start token = = = = = = = = = = = = = = = =
+    # = = = = = = = = = = = = = = = = create jwt token = = = = = = = = = = = = = = = =
     token = await encode_access_token(
         rtx_id=username,
         token_time=24 * 60 if t24 else __JWT_TOKEN_EXPIRE_MINUTES
@@ -139,7 +143,7 @@ async def login(
     return SuccessStatus(data=data)
 
 
-@router.get('/logout',
+@router.get(path='/logout',
             summary="[ACCESS]Logout退出",
             description="后端APIs的logout退出API"
             )
@@ -151,7 +155,7 @@ async def logout(
     :return: JSONResponse
     """
     try:
-        x_token_rtx = await __get_token_rtx(token=x_token)
+        x_token_rtx: str = await __get_token_rtx(token=x_token)
     except:
         return FailureStatus(
             code=Status_code.CODE_250_TOKEN_NOT_FOUND.value)
