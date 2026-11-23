@@ -222,6 +222,7 @@ VALUES
 (38, '头像管理', 'SystemOpsAvatar', '/system/ops/avatar', 36, 3, 'eafdc02f3b847285bf1815f55f1f4e46', '/system/ops/avatar/index', FALSE, '', '', TRUE, FALSE, FALSE, 'MENU', TRUE, 10102, 'admin', FALSE, TRUE, ''),
 (39, '系统日志', 'SystemOpsLog', '/system/ops/log', 36, 3, 'fa83d9352d3c8fab04893bbf60be7e06', '/system/ops/log/index', FALSE, '', '', TRUE, FALSE, FALSE, 'MENU', TRUE, 10103, 'admin', FALSE, TRUE, ''),
 (40, '任务中心', 'SystemOpsTask', '/system/ops/task', 36, 3, '0d5939c51f761fe1d7fe3c9409577a6f', '/system/ops/task/index', FALSE, '', '', TRUE, FALSE, FALSE, 'MENU', TRUE, 10104, 'admin', FALSE, TRUE, ''),
+(53, '缓存管理', 'SystemConfigRedis', '/system/config/redis', 36, 3, '94ba664e9abb71b1c780297ebbdeb52e', '/system/config/redis/index', FALSE, '', '', TRUE, FALSE, FALSE, 'MENU', TRUE, 10105, 'admin', FALSE, TRUE, 'R'),
 -- * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
 --   > 系统维护[二级菜单]
 (41, '系统配置', 'SystemConfig', '/system/config', 35, 2, 'a59948b9e45358eaaaa1b13d9cedc248', '/system/config', FALSE, '', 'SetUp', TRUE, FALSE, FALSE, 'MENU', TRUE, 10200, 'admin', FALSE, FALSE, ''),
