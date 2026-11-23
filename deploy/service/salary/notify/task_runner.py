@@ -40,9 +40,9 @@ async def run_notify_task(
         async with AsyncSessionLocal() as session:
             try:
                 if channel == "qywx":
-                    service: SalaryNotifyDtalkService = SalaryNotifyDtalkService(db_connection=session)
-                elif channel == "dtalk":
                     service: SalaryNotifyQywxService = SalaryNotifyQywxService(db_connection=session)
+                elif channel == "dtalk":
+                    service: SalaryNotifyDtalkService = SalaryNotifyDtalkService(db_connection=session)
                 elif channel == "email":
                     service: SalaryNotifyEmailService = SalaryNotifyEmailService(db_connection=session)
                 else:
