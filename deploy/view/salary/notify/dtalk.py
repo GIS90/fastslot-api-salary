@@ -31,12 +31,15 @@ Life is short, I use python.
 ------------------------------------------------
 """
 from typing import Annotated, Dict
-from fastapi import APIRouter, Depends, Body, Query
+from fastapi import APIRouter, Depends, Body, Query, BackgroundTasks
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from deploy.curd.database import get_session
 from deploy.service.salary.notify.dtalk import SalaryNotifyDtalkService
-from deploy.utils.status import Status
+from deploy.service.salary.notify.task_runner import run_notify_task
+from deploy.utils.notify_task import NotifyTaskStatus, create_task, get_task
+from deploy.utils.status import Status, SuccessStatus, FailureStatus
+from deploy.utils.status_value import StatusCode as status_code
 from deploy.utils.depend import pageable_params, depend_token_rtx, md5_params
 from deploy.schema.po.salary_notify_dtalk import (
     SalaryDtalkUpdateModel,
@@ -122,13 +125,28 @@ async def send_init(
     return await service.send_init(rtx_id=token_rtx_id, md5=md5)
 
 
-@router.post("/dtalk.send", summary="发送钉钉消息")
+@router.post("/dtalk.send", summary="提交钉钉发送消息任务")
 async def send(
     params: Annotated[SalaryDtalkSendModel, Body()],
-    token_rtx_id: str = Depends(depend_token_rtx),
-    service: SalaryNotifyDtalkService = Depends(get_service)
+    background_tasks: BackgroundTasks,
+    token_rtx_id: str = Depends(depend_token_rtx)
 ) -> Status:
-    return await service.send(rtx_id=token_rtx_id, params=params.model_dump())
+    payload: Dict = params.model_dump()
+    task_id: str = await create_task(
+        channel="dtalk", action="send", md5=payload.get("md5") or "", owner=token_rtx_id)
+    background_tasks.add_task(run_notify_task, task_id, "dtalk", "send", token_rtx_id, payload)
+    return SuccessStatus(data={"taskId": task_id, "status": NotifyTaskStatus.PENDING})
+
+
+@router.get("/dtalk.task", summary="查询钉钉发送/重发任务状态")
+async def notify_task(
+    task_id: str = Query(..., alias="taskId", min_length=32, max_length=32, description="异步任务ID"),
+    token_rtx_id: str = Depends(depend_token_rtx)
+) -> Status:
+    task = await get_task(task_id)
+    if not task or (task.get("owner") and task.get("owner") != token_rtx_id):
+        return FailureStatus(code=status_code.CODE_501_DATA_NOT_EXIST.value, message="任务不存在或已过期")
+    return SuccessStatus(data=task)
 
 
 @router.get("/dtalk.resendInit", summary="重发失败人员初始化")
@@ -140,13 +158,17 @@ async def resend_init(
     return await service.resend_init(rtx_id=token_rtx_id, md5=md5)
 
 
-@router.post("/dtalk.resend", summary="重发失败人员")
+@router.post("/dtalk.resend", summary="提交钉钉失败人员重发任务")
 async def resend(
     params: Annotated[SalaryDtalkResendModel, Body()],
-    token_rtx_id: str = Depends(depend_token_rtx),
-    service: SalaryNotifyDtalkService = Depends(get_service)
+    background_tasks: BackgroundTasks,
+    token_rtx_id: str = Depends(depend_token_rtx)
 ) -> Status:
-    return await service.resend(rtx_id=token_rtx_id, params=params.model_dump())
+    payload: Dict = params.model_dump()
+    task_id: str = await create_task(
+        channel="dtalk", action="resend", md5=payload.get("md5") or "", owner=token_rtx_id)
+    background_tasks.add_task(run_notify_task, task_id, "dtalk", "resend", token_rtx_id, payload)
+    return SuccessStatus(data={"taskId": task_id, "status": NotifyTaskStatus.PENDING})
 
 
 # - - - - - - - - - - - - - - - - - - - - 机器人配置 - - - - - - - - - - - - - - - - - - - -
