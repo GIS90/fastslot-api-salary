@@ -773,6 +773,14 @@ class SalaryNotifyEmailService:
             return FailureStatus(
                 code=status_code.CODE_505_DATA_INCOMPLETE.value,
                 message="请完善SMTP服务器、发件邮箱或密码配置")
+        # 发送之前ping一下邮箱是否可用
+        __ok: bool = await run_in_threadpool(
+            self.__ping_robot, robot_model.key, robot_model.secret, robot_model.agent_id)
+        if not __ok:
+            return FailureStatus(
+                code=status_code.CODE_903_OTHER_THREE_API_TOKEN_FAILURE.value,
+                message="连接失败，请检查SMTP服务器、邮箱或授权码是否配置正确")
+
         file_path: str = message_model.file_local_url or ""
         if not file_path or not os.path.exists(file_path):
             return FailureStatus(
@@ -852,6 +860,13 @@ class SalaryNotifyEmailService:
         if not robot_model.key or not robot_model.secret or not robot_model.agent_id:
             return FailureStatus(code=status_code.CODE_505_DATA_INCOMPLETE.value,
                                  message="请完善SMTP服务器、发件邮箱或密码配置")
+        # 发送之前ping一下邮箱是否可用
+        __ok: bool = await run_in_threadpool(
+            self.__ping_robot, robot_model.key, robot_model.secret, robot_model.agent_id)
+        if not __ok:
+            return FailureStatus(
+                code=status_code.CODE_903_OTHER_THREE_API_TOKEN_FAILURE.value,
+                message="连接失败，请检查SMTP服务器、邮箱或授权码是否配置正确")
 
         sheets: List[str] = self.__set_sheet_index(message_model)
         success_map: Dict[str, List[str]] = self.__parse_user_map(message_model.success)

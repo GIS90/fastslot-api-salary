@@ -804,6 +804,14 @@ class SalaryNotifyQywxService:
             return FailureStatus(
                 code=status_code.CODE_505_DATA_INCOMPLETE.value,
                 message="缺少CorpID、Secret或AgentId，请完善机器人配置信息")
+         # 发送之前ping一下机器人
+        __ok: bool = await run_in_threadpool(
+            self.__ping_robot, robot_model.key, robot_model.secret, robot_model.agent_id)
+        if not __ok:
+            return FailureStatus(
+                code=status_code.CODE_903_OTHER_THREE_API_TOKEN_FAILURE.value,
+                message="PING失败，请检查CorpID、Secret或AgentId是否配置正确")
+
         file_path: str = message_model.file_local_url or ""
         if not file_path or not os.path.exists(file_path):
             return FailureStatus(
@@ -890,6 +898,13 @@ class SalaryNotifyQywxService:
         if not robot_model.key or not robot_model.secret or not robot_model.agent_id:
             return FailureStatus(code=status_code.CODE_505_DATA_INCOMPLETE.value,
                                  message="缺少CorpID、Secret或AgentId，请完善机器人配置信息")
+        # 发送之前ping一下机器人
+        __ok: bool = await run_in_threadpool(
+            self.__ping_robot, robot_model.key, robot_model.secret, robot_model.agent_id)
+        if not __ok:
+            return FailureStatus(
+                code=status_code.CODE_903_OTHER_THREE_API_TOKEN_FAILURE.value,
+                message="PING失败，请检查CorpID、Secret或AgentId是否配置正确")
 
         sheets: List[str] = self.__set_sheet_index(message_model)
         success_map: Dict[str, List[str]] = self.__parse_user_map(message_model.success)
