@@ -292,7 +292,8 @@ insert into xtb_xtcs(`key`, `md5`, `remark`, `value`, `type`, `create_rtx`, `loc
 ('SALARY-QYWX-FILE-URL', '25f9e794323b453885f5181f1b624d0b', '企业微信通知模板下载', 'http://2lstore.pygo.space/templates/企业微信消息通知模板V1.0.xls', 'FILE', 'admin', False, False, 19),
 ('SALARY-EMAIL-FILE-URL', '7d0ac92c56361949d099dd9337c975e7', '邮箱通知模板下载', 'http://2lstore.pygo.space/templates/邮件消息通知模板V1.0.xlsx', 'FILE', 'admin', False, False, 20),
 ('SALARY-DTALK-ROBOT', '7df424f3c47c469c8bece5ccd7b89ed6', '钉钉机器人配置说明手册', 'https://open.dingtalk.com/document/dingstart/configure-the-robot-application', 'VALUE', 'admin', False, False, 21),
-('SALARY-QYWX-ROBOT', '046eb386e00548e29bc67bc20702d520', '企业微信机器人配置说明手册', 'https://developer.work.weixin.qq.com/document/path/101805', 'VALUE', 'admin', False, False, 22);
+('SALARY-QYWX-ROBOT', '046eb386e00548e29bc67bc20702d520', '企业微信机器人配置说明手册', 'https://developer.work.weixin.qq.com/document/path/101805', 'VALUE', 'admin', False, False, 22),
+('SALARY-EMAIL-SERVICE', '51cb01c74b7abcf24c78aa31fc5656b4', '邮箱服务器配置说明手册', 'https://mail.163.com/mailhelp/client.htm', 'VALUE', 'admin', False, False, 23);
 -- = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
 -- CSB_ENUM_EKY 枚举Key表
 -- create table && index
