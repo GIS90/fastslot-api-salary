@@ -290,8 +290,9 @@ insert into xtb_xtcs(`key`, `md5`, `remark`, `value`, `type`, `create_rtx`, `loc
 ('AVATAR-ROW-COUNT', '8f14e45fceea167a5a36dedd4bea2543', '用户头像列表每页显示数量', '6', 'VALUE', 'admin', False, False, 17),
 ('SALARY-DTALK-FILE-URL', 'e10adc3949ba59abbe56e057f20f883e', '钉钉通知模板下载', 'http://2lstore.pygo.space/templates/%E7%B3%BB%E7%BB%9F%E7%94%A8%E6%88%B7%E6%89%B9%E9%87%8F%E5%AF%BC%E5%85%A5%E6%A8%A1%E6%9D%BFV1.0.xlsx', 'FILE', 'admin', False, False, 18),
 ('SALARY-QYWX-FILE-URL', '25f9e794323b453885f5181f1b624d0b', '企业微信通知模板下载', 'http://2lstore.pygo.space/templates/%E7%B3%BB%E7%BB%9F%E7%94%A8%E6%88%B7%E6%89%B9%E9%87%8F%E5%AF%BC%E5%85%A5%E6%A8%A1%E6%9D%BFV1.0.xlsx', 'FILE', 'admin', False, False, 19),
-('SALARY-DTALK-ROBOT', '7df424f3c47c469c8bece5ccd7b89ed6', '钉钉机器人配置说明手册', 'https://open.dingtalk.com/document/dingstart/configure-the-robot-application', 'VALUE', 'admin', False, False, 20),
-('SALARY-QYWX-ROBOT', '046eb386e00548e29bc67bc20702d520', '企业微信机器人配置说明手册', 'https://developer.work.weixin.qq.com/document/path/101805', 'VALUE', 'admin', False, False, 21);
+('SALARY-MAIL-FILE-URL', '7d0ac92c56361949d099dd9337c975e7', '邮箱通知模板下载', 'http://2lstore.pygo.space/templates/%E7%B3%BB%E7%BB%9F%E7%94%A8%E6%88%B7%E6%89%B9%E9%87%8F%E5%AF%BC%E5%85%A5%E6%A8%A1%E6%9D%BFV1.0.xlsx', 'FILE', 'admin', False, False, 20),
+('SALARY-DTALK-ROBOT', '7df424f3c47c469c8bece5ccd7b89ed6', '钉钉机器人配置说明手册', 'https://open.dingtalk.com/document/dingstart/configure-the-robot-application', 'VALUE', 'admin', False, False, 21),
+('SALARY-QYWX-ROBOT', '046eb386e00548e29bc67bc20702d520', '企业微信机器人配置说明手册', 'https://developer.work.weixin.qq.com/document/path/101805', 'VALUE', 'admin', False, False, 22);
 -- = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
 -- CSB_ENUM_EKY 枚举Key表
 -- create table && index
