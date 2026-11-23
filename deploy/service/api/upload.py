@@ -44,6 +44,7 @@ from deploy.curd.xtb_user_avatar import XtbUserAvatarCurd
 from deploy.schema.dao.xtb_user_avatar import XtbUserAvatarModel
 from deploy.service.salary.notify.dtalk import SalaryNotifyDtalkService
 from deploy.service.salary.notify.qywx import SalaryNotifyQywxService
+from deploy.service.salary.notify.email import SalaryNotifyEmailService
 from deploy.delib.store_lib import QiNiuStoreLib
 from deploy.config import store_yun_access, store_yun_secret, store_yun_base, store_yun_space
 
@@ -89,6 +90,9 @@ class ApiUploadService:
         if upload_type == str(FileTypeEnum.QYWX.value):
             return await SalaryNotifyQywxService(db_connection=self.db).store_upload(
                 rtx_id=rtx_id, file_=file_)
+        if upload_type == str(FileTypeEnum.EMAIL.value):
+            return await SalaryNotifyEmailService(db_connection=self.db).store_upload(
+                rtx_id=rtx_id, file_=file_)
         return await self.upload_utils.upload(rtx_id=rtx_id, upload_type=upload_type, file_=file_)
 
     async def uploads(self, rtx_id: str, upload_type: str, files_: List[UploadFile],
@@ -104,6 +108,8 @@ class ApiUploadService:
                 result = await SalaryNotifyDtalkService(db_connection=self.db).store_upload(rtx_id=rtx_id, file_=f)
             elif upload_type == str(FileTypeEnum.QYWX.value):
                 result = await SalaryNotifyQywxService(db_connection=self.db).store_upload(rtx_id=rtx_id, file_=f)
+            elif upload_type == str(FileTypeEnum.EMAIL.value):
+                result = await SalaryNotifyEmailService(db_connection=self.db).store_upload(rtx_id=rtx_id, file_=f)
             else:
                 result = await self.upload_utils.upload(rtx_id=rtx_id, upload_type=upload_type, file_=f)
             if result.dict().get("code") == 100:

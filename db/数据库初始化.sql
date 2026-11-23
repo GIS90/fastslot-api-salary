@@ -274,8 +274,8 @@ insert into xtb_xtcs(`key`, `md5`, `remark`, `value`, `type`, `create_rtx`, `loc
 ('ADMIN-DATA-AUTHORITY', '6cfc35fda5cebaa3d39afa1a438a0e27', '管理员数据权限用户列表', 'a1,b2,c3', 'VALUE', 'admin', False, False, 1),
 ('REDIS-CACHE-EXPIRE', '4b8edc2094cb917ecb179453e9e472d7', 'Redis数据缓存时间，单位为秒，默认为4小时', '14400',  'VALUE', 'admin', False, False, 2),
 ('USER-DEFAULT-PASSWORD', '2560983a81db89c5f8ac7bc59ceec23e', '用户管理：默认密码', 'abcd1234@',  'VALUE', 'admin', False, False, 3),
-('USER-DEFAULT-AVATAR', 'ef2cee999bde28a0f2b2485127d8a389', '用户管理：默认头像', 'http://2lstore.pygo.space/avatars/default.png',  'FILE', 'admin', False, False, 4),
-('USER-IMPORT-URL', '8c303643ae592c91ed5a7c45cd030fc1', '用户管理：上传默认模板URL地址', 'http://2lstore.pygo.space/templates/%E7%B3%BB%E7%BB%9F%E7%94%A8%E6%88%B7%E6%89%B9%E9%87%8F%E5%AF%BC%E5%85%A5%E6%A8%A1%E6%9D%BFV1.0.xlsx',  'FILE', 'admin', False, False, 5),
+('USER-DEFAULT-AVATAR', 'ef2cee999bde28a0f2b2485127d8a389', '用户管理：默认头像', 'http://2lstore.pygo.space/templates/default.png',  'FILE', 'admin', False, False, 4),
+('USER-IMPORT-URL', '8c303643ae592c91ed5a7c45cd030fc1', '用户管理：上传默认模板URL地址', 'http://2lstore.pygo.space/templates/系统用户批量导入模板V1.0.xlsx',  'FILE', 'admin', False, False, 5),
 ('UPLOAD-FILE-MAX', '19a7fd901645cd10a0de9b495d1f6088', '文件上传最大文件数量', '15', 'VALUE', 'admin', False, False, 6),
 ('UPLOAD-AVATAR-SIZE-MAX', 'a1b2c3d4e5f6g7h8i9j0k1l2m3n4o5p6', '图片上传大小（单位：MB）', '5', 'VALUE', 'admin', False, False, 7),
 ('UPLOAD-FILE-SIZE-MAX', 'f9e8d7c6b5a4s3d2f1g0h9j8k7l6m5n4', '文件上传大小（单位：MB）', '10', 'VALUE', 'admin', False, False, 8),
@@ -288,9 +288,9 @@ insert into xtb_xtcs(`key`, `md5`, `remark`, `value`, `type`, `create_rtx`, `loc
 ('HOME-TIP-AFTERNOON', 'a262837654996d535aa3f3790a6eba4f', '系统登录温馨提示：下午14点～下午18点', '下午是继续推进各项任务的好时间，保持专注和效率，希望您能够保持良好的状态，顺利完成每一天的目标！', 'VALUE', 'admin', False, False, 15),
 ('HOME-TIP-NIGHT', '2cb3bb4adb5d010267204a7effd2c8da', '系统登录温馨提示：下午18点～凌晨6点', '一天的努力即将结束，回顾今天的成就，为明天做好准备。别忘了放松一下自己，享受美好的夜晚时光，睡觉要有好梦。', 'VALUE', 'admin', False, False, 16),
 ('AVATAR-ROW-COUNT', '8f14e45fceea167a5a36dedd4bea2543', '用户头像列表每页显示数量', '6', 'VALUE', 'admin', False, False, 17),
-('SALARY-DTALK-FILE-URL', 'e10adc3949ba59abbe56e057f20f883e', '钉钉通知模板下载', 'http://2lstore.pygo.space/templates/%E7%B3%BB%E7%BB%9F%E7%94%A8%E6%88%B7%E6%89%B9%E9%87%8F%E5%AF%BC%E5%85%A5%E6%A8%A1%E6%9D%BFV1.0.xlsx', 'FILE', 'admin', False, False, 18),
-('SALARY-QYWX-FILE-URL', '25f9e794323b453885f5181f1b624d0b', '企业微信通知模板下载', 'http://2lstore.pygo.space/templates/%E7%B3%BB%E7%BB%9F%E7%94%A8%E6%88%B7%E6%89%B9%E9%87%8F%E5%AF%BC%E5%85%A5%E6%A8%A1%E6%9D%BFV1.0.xlsx', 'FILE', 'admin', False, False, 19),
-('SALARY-MAIL-FILE-URL', '7d0ac92c56361949d099dd9337c975e7', '邮箱通知模板下载', 'http://2lstore.pygo.space/templates/%E7%B3%BB%E7%BB%9F%E7%94%A8%E6%88%B7%E6%89%B9%E9%87%8F%E5%AF%BC%E5%85%A5%E6%A8%A1%E6%9D%BFV1.0.xlsx', 'FILE', 'admin', False, False, 20),
+('SALARY-DTALK-FILE-URL', 'e10adc3949ba59abbe56e057f20f883e', '钉钉通知模板下载', 'http://2lstore.pygo.space/2templates/钉钉消息通知模板V1.0.xls', 'FILE', 'admin', False, False, 18),
+('SALARY-QYWX-FILE-URL', '25f9e794323b453885f5181f1b624d0b', '企业微信通知模板下载', 'http://2lstore.pygo.space/templates/企业微信消息通知模板V1.0.xls', 'FILE', 'admin', False, False, 19),
+('SALARY-EMAIL-FILE-URL', '7d0ac92c56361949d099dd9337c975e7', '邮箱通知模板下载', 'http://2lstore.pygo.space/templates/邮件消息通知模板V1.0.xlsx', 'FILE', 'admin', False, False, 20),
 ('SALARY-DTALK-ROBOT', '7df424f3c47c469c8bece5ccd7b89ed6', '钉钉机器人配置说明手册', 'https://open.dingtalk.com/document/dingstart/configure-the-robot-application', 'VALUE', 'admin', False, False, 21),
 ('SALARY-QYWX-ROBOT', '046eb386e00548e29bc67bc20702d520', '企业微信机器人配置说明手册', 'https://developer.work.weixin.qq.com/document/path/101805', 'VALUE', 'admin', False, False, 22);
 -- = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
@@ -792,6 +792,66 @@ CREATE TABLE `salary_qywx_robot`  (
 ) COMMENT='企业微信消息-机器人配置表';
 
 CREATE UNIQUE INDEX salary_qywx_robot_index ON salary_qywx_robot (`md5`);
+-- ----------------------------------------------------------------------------------------------
+-- 邮件消息-信息表
+DROP TABLES IF EXISTS `salary_email_message`;
+
+CREATE TABLE `salary_email_message`  (
+    `id` int NOT NULL AUTO_INCREMENT COMMENT '主键，自增ID',
+    `file_name` varchar(80) NOT NULL COMMENT '文件名称',
+    `file_local_url` varchar(150) NULL COMMENT '文件存储本地路径',
+    `file_store_url` varchar(150) NULL COMMENT '文件存储云对象存储位置',
+    `md5` varchar(64) not null unique COMMENT '数据唯一标识：MD5-ID',
+    `robot` varchar(55) NULL COMMENT '邮件服务配置md5-id',
+    `count` int NULL default 0 COMMENT '消息文件发送的累积次数',
+    `number` int NULL default 0 COMMENT '消息发送的累积条数',
+    `nsheet` int default 1 COMMENT 'sheet数',
+    `sheet_names` text COMMENT 'Sheets名称列表，以json方式存储',
+    `sheet_columns` text COMMENT 'Sheets列名的集合，以json方式存储',
+    `headers` text COMMENT 'excel的header信息，以json方式存储',
+    `set_sheet` varchar(35) COMMENT '当前设置的sheet选择索引，列表格式',
+    `cur_sheet` varchar(4) COMMENT '当前设置的sheet索引',
+    `set_column` text COMMENT '当前设置的sheet选择索引，表头列表设置，json字符串',
+    `set_title` text COMMENT '每个sheet页码的消息标题',
+    `success` text COMMENT '发送成功人员邮箱名单',
+    `failure` text COMMENT '发送失败人员邮箱名单',
+    `create_rtx` varchar(35) COMMENT '创建用户RTX-ID',
+    `create_time` datetime default CURRENT_TIMESTAMP COMMENT '创建时间',
+    `update_rtx` varchar(35) COMMENT '更新用户RTX-ID',
+    `update_time` datetime COMMENT '更新时间',
+    `delete_rtx` varchar(35) COMMENT '删除用户RTX-ID',
+    `delete_time` datetime COMMENT '删除时间',
+    `status` bool default False COMMENT '数据状态：1删除；0正常（默认）',
+
+    PRIMARY KEY (`id`)
+) COMMENT='邮件消息-信息表';
+
+CREATE UNIQUE INDEX salary_email_message_index ON salary_email_message (`md5`);
+-- ----------------------------------------------------------------------------------------------
+-- 邮件消息-服务配置表
+DROP TABLES IF EXISTS `salary_email_robot`;
+
+CREATE TABLE `salary_email_robot`  (
+    `id` int NOT NULL AUTO_INCREMENT COMMENT '主键，自增ID',
+    `name` varchar(30) NOT NULL COMMENT '邮件服务名称',
+    `md5` varchar(64) not null unique COMMENT '数据唯一标识：MD5-ID',
+    `key` varchar(120) NOT NULL COMMENT 'SMTP服务器地址:端口',
+    `secret` varchar(120) NOT NULL COMMENT '邮箱密码或授权码',
+    `agent_id` varchar(120) NOT NULL COMMENT '发件邮箱地址',
+    `select` bool DEFAULT False COMMENT '是否当前为选择',
+    `description` varchar(120) COMMENT '描述',
+    `create_rtx` varchar(35) COMMENT '创建用户RTX-ID',
+    `create_time` datetime default CURRENT_TIMESTAMP COMMENT '创建时间',
+    `update_rtx` varchar(35) COMMENT '更新用户RTX-ID',
+    `update_time` datetime COMMENT '更新时间',
+    `delete_rtx` varchar(35) COMMENT '删除用户RTX-ID',
+    `delete_time` datetime COMMENT '删除时间',
+    `status` bool default False COMMENT '数据状态：1删除；0正常（默认）',
+
+    PRIMARY KEY (`id`)
+) COMMENT='邮件消息-服务配置表';
+
+CREATE UNIQUE INDEX salary_email_robot_index ON salary_email_robot (`md5`);
 -- = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
 -- = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
 -- = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =

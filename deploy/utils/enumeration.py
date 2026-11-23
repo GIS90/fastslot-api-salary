@@ -161,6 +161,7 @@ class FileTypeEnum(IntEnum):
     USER_IMPORT = 5
     XTCS = 6    # 系统参数
     QYWX = 7    # 企业微信消息通知
+    EMAIL = 8   # 邮件消息通知
     AVATAR = 100    # 用户头像
 # ----------------------------------------------------------------------------------------------------------
 
@@ -212,6 +213,8 @@ class XtbXtcsKEY(StrEnum):
     SALARY_QYWX_FILE_URL = "SALARY-QYWX-FILE-URL"
     SALARY_DTALK_ROBOT = "SALARY-DTALK-ROBOT"
     SALARY_QYWX_ROBOT = "SALARY-QYWX-ROBOT"
+    SALARY_EMAIL_FILE_URL = "SALARY-EMAIL-FILE-URL"
+    SALARY_EMAIL_SERVICE = "SALARY-EMAIL-SERVICE"
 
 
 @unique
@@ -275,4 +278,5 @@ class XtbReportKey(StrEnum):
     SystemOpsAvatar = "SystemOpsAvatar"
     SalaryNotifyDtalk = "SalaryNotifyDtalk"
     SalaryNotifyQywx = "SalaryNotifyQywx"
+    SalaryNotifyEmail = "SalaryNotifyEmail"
 

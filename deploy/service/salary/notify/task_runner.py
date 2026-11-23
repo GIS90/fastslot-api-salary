@@ -18,10 +18,10 @@ python version:
 
 ------------------------------------------------
 """
-from typing import Dict
-
+from typing import Any, Dict
 from deploy.curd.database import AsyncSessionLocal
 from deploy.service.salary.notify.dtalk import SalaryNotifyDtalkService
+from deploy.service.salary.notify.email import SalaryNotifyEmailService
 from deploy.service.salary.notify.qywx import SalaryNotifyQywxService
 from deploy.utils.logger import logger as LOG
 from deploy.utils.notify_task import set_failure, set_running, set_success
@@ -40,9 +40,11 @@ async def run_notify_task(
         async with AsyncSessionLocal() as session:
             try:
                 if channel == "qywx":
-                    service = SalaryNotifyQywxService(db_connection=session)
+                    service: SalaryNotifyDtalkService = SalaryNotifyDtalkService(db_connection=session)
                 elif channel == "dtalk":
-                    service = SalaryNotifyDtalkService(db_connection=session)
+                    service: SalaryNotifyQywxService = SalaryNotifyQywxService(db_connection=session)
+                elif channel == "email":
+                    service: SalaryNotifyEmailService = SalaryNotifyEmailService(db_connection=session)
                 else:
                     raise ValueError(f"不支持的通知渠道：{channel}")
 

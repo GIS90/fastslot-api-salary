@@ -51,6 +51,7 @@ from deploy.service.system.ops.avatar import SystemOpsAvatarService
 from deploy.service.system.config.api import SystemConfigApiService
 from deploy.service.salary.notify.dtalk import SalaryNotifyDtalkService
 from deploy.service.salary.notify.qywx import SalaryNotifyQywxService
+from deploy.service.salary.notify.email import SalaryNotifyEmailService
 
 
 @unique
@@ -97,6 +98,7 @@ class ApiDownloadService(object):
         self.system_config_api_service: SystemConfigApiService = SystemConfigApiService(db_connection=db_connection)
         self.salary_notify_dtalk_service: SalaryNotifyDtalkService = SalaryNotifyDtalkService(db_connection=db_connection)
         self.salary_notify_qywx_service: SalaryNotifyQywxService = SalaryNotifyQywxService(db_connection=db_connection)
+        self.salary_notify_email_service: SalaryNotifyEmailService = SalaryNotifyEmailService(db_connection=db_connection)
 
     def __str__(self):
         return "ApiDownloadService class."
@@ -180,6 +182,9 @@ class ApiDownloadService(object):
                 case "SalaryNotifyQywx":
                     # 工资>消息通知>企业微信通知
                     __res = await self.salary_notify_qywx_service.download(rtx_id=rtx_id, params=new_params)
+                case "SalaryNotifyEmail":
+                    # 工资>消息通知>邮件通知
+                    __res = await self.salary_notify_email_service.download(rtx_id=rtx_id, params=new_params)
                 case _:
                     return FailureStatus(
                         code=status_code.CODE_404_REQUEST_PARAMETER_VALUE_ERROR.value,
