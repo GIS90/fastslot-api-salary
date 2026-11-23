@@ -450,7 +450,7 @@ class SalaryNotifyDtalkService:
         return SuccessStatus(data={"name": model.file_name, "md5": md5_value})
 
     async def pagination(self, rtx_id: str, params: Dict) -> Status:
-        models: List[SalaryDtalkMessageModel] = await self.salary_dtalk_message_curd.pagination(
+        models: List[SalaryDtalkMessageModel] | None = await self.salary_dtalk_message_curd.pagination(
             db=self.db,
             offset=params.get("offset"),
             limit=params.get("limit"),
@@ -474,7 +474,7 @@ class SalaryNotifyDtalkService:
         )
         if not fields:
             return FailureStatus(code=status_code.CODE_102_SUCCESS_NO_COLUMN.value, data=_default_data)
-        data: List = await many_model_converter_dict(
+        data: List | None = await many_model_converter_dict(
             models=models,
             fields=fields.get("column"),
             default_value=TABLE_DEFAULT_NULL,
@@ -580,7 +580,7 @@ class SalaryNotifyDtalkService:
             raise ReportNotColumnException(detail="[钉钉消息通知]未配置导出表头")
 
         __auto_id_name: Any = xtbb_field_id_value(options=fields.get("column"))
-        data: List = await many_model_converter_dict(
+        data: List | None = await many_model_converter_dict(
             models=models,
             fields=fields.get("column"),
             default_value=TABLE_DEFAULT_NULL,
