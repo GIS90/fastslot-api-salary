@@ -33,16 +33,13 @@ Life is short, I use python.
 import os
 import json
 import hashlib
+import xlrd
+import openpyxl
 from typing import Dict, List, Optional, Tuple, Any, Literal
 from fastapi import UploadFile
 from sqlalchemy.ext.asyncio import AsyncSession
 from starlette.concurrency import run_in_threadpool
-
-import xlrd
-import openpyxl
-
 from deploy.config import (
-    store_yun_base,
     table_default_null as TABLE_DEFAULT_NULL,
     table_default_db_id as TABLE_DEFAULT_DB_ID
 )
@@ -54,7 +51,7 @@ from deploy.utils.status import Status, SuccessStatus, FailureStatus
 from deploy.utils.status_value import StatusCode as status_code
 from deploy.utils.utils import (
     get_now, md5 as generator_md5, get_qiniu_abs_file_url, xtbb_field_id_value, 
-    random_uuid4, rename_local_file
+    random_uuid4, rename_local_file, filename2md5
 )
 from deploy.utils.converter import model_converter_dict, many_model_converter_dict
 from deploy.utils.enumeration import FileTypeEnum, XtbReportKey
@@ -163,19 +160,6 @@ class SalaryNotifyDtalkService:
             if filtered:
                 result[sheet] = filtered
         return result
-
-    @staticmethod
-    def __file_md5(file_path: str) -> str:
-        if not file_path or not os.path.exists(file_path):
-            return ""
-        _md5 = hashlib.md5()
-        try:
-            with open(file_path, "rb") as f:
-                for chunk in iter(lambda: f.read(1024 * 1024), b""):
-                    _md5.update(chunk)
-            return _md5.hexdigest()
-        except Exception:
-            return ""
 
     @staticmethod
     def __default_columns(columns: Dict) -> Dict:
@@ -406,7 +390,10 @@ class SalaryNotifyDtalkService:
         local_file: str = data.get("local") or ""
         store_name: str = data.get("store_name") or ""
 
-        md5_value: str = self.__file_md5(local_file)
+        md5_value, _ = filename2md5(
+            rtx_id=rtx_id, 
+            file_name=file_name
+        )
         if not md5_value:
             return FailureStatus(code=status_code.CODE_456_REQUEST_FILE_LOCAL_STORE_FAILURE.value)
         if await self.salary_dtalk_message_curd.get_by_md5(db=self.db, md5=md5_value):
@@ -736,18 +723,18 @@ class SalaryNotifyDtalkService:
         """重发初始化：加载配置中的 Sheet、各 Sheet 失败名单及机器人选项"""
         __flag, model = await self.__get_alive_message(md5)
         if not __flag: return model
-        robots = await self.salary_dtalk_robot_curd.option(db=self.db)
+        robots: List[SalaryDtalkRobotModel] | None = await self.salary_dtalk_robot_curd.option(db=self.db)
         robot_index: str = ""
         robot_enums: List[Dict] = []
         for robot in robots or []:
             robot_enums.append({"key": robot.md5, "value": robot.name})
             if robot.md5 == (model.robot or "") or (not model.robot and robot.select):
-                robot_index = robot.md5
+                robot_index: Any | str = robot.md5
         sheet_names: Dict = self.__sheet_names(model)
         failure_map: Dict[str, List[str]] = self.__parse_user_map(model.failure)
         sheets: List[str] = self.__set_sheet_index(model)
         failure_users: Dict[str, List[str]] = {
-            sheet: list(failure_map.get(sheet) or []) for sheet in sheets
+            sheet: list[str](failure_map.get(sheet) or []) for sheet in sheets
         }
         failure_groups: List[Dict] = [
             {
@@ -767,16 +754,23 @@ class SalaryNotifyDtalkService:
         })
 
     async def send(self, rtx_id: str, params: Dict) -> Status:
+        # 消息数据
         __flag, message_model = await self.__get_alive_message(params.get("md5"))
-        if not __flag:
-            return message_model
+        if not __flag: return message_model
+        # 机器人数据
         __flag, robot_model = await self.__get_alive_robot(params.get("robot"))
-        if not __flag:
-            return robot_model
+        if not __flag: return robot_model
         if not robot_model.key or not robot_model.secret:
             return FailureStatus(
                 code=status_code.CODE_505_DATA_INCOMPLETE.value,
                 message="缺少key或者secret，请完善机器人配置信息")
+        # 发送之前ping一下机器人
+        __ok: bool = await run_in_threadpool(self.__ping_robot, robot_model.key, robot_model.secret)
+        if not __ok:
+            return FailureStatus(
+                code=status_code.CODE_903_OTHER_THREE_API_TOKEN_FAILURE.value,
+                message="机器人未连通，请检查KEY或SECRET是否配置正确")
+
         file_path: str = message_model.file_local_url or ""
         if not file_path or not os.path.exists(file_path):
             return FailureStatus(
@@ -786,9 +780,9 @@ class SalaryNotifyDtalkService:
         if not sheet_list:
             return FailureStatus(code=status_code.CODE_403_REQUEST_PARAMETER_NOT_NULL.value, message="请选择发送的Sheet，并配置列和标题")
 
-        set_columns: Dict = self.__json_dict(message_model.set_column)
-        set_titles: Dict = self.__json_dict(message_model.set_title)
-        sheet_names: Dict = self.__sheet_names(message_model)
+        set_columns: Dict = self.__json_dict(value=message_model.set_column)
+        set_titles: Dict = self.__json_dict(value=message_model.set_title)
+        sheet_names: Dict = self.__sheet_names(model=message_model)
 
         __results: List[Dict] = []
         __number: int = 0
@@ -798,7 +792,7 @@ class SalaryNotifyDtalkService:
         for sheet in sheet_list:
             __sheet: str = str(sheet)
             item: Dict = {"sheet": __sheet, "sheetName": sheet_names.get(__sheet, "")}
-            rows = self.__read_sheet_rows(
+            rows: List[Dict[Any, Any]] = self.__read_sheet_rows(
                 file_path=file_path,
                 sheet_index=int(__sheet),
                 columns=set_columns.get(__sheet) or []
@@ -855,6 +849,12 @@ class SalaryNotifyDtalkService:
         if not robot_model.key or not robot_model.secret:
             return FailureStatus(code=status_code.CODE_505_DATA_INCOMPLETE.value,
                                  message="缺少key或secret，请完善机器人配置信息")
+        # 发送之前ping一下机器人
+        __ok: bool = await run_in_threadpool(self.__ping_robot, robot_model.key, robot_model.secret)
+        if not __ok:
+            return FailureStatus(
+                code=status_code.CODE_903_OTHER_THREE_API_TOKEN_FAILURE.value,
+                message="机器人未连通，请检查KEY或SECRET是否配置正确")
 
         sheets: List[str] = self.__set_sheet_index(message_model)
         success_map: Dict[str, List[str]] = self.__parse_user_map(message_model.success)

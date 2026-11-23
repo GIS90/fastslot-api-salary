@@ -33,13 +33,12 @@ Life is short, I use python.
 import os
 import json
 import hashlib
+import xlrd
+import openpyxl
 from typing import Dict, List, Optional, Tuple, Any, Literal
 from fastapi import UploadFile
 from sqlalchemy.ext.asyncio import AsyncSession
 from starlette.concurrency import run_in_threadpool
-
-import xlrd
-import openpyxl
 
 from deploy.config import (
     store_yun_base,
@@ -54,7 +53,7 @@ from deploy.utils.status import Status, SuccessStatus, FailureStatus
 from deploy.utils.status_value import StatusCode as status_code
 from deploy.utils.utils import (
     get_now, md5 as generator_md5, get_qiniu_abs_file_url, xtbb_field_id_value, 
-    random_uuid4, rename_local_file
+    random_uuid4, rename_local_file, filename2md5
 )
 from deploy.utils.converter import model_converter_dict, many_model_converter_dict
 from deploy.utils.enumeration import FileTypeEnum, XtbReportKey
@@ -163,19 +162,6 @@ class SalaryNotifyEmailService:
             if filtered:
                 result[sheet] = filtered
         return result
-
-    @staticmethod
-    def __file_md5(file_path: str) -> str:
-        if not file_path or not os.path.exists(file_path):
-            return ""
-        _md5 = hashlib.md5()
-        try:
-            with open(file_path, "rb") as f:
-                for chunk in iter(lambda: f.read(1024 * 1024), b""):
-                    _md5.update(chunk)
-            return _md5.hexdigest()
-        except Exception:
-            return ""
 
     @staticmethod
     def __default_columns(columns: Dict) -> Dict:
@@ -399,7 +385,10 @@ class SalaryNotifyEmailService:
         local_file: str = data.get("local") or ""
         store_name: str = data.get("store_name") or ""
 
-        md5_value: str = self.__file_md5(local_file)
+        md5_value, _ = filename2md5(
+            rtx_id=rtx_id, 
+            file_name=file_name
+        )
         if not md5_value:
             return FailureStatus(code=status_code.CODE_456_REQUEST_FILE_LOCAL_STORE_FAILURE.value)
         if await self.salary_email_message_curd.get_by_md5(db=self.db, md5=md5_value):
