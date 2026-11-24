@@ -121,27 +121,8 @@ class XtbUserAvatarCurd(BaseCurd):
     ) -> Optional[List]:
         try:
             stmt = select(
-                XtbUserAvatarModel.id,
-                XtbUserAvatarModel.name,
-                XtbUserAvatarModel.md5,
-                XtbUserAvatarModel.format,
-                XtbUserAvatarModel.url,
-                XtbUserAvatarModel.or_url,
-                XtbUserAvatarModel.count,
-                XtbUserAvatarModel.favorite,
-                XtbUserAvatarModel.width,
-                XtbUserAvatarModel.height,
-                XtbUserAvatarModel.size,
-                XtbUserAvatarModel.type,
-                CsbEnumValueModel.value.label("type__text"),
-                XtbUserAvatarModel.summary,
-                XtbUserAvatarModel.tag,
-                XtbUserAvatarModel.lock,
-                XtbUserAvatarModel.create_time,
-                XtbUserAvatarModel.create_rtx,
-                XtbUserAvatarModel.update_rtx,
-                XtbUserAvatarModel.update_time,
-                XtbUserAvatarModel.status
+                *XtbUserAvatarModel.__table__.columns,
+                CsbEnumValueModel.value.label("type__text")
             ).outerjoin(
                 CsbEnumValueModel,
                 and_(
@@ -186,27 +167,8 @@ class XtbUserAvatarCurd(BaseCurd):
     ) -> Optional[List]:
         try:
             stmt = select(
-                XtbUserAvatarModel.id,
-                XtbUserAvatarModel.name,
-                XtbUserAvatarModel.md5,
-                XtbUserAvatarModel.format,
-                XtbUserAvatarModel.url,
-                XtbUserAvatarModel.or_url,
-                XtbUserAvatarModel.count,
-                XtbUserAvatarModel.favorite,
-                XtbUserAvatarModel.width,
-                XtbUserAvatarModel.height,
-                XtbUserAvatarModel.size,
-                XtbUserAvatarModel.type,
-                CsbEnumValueModel.value.label("type__text"),
-                XtbUserAvatarModel.summary,
-                XtbUserAvatarModel.tag,
-                XtbUserAvatarModel.lock,
-                XtbUserAvatarModel.create_time,
-                XtbUserAvatarModel.create_rtx,
-                XtbUserAvatarModel.update_rtx,
-                XtbUserAvatarModel.update_time,
-                XtbUserAvatarModel.status
+               *XtbUserAvatarModel.__table__.columns,
+                CsbEnumValueModel.value.label("type__text")
             ).outerjoin(
                 CsbEnumValueModel,
                 and_(

@@ -126,17 +126,9 @@ class XtbUserTaskCurd(BaseCurd):
         if filter_ is None: filter_ = {}
         try:
             stmt = (select(
-                XtbUserTaskModel.create_rtx,
-                XtbUserTaskModel.api,
-                XtbUserTaskModel.name,
-                XtbUserTaskModel.md5,
-                XtbUserTaskModel.data,
+                *XtbUserTaskModel.__table__.columns,
                 EV1.value.label("data__text"),
-                XtbUserTaskModel.task,
                 EV2.value.label("task__text"),
-                XtbUserTaskModel.cost,
-                XtbUserTaskModel.create_time,
-                XtbUserTaskModel.update_time,
             ).outerjoin(
                 EV1,
                 XtbUserTaskModel.data == EV1.key
@@ -173,18 +165,9 @@ class XtbUserTaskCurd(BaseCurd):
     ) -> Optional[List]:
         try:
             stmt = (select(
-                XtbUserTaskModel.id,
-                XtbUserTaskModel.create_rtx,
-                XtbUserTaskModel.api,
-                XtbUserTaskModel.name,
-                XtbUserTaskModel.md5,
-                XtbUserTaskModel.data,
+                *XtbUserTaskModel.__table__.columns,
                 EV1.value.label("data__text"),
-                XtbUserTaskModel.task,
                 EV2.value.label("task__text"),
-                XtbUserTaskModel.cost,
-                XtbUserTaskModel.create_time,
-                XtbUserTaskModel.update_time,
             ).outerjoin(
                 EV1,
                 XtbUserTaskModel.data == EV1.key
