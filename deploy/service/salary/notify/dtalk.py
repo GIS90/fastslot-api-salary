@@ -764,7 +764,7 @@ class SalaryNotifyDtalkService:
             return FailureStatus(
                 code=status_code.CODE_505_DATA_INCOMPLETE.value,
                 message="缺少key或者secret，请完善机器人配置信息")
-        # 发送之前ping一下机器人
+        # 发送之前ping一下机器人是否可用
         __ok: bool = await run_in_threadpool(self.__ping_robot, robot_model.key, robot_model.secret)
         if not __ok:
             return FailureStatus(
@@ -849,7 +849,7 @@ class SalaryNotifyDtalkService:
         if not robot_model.key or not robot_model.secret:
             return FailureStatus(code=status_code.CODE_505_DATA_INCOMPLETE.value,
                                  message="缺少key或secret，请完善机器人配置信息")
-        # 发送之前ping一下机器人
+        # 发送之前ping一下机器人是否可用
         __ok: bool = await run_in_threadpool(self.__ping_robot, robot_model.key, robot_model.secret)
         if not __ok:
             return FailureStatus(

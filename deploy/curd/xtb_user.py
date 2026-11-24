@@ -103,23 +103,9 @@ class XtbUserCurd(BaseCurd):
     ) -> Optional[List]:
         try:
             stmt = select(
-                XtbUserModel.id,
-                XtbUserModel.rtx_id,
-                XtbUserModel.md5,
-                XtbUserModel.name,
-                XtbUserModel.sex,
+                *XtbUserModel.__table__.columns,
                 CsbEnumValueModel.value.label("sex__text"),
-                XtbUserModel.phone,
-                XtbUserModel.email,
-                XtbUserModel.avatar,
-                XtbUserModel.introduction,
-                XtbUserModel.department,
-                XtbDepartmentModel.name.label("department__text"),
-                XtbUserModel.create_rtx,
-                XtbUserModel.create_time,
-                XtbUserModel.update_rtx,
-                XtbUserModel.update_time,
-                XtbUserModel.status
+                XtbDepartmentModel.name.label("department__text")
             ).outerjoin(
                 CsbEnumValueModel,
                 and_(
@@ -152,23 +138,9 @@ class XtbUserCurd(BaseCurd):
     ) -> Optional[List]:
         try:
             stmt = select(
-                XtbUserModel.id,
-                XtbUserModel.rtx_id,
-                XtbUserModel.name,
-                XtbUserModel.sex,
+                *XtbUserModel.__table__.columns,
                 CsbEnumValueModel.value.label("sex__text"),
-                XtbUserModel.phone,
-                XtbUserModel.email,
-                XtbUserModel.avatar,
-                XtbUserModel.introduction,
-                XtbUserModel.role,
-                XtbUserModel.department,
-                XtbDepartmentModel.name.label("department__text"),
-                XtbUserModel.create_rtx,
-                XtbUserModel.create_time,
-                XtbUserModel.update_rtx,
-                XtbUserModel.update_time,
-                XtbUserModel.status
+                XtbDepartmentModel.name.label("department__text")
             ).outerjoin(
                 CsbEnumValueModel,
                 XtbUserModel.sex == CsbEnumValueModel.key

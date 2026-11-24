@@ -44,6 +44,7 @@ from deploy.view.system.ops.task import router as system_ops_task_router
 from deploy.view.system.ops.log import router as system_ops_log_router
 from deploy.view.system.ops.depart import router as system_ops_depart_router
 from deploy.view.system.ops.avatar import router as system_ops_avatar_router
+from deploy.view.system.ops.redis import router as system_ops_redis_router
 from deploy.view.system.config.xtcs import router as system_config_xtcs_router
 from deploy.view.system.config.dict import router as system_config_dict_router
 from deploy.view.system.config.report import router as system_config_report_router
@@ -69,7 +70,7 @@ View根据系统设计的api进行模块划分，其中有3个比较特殊（不
     发薪通知：[dtalk]钉钉通知 [qywx]企业微信通知 [email]邮件通知
   [system]系统
     权限管理：[user]用户管理 [role]角色管理 [menu]菜单管理
-    系统维护：[task]任务中心 [log]系统日志 [depart]部门管理 [avatar]头像管理
+    系统维护：[task]任务中心 [log]系统日志 [depart]部门管理 [avatar]头像管理 [redis]缓存管理
     系统配置：[xtcs]参数配置 [dict]数据字典 [report]报表配置 [api]API管理
   设置
     [profile]个人中心
@@ -90,6 +91,7 @@ add_routers = [
     system_ops_log_router,
     system_ops_depart_router,
     system_ops_avatar_router,
+    system_ops_redis_router,
     system_config_xtcs_router,
     system_config_dict_router,
     system_config_report_router,

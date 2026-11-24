@@ -35,6 +35,7 @@ from typing import Any, List, Dict, Optional
 import json
 from deploy.config import store_yun_base as STORE_YUN_BASE_URL
 from deploy.utils.utils import get_qiniu_abs_file_url
+from deploy.utils.enumeration import FieldTypeEnum
 
 
 __all__ = [
@@ -91,6 +92,9 @@ async def model_converter_dict(
 
     model_dict: Dict = {}
     for field_key, field_type, field_name, field_null in valid_fields:
+        # 对于枚举字段特殊处理
+        if field_type == "enum_text":
+            field_key: str = f"{field_key}__text"
         raw_value = getattr(model, field_key, "")
         # 显式判断 None 来决定是否使用默认值
         field_value = raw_value if raw_value is not None or field_null \
@@ -98,40 +102,40 @@ async def model_converter_dict(
         if field_value is None: field_value = ""
         try:
             match field_type:
-                case "string":
+                case FieldTypeEnum.STR:
                     model_dict[field_name] = str(field_value)
-                case "integer":
+                case FieldTypeEnum.INT:
                     model_dict[field_name] = int(field_value)
-                case "number":
+                case FieldTypeEnum.FLOAT:
                     model_dict[field_name] = float(field_value)
-                case "boolean":
+                case FieldTypeEnum.BOOL:
                     model_dict[field_name] = bool(field_value)
-                case "boolean_text":
+                case FieldTypeEnum.BOOL_TEXT:
                     model_dict[field_name] = "是" if bool(field_value) else "否"
-                case "user_status_text":
+                case FieldTypeEnum.USER_STATUS_TEXT:
                     model_dict[field_name] = "注销" if bool(field_value) else "启用"
-                case "lock_text":
+                case FieldTypeEnum.LOCK_TEXT:
                     model_dict[field_name] = "锁定" if bool(field_value) else "正常"
-                case "datetime" | "date" | "time" if isinstance(field_value, (datetime.datetime, datetime.date)):
-                    fmt_map = {
+                case FieldTypeEnum.DATETIME | FieldTypeEnum.DATE | FieldTypeEnum.TIME if isinstance(field_value, (datetime.datetime, datetime.date)):
+                    fmt_map: dict[str, str] = {
                         "datetime": "%Y-%m-%d %H:%M:%S",
                         "date": "%Y-%m-%d",
                         "time": "%H:%M:%S"
                     }
-                    model_dict[field_name] = field_value.strftime(fmt_map[field_type])
-                case "timestamp" if hasattr(field_value, 'timestamp'):
+                    model_dict[field_name] = field_value.strftime(format=fmt_map[field_type])
+                case FieldTypeEnum.TIMESTAMP:
                     model_dict[field_name] = field_value.timestamp()
-                case "list":
+                case FieldTypeEnum.LIST:
                     if isinstance(field_value, str):
                         field_value = json.loads(field_value)
                     model_dict[field_name] = list(field_value)
-                case "dict":
+                case FieldTypeEnum.DICT:
                     if isinstance(field_value, str):
                         field_value = json.loads(field_value)
                     model_dict[field_name] = dict(field_value)
-                case "split_list":
+                case FieldTypeEnum.SPLITLIST:
                     model_dict[field_name] = [str(x) for x in field_value.split(",")] if field_value else []
-                case "file_store_url":
+                case FieldTypeEnum.FILE_STORE_URL:
                     model_dict[field_name] = get_qiniu_abs_file_url(url=field_value)
                 case _:
                     model_dict[field_name] = str(field_value)

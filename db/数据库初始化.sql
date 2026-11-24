@@ -222,7 +222,7 @@ VALUES
 (38, '头像管理', 'SystemOpsAvatar', '/system/ops/avatar', 36, 3, 'eafdc02f3b847285bf1815f55f1f4e46', '/system/ops/avatar/index', FALSE, '', '', TRUE, FALSE, FALSE, 'MENU', TRUE, 10102, 'admin', FALSE, TRUE, ''),
 (39, '系统日志', 'SystemOpsLog', '/system/ops/log', 36, 3, 'fa83d9352d3c8fab04893bbf60be7e06', '/system/ops/log/index', FALSE, '', '', TRUE, FALSE, FALSE, 'MENU', TRUE, 10103, 'admin', FALSE, TRUE, ''),
 (40, '任务中心', 'SystemOpsTask', '/system/ops/task', 36, 3, '0d5939c51f761fe1d7fe3c9409577a6f', '/system/ops/task/index', FALSE, '', '', TRUE, FALSE, FALSE, 'MENU', TRUE, 10104, 'admin', FALSE, TRUE, ''),
-(53, '缓存管理', 'SystemConfigRedis', '/system/config/redis', 36, 3, '94ba664e9abb71b1c780297ebbdeb52e', '/system/config/redis/index', FALSE, '', '', TRUE, FALSE, FALSE, 'MENU', TRUE, 10105, 'admin', FALSE, TRUE, 'R'),
+(53, '缓存管理', 'SystemOpsRedis', '/system/ops/redis', 36, 3, '94ba664e9abb71b1c780297ebbdeb52e', '/system/ops/redis/index', FALSE, '', '', TRUE, FALSE, FALSE, 'MENU', TRUE, 10105, 'admin', FALSE, TRUE, 'R'),
 -- * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
 --   > 系统维护[二级菜单]
 (41, '系统配置', 'SystemConfig', '/system/config', 35, 2, 'a59948b9e45358eaaaa1b13d9cedc248', '/system/config', FALSE, '', 'SetUp', TRUE, FALSE, FALSE, 'MENU', TRUE, 10200, 'admin', FALSE, FALSE, ''),
@@ -333,7 +333,8 @@ insert into csb_enum_key(`key`, `md5`, `value`, `lock`, `status`, `create_rtx`, 
 ('xtbb-field-type', 'a7d2f9e4c1b8a3d6f5e2c9b7a4d1f8e3', '报表字段类型', False, False, 'admin', 10),
 ('xtbb-field-align', 'e3b0c44298fc1c149afbf4c8996fb924', '报表字段对齐方式', False, False, 'admin', 11),
 ('avatar-type', '7f3a9c2e1b8d4f6a0c5e9b2d7a1f3c8e', '头像类型', False, False, 'admin', 12),
-('xtcs-type', '8621ffdbc5698829397d97767ac13db3', '系统参数类型', False, False, 'admin', 13);
+('xtcs-type', '8621ffdbc5698829397d97767ac13db3', '系统参数类型', False, False, 'admin', 13),
+('redis-match', 'f4722fc556c2837ca6afc1f5aeb380a7', 'Redis缓存匹配方式', False, False, 'admin', 14);
 
 -- CSB_ENUM_VALUE枚举 Value表
 -- create table && index
@@ -408,7 +409,8 @@ insert into csb_enum_value(`name`, `md5`, `key`, `value`, `remark`, `lock`, `sta
 ('xtbb-field-type', 'b4d1f7a3c9e6b2d8f5a1c7e3b9d6f2a8', 'dict', '字典', '系统报表字段类型 > 字典', False, False, 'admin', 11),
 ('xtbb-field-type', 'c9e6b2d8f5a1c7e3b9d6f2a8c4e1b7d3', 'split_list', '拆分列表', '系统报表字段类型 > 拆分列表', False, False, 'admin', 12),
 ('xtbb-field-type', 'd6f2a8c4e1b7d3f9a5c2e8b4d1f7a3c9', 'user_status_text', '用户状态文本', '系统报表字段类型 > 用户状态文本', False, False, 'admin', 13),
-('xtbb-field-type', 'e3b9d6f2a8c4e1b7d3f9a5c2e8b4d1f7', 'lock_text', '锁定文本', '系统报表字段类型 > 持定文本', False, False, 'admin', 14),
+('xtbb-field-type', 'e3b9d6f2a8c4e1b7d3f9a5c2e8b4d1f7', 'lock_text', '锁定文本', '系统报表字段类型 > 锁定文本', False, False, 'admin', 14),
+('xtbb-field-type', 'fd68ef3d3d7fef3ba13fa9aab9b937b1', 'enum_text', '枚举文本', '系统报表字段类型 > 持定文本', False, False, 'admin', 15),
 ('xtbb-field-align', 'e3b0c44298fc1c149afbf4c8996fb924', 'center', '居中对齐', '系统报表字段对齐方式 > 居中对齐', False, False, 'admin', 1),
 ('xtbb-field-align', '5d41402abc4b2a76b9719d911017c592', 'left', '左对齐', '系统报表字段对齐方式 > 左对齐', False, False, 'admin', 2),
 ('xtbb-field-align', '6f1ed002ab5595859014ebf0951522d9', 'right', '右对齐', '系统报表字段对齐方式 > 右对齐', False, False, 'admin', 3),
@@ -428,7 +430,15 @@ insert into csb_enum_value(`name`, `md5`, `key`, `value`, `remark`, `lock`, `sta
 ('avatar-type', '3a4b5c6d7e8f901a2b3c4d5e6f708192', 'OTHER', '其他', '头像类别：其他未归类的头像', False, False, 'admin', 14),
 ('xtcs-type', 'd8578edf8458ce06fbc5bb76a58c5ca4 ', 'VALUE', '值', '参数类型：值', False, False, 'admin', 1),
 ('xtcs-type', '7d793037a0760186574b0282f2f435e7', 'FILE', '文件', '参数类型：文件', False, False, 'admin', 2),
-('xtcs-type', 'e10adc3949ba59abbe56e057f20f883e', 'OTHER', '其他', '参数类型：其他', True, False, 'admin', 3);
+('xtcs-type', 'e10adc3949ba59abbe56e057f20f883e', 'OTHER', '其他', '参数类型：其他', True, False, 'admin', 3),
+('redis-match', '65ced1c77e36284d24f838579921a53c', 'prefix', '前缀匹配', '按key前缀匹配', FALSE, FALSE, 'admin', 1),
+('redis-match', '1ceea6140924d190ba58018a092ec59f', 'pattern', '通配符匹配', '支持*和?通配符', FALSE, FALSE, 'admin', 2),
+('redis-match', 'cfe5cfd0fd98921cbef328468d9bb35c', 'regex', '正则匹配', '按正则表达式匹配', FALSE, FALSE, 'admin', 3);
+
+
+
+
+
 
 
 
@@ -855,12 +865,76 @@ CREATE TABLE `salary_email_robot`  (
 
 CREATE UNIQUE INDEX salary_email_robot_index ON salary_email_robot (`md5`);
 -- = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
+-- 系统表-Redis连接配置
+DROP TABLE IF EXISTS `xtb_redis_config`;
+CREATE TABLE `xtb_redis_config`  (
+    `id` int NOT NULL AUTO_INCREMENT COMMENT '主键，自增ID',
+    `name` varchar(55) NOT NULL COMMENT '配置名称',
+    `md5` varchar(64) NOT NULL UNIQUE COMMENT '数据唯一标识：MD5-ID',
+    `host` varchar(120) NOT NULL DEFAULT '127.0.0.1' COMMENT 'Redis主机地址',
+    `port` int DEFAULT 6379 COMMENT 'Redis端口',
+    `db` int DEFAULT 0 COMMENT 'Redis数据库编号',
+    `password` varchar(120) DEFAULT NULL COMMENT 'Redis密码，为空表示无密码',
+    `summary` varchar(255) DEFAULT NULL COMMENT '配置说明',
+    `lock` bool DEFAULT FALSE COMMENT '锁定状态：1停用；0启用',
+    `order_id` int DEFAULT 1 COMMENT '排序编码',
+    `create_rtx` varchar(35) DEFAULT NULL COMMENT '创建用户RTX-ID',
+    `create_time` datetime DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+    `update_rtx` varchar(35) DEFAULT NULL COMMENT '更新用户RTX-ID',
+    `update_time` datetime DEFAULT NULL COMMENT '更新时间',
+    `delete_rtx` varchar(35) DEFAULT NULL COMMENT '删除用户RTX-ID',
+    `delete_time` datetime DEFAULT NULL COMMENT '删除时间',
+    `status` bool DEFAULT FALSE COMMENT '数据状态：1删除；0正常（默认）',
+    PRIMARY KEY (`id`),
+    UNIQUE KEY `xtb_redis_config_name_index` (`name`)
+) COMMENT='系统表-Redis连接配置表';
+
+-- 系统表-Redis缓存清理规则
+DROP TABLE IF EXISTS `xtb_redis_rule`;
+CREATE TABLE `xtb_redis_rule`  (
+    `id` int NOT NULL AUTO_INCREMENT COMMENT '主键，自增ID',
+    `name` varchar(55) NOT NULL COMMENT '规则名称',
+    `md5` varchar(64) NOT NULL UNIQUE COMMENT '数据唯一标识：MD5-ID',
+    `redis_md5` varchar(64) NOT NULL COMMENT '关联Redis连接配置MD5',
+    `match` varchar(20) DEFAULT 'prefix' COMMENT '匹配方式（从枚举值获取）：prefix/pattern/regex',
+    `pattern` varchar(255) NOT NULL COMMENT '键匹配内容，由后端解析执行',
+    `max_keys` int DEFAULT 1000 COMMENT '单次清理最大键数量限制',
+    `summary` varchar(255) DEFAULT NULL COMMENT '规则说明',
+    `lock` bool DEFAULT FALSE COMMENT '锁定状态：1停用；0启用',
+    `order_id` int DEFAULT 1 COMMENT '排序编码',
+    `last_clean_time` datetime DEFAULT NULL COMMENT '上次清理时间',
+    `last_clean_count` int DEFAULT 0 COMMENT '上次清理键数量',
+    `create_rtx` varchar(35) DEFAULT NULL COMMENT '创建用户RTX-ID',
+    `create_time` datetime DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+    `update_rtx` varchar(35) DEFAULT NULL COMMENT '更新用户RTX-ID',
+    `update_time` datetime DEFAULT NULL COMMENT '更新时间',
+    `delete_rtx` varchar(35) DEFAULT NULL COMMENT '删除用户RTX-ID',
+    `delete_time` datetime DEFAULT NULL COMMENT '删除时间',
+    `status` bool DEFAULT FALSE COMMENT '数据状态：1删除；0正常（默认）',
+    PRIMARY KEY (`id`),
+    KEY `xtb_redis_rule_config_index` (`redis_md5`)
+) COMMENT='系统表-Redis缓存清理规则表';
 -- = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
 -- = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
 -- = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
 -- = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
 -- = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
 -- = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -897,7 +971,4 @@ CREATE TABLE `tool_office_pdf` (
 
 CREATE UNIQUE INDEX tool_office_pdf_index ON tool_office_pdf (`md5`);
 
-
-
-
-
+-- = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =

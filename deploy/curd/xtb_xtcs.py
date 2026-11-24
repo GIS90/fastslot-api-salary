@@ -32,13 +32,15 @@ Life is short, I use python.
 """
 from typing import Optional, List, Any, Dict
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy import select, update, delete, insert, asc, desc, or_
+from sqlalchemy import select, update, delete, insert, asc, desc, or_, and_
 from sqlalchemy.orm.attributes import InstrumentedAttribute
 from sqlalchemy import func
 
 from deploy.curd.base_curd import BaseCurd
 from deploy.schema.dao.xtb_xtcs import XtbXtcsModel
 from deploy.utils.exception import SQLDBHandleException
+from deploy.utils.enumeration import CsbEnumKEY
+from deploy.schema.dao.csb_enum_value import CsbEnumValueModel
 
 
 class XtbXtcsCurd(BaseCurd):
@@ -143,7 +145,17 @@ class XtbXtcsCurd(BaseCurd):
         cls, db: AsyncSession, offset: int = 0, limit: int = 15, content: str = None, *args, **kwargs
     ) -> Optional[List]:
         try:
-            stmt = select(XtbXtcsModel).where(XtbXtcsModel.status != 1)
+            stmt = select(
+                *XtbXtcsModel.__table__.columns,
+                CsbEnumValueModel.value.label("type__text")
+            ).outerjoin(
+                CsbEnumValueModel,
+                and_(
+                    XtbXtcsModel.type == CsbEnumValueModel.key,
+                    CsbEnumValueModel.name == CsbEnumKEY.XTCS_TYPE.value
+                )
+            ).where(XtbXtcsModel.status != 1)
+
             if content:
                 stmt = stmt.where(
                     or_(
@@ -154,7 +166,7 @@ class XtbXtcsCurd(BaseCurd):
                 )
             stmt = stmt.order_by(asc(XtbXtcsModel.order_id), asc(XtbXtcsModel.create_time)).offset(offset).limit(limit)
             result = await db.execute(stmt)
-            return result.scalars().all()
+            return result.mappings().all()
         except Exception as e:
             raise SQLDBHandleException(f"[{cls.__name__}*查询All]{e}")
 
@@ -179,7 +191,16 @@ class XtbXtcsCurd(BaseCurd):
             cls, db: AsyncSession, params: Dict, *args, **kwargs
     ) -> Optional[List]:
         try:
-            stmt = select(XtbXtcsModel).where(XtbXtcsModel.status != 1)
+            stmt = select(
+                *XtbXtcsModel.__table__.columns,
+                CsbEnumValueModel.value.label("type__text")
+            ).outerjoin(
+                CsbEnumValueModel,
+                and_(
+                    XtbXtcsModel.type == CsbEnumValueModel.key,
+                    CsbEnumValueModel.name == CsbEnumKEY.XTCS_TYPE.value
+                )
+            ).where(XtbXtcsModel.status != 1)
             if params.get("list"):
                 stmt = stmt.where(XtbXtcsModel.md5.in_(params.get("list")))
             stmt = stmt.order_by(asc(XtbXtcsModel.create_time))

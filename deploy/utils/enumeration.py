@@ -157,12 +157,12 @@ class FileTypeEnum(IntEnum):
     EXCEL_MERGE = 1
     EXCEL_SPLIT = 2
     PDF = 3
-    DINGTALK = 4    # 钉钉消息通知
-    USER_IMPORT = 5
-    XTCS = 6    # 系统参数
-    QYWX = 7    # 企业微信消息通知
-    EMAIL = 8   # 邮件消息通知
-    AVATAR = 100    # 用户头像
+    DINGTALK = 4      # 钉钉消息通知
+    USER_IMPORT = 5   # 用户导入   
+    XTCS = 6          # 系统参数
+    QYWX = 7          # 企业微信消息通知
+    EMAIL = 8         # 邮件消息通知
+    AVATAR = 100      # 用户头像
 # ----------------------------------------------------------------------------------------------------------
 
 
@@ -185,6 +185,8 @@ class FieldTypeEnum(StrEnum):
     SPLITLIST = "split_list"
     USER_STATUS_TEXT = "user_status_text"
     LOCK_TEXT = "lock_text"
+    FILE_STORE_URL = "file_store_url"
+    ENUM_TEXT = "enum_text"
 
 
 @unique
@@ -235,6 +237,7 @@ class CsbEnumKEY(StrEnum):
     XTBB_FIELD_TYPE = "xtbb-field-type"
     AVATAR_TYPE = "avatar-type"
     XTCS_TYPE = "xtcs-type"
+    REDIS_MATCH = "redis-match"
 
 
 
@@ -276,6 +279,7 @@ class XtbReportKey(StrEnum):
     SystemOpsLog = "SystemOpsLog"
     SystemOpsTask = "SystemOpsTask"
     SystemOpsAvatar = "SystemOpsAvatar"
+    SystemOpsRedis = "SystemOpsRedis"
     SalaryNotifyDtalk = "SalaryNotifyDtalk"
     SalaryNotifyQywx = "SalaryNotifyQywx"
     SalaryNotifyEmail = "SalaryNotifyEmail"
