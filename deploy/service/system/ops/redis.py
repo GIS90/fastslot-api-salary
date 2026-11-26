@@ -314,22 +314,23 @@ class SystemOpsRedisService:
         try:
             client = self.__client(config)
             items: List[Dict] = []
+            keys: List[str] = []
             with client.get_connection() as conn:
-                keys: List[str] = []
                 for key in conn.scan_iter(match=scan_pattern, count=500):
                     keys.append(key)
                     if len(keys) >= max_keys:
                         break
-                for key in keys:
-                    type_ = conn.type(key)
-                    ttl = conn.ttl(key)
-                    items.append({
-                        "key": key,
-                        "type": type_,
-                        "ttl": ttl,
-                        "ttlText": "永不过期" if ttl == -1 else (f"{ttl}秒" if ttl > 0 else "已过期"),
-                        "value": self.__format_value(conn, key, type_),
-                    })
+            for key in keys:
+                if not key: continue
+                type_ = conn.type(key)
+                ttl = conn.ttl(key)
+                items.append({
+                    "key": key,
+                    "type": type_,
+                    "ttl": ttl,
+                    "ttlText": "永不过期" if ttl == -1 else (f"{ttl}秒" if ttl > 0 else "已过期"),
+                    "value": self.__format_value(conn, key, type_),
+                })
             return SuccessStatus(data={
                 "list": items,
                 "total": len(items),
