@@ -240,7 +240,6 @@ class CsbEnumKEY(StrEnum):
     REDIS_MATCH = "redis-match"
 
 
-
 @unique
 class DownloadExcelFormat(StrEnum):
     """

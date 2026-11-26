@@ -45,6 +45,10 @@ class SalaryDtalkRobotCurd(BaseCurd):
     async def new_model() -> SalaryDtalkRobotModel:
         return SalaryDtalkRobotModel()
 
+    @staticmethod
+    def _not_deleted():
+        return SalaryDtalkRobotModel.status != True
+
     @classmethod
     async def get_by_md5(cls, db: AsyncSession, md5: str) -> Optional[SalaryDtalkRobotModel]:
         try:
@@ -62,7 +66,7 @@ class SalaryDtalkRobotCurd(BaseCurd):
             conditions = [
                 SalaryDtalkRobotModel.key == key,
                 SalaryDtalkRobotModel.secret == secret,
-                SalaryDtalkRobotModel.status.is_(False)
+                cls._not_deleted()
             ]
             if agent_id:
                 conditions.append(SalaryDtalkRobotModel.agent_id == agent_id)
@@ -76,7 +80,7 @@ class SalaryDtalkRobotCurd(BaseCurd):
     async def count(cls, db: AsyncSession) -> int:
         try:
             stmt = select(func.count(SalaryDtalkRobotModel.id)).where(
-                SalaryDtalkRobotModel.status.is_(False)
+                cls._not_deleted()
             )
             result = await db.execute(stmt)
             return result.scalar()
@@ -89,7 +93,7 @@ class SalaryDtalkRobotCurd(BaseCurd):
     ) -> Optional[List[SalaryDtalkRobotModel]]:
         try:
             stmt = select(SalaryDtalkRobotModel).where(
-                SalaryDtalkRobotModel.status.is_(False)
+               cls._not_deleted()
             ).order_by(asc(SalaryDtalkRobotModel.create_time)).offset(offset).limit(limit)
             result = await db.execute(stmt)
             return result.scalars().all()
@@ -104,7 +108,7 @@ class SalaryDtalkRobotCurd(BaseCurd):
     async def option(cls, db: AsyncSession) -> Optional[List[SalaryDtalkRobotModel]]:
         try:
             stmt = select(SalaryDtalkRobotModel).where(
-                SalaryDtalkRobotModel.status.is_(False)
+               cls._not_deleted()
             ).order_by(asc(SalaryDtalkRobotModel.create_time))
             result = await db.execute(stmt)
             return result.scalars().all()
@@ -148,7 +152,7 @@ class SalaryDtalkRobotCurd(BaseCurd):
             stmt = update(SalaryDtalkRobotModel).where(
                 and_(
                     SalaryDtalkRobotModel.md5.in_(md5_list),
-                    SalaryDtalkRobotModel.status.is_(False)
+                    cls._not_deleted()
                 )
             ).values(status=True, delete_rtx=rtx_id, delete_time=func.now())
             await db.execute(stmt)

@@ -47,6 +47,10 @@ class XtbRequestCurd(BaseCurd):
     async def new_model():
         return XtbRequestModel()
 
+    @staticmethod
+    def _not_deleted():
+        return XtbRequestModel.status != True
+
     async def _get_model_by_field(
         self,
         db: AsyncSession,
@@ -76,7 +80,7 @@ class XtbRequestCurd(BaseCurd):
     async def count(cls, db: AsyncSession, rtx_id: str = None, filter_: Dict | None = None) -> int:
         if filter_ is None: filter_ = {}
         try:
-            stmt = select(func.count(XtbRequestModel.id)).where(XtbRequestModel.status != 1)
+            stmt = select(func.count(XtbRequestModel.id)).where(cls._not_deleted())
             if rtx_id:
                 stmt = stmt.where(XtbRequestModel.create_rtx == rtx_id)
             if filter_.get("method"):
@@ -84,10 +88,9 @@ class XtbRequestCurd(BaseCurd):
             if filter_.get("user"):
                 stmt = stmt.where(XtbRequestModel.create_rtx.in_(filter_.get("user")))
             if filter_.get("content"):
-                stmt = stmt.where(XtbRequestModel.url.like(f"%{filter_.get('content')}%"))
+                stmt = stmt.where(XtbRequestModel.url.like(filter_.get('content')))
             if filter_.get("dateRange"):
-                __start, __end = automatic_time(dateRange=filter_.get("dateRange"))
-                stmt = stmt.where(XtbRequestModel.create_time.between(__start, __end))
+                stmt = stmt.where(XtbRequestModel.create_time.between(filter_.get("dateRange")[0], filter_.get("dateRange")[1]))
             result = await db.execute(stmt)
             return result.scalar()
         except Exception as e:
@@ -98,7 +101,7 @@ class XtbRequestCurd(BaseCurd):
         try:
             result = await db.execute(
                 select(func.count(XtbRequestModel.id)).where(
-                    XtbRequestModel.status != 1,
+                    cls._not_deleted(),
                     XtbRequestModel.md5.in_(md5_list)
                 )
             )
@@ -112,7 +115,7 @@ class XtbRequestCurd(BaseCurd):
     ) -> Optional[List]:
         if filter_ is None: filter_ = {}
         try:
-            stmt = select(XtbRequestModel).where(XtbRequestModel.status != 1)
+            stmt = select(XtbRequestModel).where(cls._not_deleted())
             if rtx_id:
                 stmt = stmt.where(XtbRequestModel.create_rtx == rtx_id)
             if filter_.get("method"):
@@ -120,10 +123,9 @@ class XtbRequestCurd(BaseCurd):
             if filter_.get("user"):
                 stmt = stmt.where(XtbRequestModel.create_rtx.in_(filter_.get("user")))
             if filter_.get("content"):
-                stmt = stmt.where(XtbRequestModel.url.like(f"%{filter_.get('content')}%"))
+                stmt = stmt.where(XtbRequestModel.url.like(filter_.get('content')))
             if filter_.get("dateRange"):
-                __start, __end = automatic_time(dateRange=filter_.get("dateRange"))
-                stmt = stmt.where(XtbRequestModel.create_time.between(__start, __end))
+                stmt = stmt.where(XtbRequestModel.create_time.between(filter_.get("dateRange")[0], filter_.get("dateRange")[1]))
             stmt = (stmt
                     .order_by(desc(XtbRequestModel.id))
                     .offset(offset)
@@ -138,7 +140,7 @@ class XtbRequestCurd(BaseCurd):
             cls, db: AsyncSession, params: Dict, *args, **kwargs
     ) -> Optional[List]:
         try:
-            stmt = select(XtbRequestModel).where(XtbRequestModel.status != 1)
+            stmt = select(XtbRequestModel).where(cls._not_deleted())
             if params.get("list"):
                 stmt = stmt.where(XtbRequestModel.md5.in_(params.get("list")))
             stmt = stmt.order_by(desc(XtbRequestModel.create_time))

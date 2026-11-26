@@ -46,6 +46,10 @@ class XtbApiCurd(BaseCurd):
     async def new_model() -> XtbApiModel:
         return XtbApiModel()
 
+    @staticmethod
+    def _not_deleted():
+        return XtbApiModel.status != True
+
     async def _get_model_by_field(
         self,
         db: AsyncSession,
@@ -62,7 +66,7 @@ class XtbApiCurd(BaseCurd):
 
             result = await db.execute(select(XtbApiModel).where(
                 _field == value,
-                XtbApiModel.status != 1
+                self._not_deleted()
                 )
             )
             return result.scalar_one_or_none()
@@ -85,7 +89,7 @@ class XtbApiCurd(BaseCurd):
     async def count(cls, db: AsyncSession) -> int:
         try:
             result = await db.execute(
-                select(func.count(XtbApiModel.id)).where(XtbApiModel.status != 1)
+                select(func.count(XtbApiModel.id)).where(cls._not_deleted())
             )
             return result.scalar()
         except Exception as e:
@@ -99,7 +103,7 @@ class XtbApiCurd(BaseCurd):
             result = await db.execute(
                 select(func.count(XtbApiModel.id)).where(
                     XtbApiModel.md5.in_(md5_list),
-                    XtbApiModel.status != 1
+                    cls._not_deleted()
                 )
             )
             return result.scalar()
@@ -111,7 +115,7 @@ class XtbApiCurd(BaseCurd):
         cls, db: AsyncSession, offset: int = 0, limit: int = 15, content: str = None, *args, **kwargs
     ) -> Optional[List]:
         try:
-            stmt = select(XtbApiModel).where(XtbApiModel.status != 1)
+            stmt = select(XtbApiModel).where(cls._not_deleted())
             if content:
                 stmt = stmt.where(
                     or_(
@@ -134,7 +138,7 @@ class XtbApiCurd(BaseCurd):
             cls, db: AsyncSession, params: Dict, *args, **kwargs
     ) -> Optional[List]:
         try:
-            stmt = select(XtbApiModel).where(XtbApiModel.status != 1)
+            stmt = select(XtbApiModel).where(cls._not_deleted())
             if params.get("list"):
                 stmt = stmt.where(XtbApiModel.md5.in_(params.get("list")))
             stmt = stmt.order_by(asc(XtbApiModel.order_id), asc(XtbApiModel.create_time))
@@ -152,7 +156,7 @@ class XtbApiCurd(BaseCurd):
         try:
             stmt = select(XtbApiModel)
             if filter_status:
-                stmt = stmt.where(XtbApiModel.status != 1)
+                stmt = stmt.where(cls._not_deleted())
             stmt = stmt.order_by(asc(XtbApiModel.order_id), asc(XtbApiModel.create_time))
             result = await db.execute(stmt)
             return result.scalars().all()

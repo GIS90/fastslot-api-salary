@@ -44,6 +44,10 @@ class SalaryEmailRobotCurd(BaseCurd):
     @staticmethod
     async def new_model() -> SalaryEmailRobotModel:
         return SalaryEmailRobotModel()
+    
+    @staticmethod
+    def _not_deleted():
+        return SalaryEmailRobotModel.status != True
 
     @classmethod
     async def get_by_md5(cls, db: AsyncSession, md5: str) -> Optional[SalaryEmailRobotModel]:
@@ -62,7 +66,7 @@ class SalaryEmailRobotCurd(BaseCurd):
             conditions = [
                 SalaryEmailRobotModel.key == key,
                 SalaryEmailRobotModel.secret == secret,
-                SalaryEmailRobotModel.status.is_(False)
+                cls._not_deleted()
             ]
             if agent_id:
                 conditions.append(SalaryEmailRobotModel.agent_id == agent_id)
@@ -76,7 +80,7 @@ class SalaryEmailRobotCurd(BaseCurd):
     async def count(cls, db: AsyncSession) -> int:
         try:
             stmt = select(func.count(SalaryEmailRobotModel.id)).where(
-                SalaryEmailRobotModel.status.is_(False)
+                cls._not_deleted()
             )
             result = await db.execute(stmt)
             return result.scalar()
@@ -89,7 +93,7 @@ class SalaryEmailRobotCurd(BaseCurd):
     ) -> Optional[List[SalaryEmailRobotModel]]:
         try:
             stmt = select(SalaryEmailRobotModel).where(
-                SalaryEmailRobotModel.status.is_(False)
+                cls._not_deleted()
             ).order_by(asc(SalaryEmailRobotModel.create_time)).offset(offset).limit(limit)
             result = await db.execute(stmt)
             return result.scalars().all()
@@ -104,7 +108,7 @@ class SalaryEmailRobotCurd(BaseCurd):
     async def option(cls, db: AsyncSession) -> Optional[List[SalaryEmailRobotModel]]:
         try:
             stmt = select(SalaryEmailRobotModel).where(
-                SalaryEmailRobotModel.status.is_(False)
+                cls._not_deleted()
             ).order_by(asc(SalaryEmailRobotModel.create_time))
             result = await db.execute(stmt)
             return result.scalars().all()
@@ -148,7 +152,7 @@ class SalaryEmailRobotCurd(BaseCurd):
             stmt = update(SalaryEmailRobotModel).where(
                 and_(
                     SalaryEmailRobotModel.md5.in_(md5_list),
-                    SalaryEmailRobotModel.status.is_(False)
+                    cls._not_deleted()
                 )
             ).values(status=True, delete_rtx=rtx_id, delete_time=func.now())
             await db.execute(stmt)

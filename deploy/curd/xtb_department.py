@@ -48,6 +48,10 @@ class XtbDepartmentCurd(BaseCurd):
     async def new_model() -> XtbDepartmentModel:
         return XtbDepartmentModel()
 
+    @staticmethod
+    def _not_deleted():
+        return XtbDepartmentModel.status != True
+
     async def _get_model_by_field(
         self,
         db: AsyncSession,
@@ -64,7 +68,7 @@ class XtbDepartmentCurd(BaseCurd):
 
             result = await db.execute(select(XtbDepartmentModel).where(
                 _field == value,
-                XtbDepartmentModel.status != 1
+                self._not_deleted()
                 )
             )
             return result.scalar_one_or_none()
@@ -94,7 +98,7 @@ class XtbDepartmentCurd(BaseCurd):
         try:
             stmt = select(XtbDepartmentModel.id).where(
                 XtbDepartmentModel.md5.in_(md5_list),
-                XtbDepartmentModel.status != 1
+                cls._not_deleted()
             )
             result = await db.execute(stmt)
             return result.scalars().all()
@@ -106,7 +110,7 @@ class XtbDepartmentCurd(BaseCurd):
         try:
             stmt = select(XtbDepartmentModel).where(
                 XtbDepartmentModel.name == name,
-                XtbDepartmentModel.status != 1
+                cls._not_deleted()
             )
             if md5:
                 stmt = stmt.where(XtbDepartmentModel.md5 != md5)
@@ -122,7 +126,7 @@ class XtbDepartmentCurd(BaseCurd):
         try:
             stmt = select(XtbDepartmentModel).where(
                 XtbDepartmentModel.pid == pid,
-                XtbDepartmentModel.status != 1
+                cls._not_deleted()
             )
             result = await db.execute(stmt)
             return result.scalars().all()
@@ -134,7 +138,7 @@ class XtbDepartmentCurd(BaseCurd):
         try:
             stmt = select(XtbDepartmentModel).where(
                 XtbDepartmentModel.dept_path.like(dept_path + ">%"),    # like前半部分
-                XtbDepartmentModel.status != 1
+                cls._not_deleted()
             )
             result = await db.execute(stmt)
             return result.scalars().all()
@@ -146,7 +150,7 @@ class XtbDepartmentCurd(BaseCurd):
             cls, db: AsyncSession, params: Dict, *args, **kwargs
     ) -> Optional[List]:
         try:
-            stmt = select(XtbDepartmentModel).where(XtbDepartmentModel.status != 1)
+            stmt = select(XtbDepartmentModel).where(cls._not_deleted())
             if params.get("list"):
                 stmt = stmt.where(XtbDepartmentModel.md5.in_(params.get("list")))
             stmt = stmt.order_by(asc(XtbDepartmentModel.order_id), desc(XtbDepartmentModel.create_time))
@@ -165,7 +169,7 @@ class XtbDepartmentCurd(BaseCurd):
         try:
             stmt = select(XtbDepartmentModel)
             if filter_status:
-                stmt = stmt.where(XtbDepartmentModel.status != True)
+                stmt = stmt.where(cls._not_deleted())
             if not root:
                 stmt = stmt.where(XtbDepartmentModel.id != DEPART_ROOT_ID)
             stmt = stmt.order_by(asc(XtbDepartmentModel.order_id), desc(XtbDepartmentModel.create_time))

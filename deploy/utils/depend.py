@@ -30,7 +30,7 @@ Life is short, I use python.
 
 ------------------------------------------------
 """
-from typing import Union, Dict
+from typing import Any, Union, Dict
 from os.path import splitext as os_path_splitext
 from fastapi import Header, Query
 from typing import Optional, Dict, List
@@ -50,7 +50,7 @@ from deploy.utils.enumeration import XtbXtcsKEY
 
 
 # redis-cli
-redis_cli = RedisClientLib(host=redis_host, port=redis_port, db=redis_db, password=redis_password)
+redis_cli: RedisClientLib = RedisClientLib(host=redis_host, port=redis_port, db=redis_db, password=redis_password)
 # parameters
 MIN_LENGTH = 1
 MAX_LENGTH = 299
@@ -181,23 +181,27 @@ async def md5_list_params(
 """
 Pageable-Params依赖
 > pageable_params：分页参数
-> pageable_query_params：分页参数 + 非模糊查询
-> pageable_like_params：分页参数 + 模糊查询
-> pageable_model_params：分页参数 + 条件数据模型（type：dict）
+> pageable_query_params：分页参数 + 非模糊查询content
+> pageable_like_params：分页参数 + 模糊查询content
+> pageable_model_params：分页参数 + 条件数据模型filter（type：dict）
 """
+def __common_pageable_params(page: int, pageSize: int) -> Dict:
+    return {"page": page, "pageSize": pageSize, "limit": pageSize, "offset": (page - 1) * pageSize}
+
+
 async def pageable_params(
     page: int = Query(default=1, ge=MIN_LENGTH, description="页码"),
-    pageSize: int = Query(default=15, ge=MIN_LENGTH, description="条数"),
+    pageSize: int = Query(default=15, ge=MIN_LENGTH, description="条数")
 ) -> Dict:
-    return {"page": page, "pageSize": pageSize, "limit": pageSize, "offset": (page - 1) * pageSize}
+    return __common_pageable_params(page=page, pageSize=pageSize)
 
 
 async def pageable_query_params(
     page: int = Query(default=1, ge=MIN_LENGTH, description="页码"),
     pageSize: int = Query(default=15, ge=MIN_LENGTH, description="条数"),
-    content: str | None = Query(default=None, max_length=MAX_LENGTH, description="非模糊查询"),
+    content: str | None = Query(default=None, max_length=MAX_LENGTH, description="非模糊查询")
 ) -> Dict:
-    __params: Dict = {"page": page, "pageSize": pageSize, "limit": pageSize, "offset": (page - 1) * pageSize }
+    __params: Dict = __common_pageable_params(page=page, pageSize=pageSize)
     if content:
         __params["content"] = content
     return  __params
@@ -206,25 +210,33 @@ async def pageable_query_params(
 async def pageable_like_params(
     page: int = Query(default=1, ge=MIN_LENGTH, description="页码"),
     pageSize: int = Query(default=15, ge=MIN_LENGTH, description="条数"),
-    content: Optional[str] = Query(default=None, max_length=MAX_LENGTH, description="模糊查询参数"),
+    content: Optional[str] = Query(default=None, max_length=MAX_LENGTH, description="模糊查询参数")
 ) -> Dict:
-    __params: Dict = {"page": page, "pageSize": pageSize, "limit": pageSize, "offset": (page - 1) * pageSize }
+    __params: Dict = __common_pageable_params(page=page, pageSize=pageSize)
     if content:
         __params["content"] = f"%{content}%"
     return  __params
 
 
-async def pageable_model_params(
-    params: PageFilterModel
-) -> Dict:
-    page, pageSize, filter_ = params.page, params.pageSize, params.filter
+async def pageable_filter_params(params: PageFilterModel) -> Dict:
+    """分页查询参数：解析 body 中的 page/pageSize/filter，并归一化过滤条件"""
+    __page: int = params.page or 1
+    __pageSize: int = params.pageSize or 15
+    filter_: Dict = params.filter or {}
+    __params: Dict = __common_pageable_params(page=params.page, pageSize=params.pageSize)
     if filter_.get("content"):
-        filter_["content"] = "%" + filter_.get("content") + "%"
+        filter_["content"] = "%" + str(filter_.get("content")) + "%"
+    if filter_.get("createTime"):
+        create_time = filter_.get("createTime")
+        if isinstance(create_time, (list, tuple)) and len(create_time) == 2:
+            filter_["createTime"] = (str(create_time[0]) + " 00:00:00", str(create_time[1]) + " 23:59:59")
     if filter_.get("dateRange"):
-        filter_["start"] = filter_.get("dateRange")[0] + " 00:00:00"
-        filter_["end"] = filter_.get("dateRange")[1] + " 23:59:59"
-        filter_.pop("dateRange")
-    return {"page": page, "pageSize": pageSize, "limit": pageSize, "offset": (page - 1) * pageSize, "filter_": filter_}
+        date_range = filter_.get("dateRange")
+        if isinstance(date_range, (list, tuple)) and len(date_range) == 2:
+            filter_["dateRange"] = (str(date_range[0]) + " 00:00:00", str(date_range[1]) + " 23:59:59")
+    if filter_:
+        __params["filter"] = filter_
+    return __params
 
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

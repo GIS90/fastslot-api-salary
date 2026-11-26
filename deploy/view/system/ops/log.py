@@ -30,15 +30,15 @@ Life is short, I use python.
 
 ------------------------------------------------
 """
-from typing import Annotated
+from typing import Annotated, Dict
 from fastapi import APIRouter, Depends, Query, Body
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from deploy.curd.database import get_session
 from deploy.service.system.ops.log import SystemOpsLogService
 from deploy.utils.status import Status
-from deploy.utils.depend import depend_token_rtx
-from deploy.schema.po.x import PageFilterModel, RequestMd5Models
+from deploy.utils.depend import depend_token_rtx, pageable_filter_params
+from deploy.schema.po.x import RequestMd5Models
 
 
 # router
@@ -50,11 +50,11 @@ def get_service(db: AsyncSession = Depends(get_session)) -> SystemOpsLogService:
 
 @router.post("/log.list", summary="数据列表")
 async def pagination(
-    params: Annotated[PageFilterModel, Body()],
+    params: Dict = Depends(pageable_filter_params),
     token_rtx_id: str = Depends(depend_token_rtx),
     service: SystemOpsLogService = Depends(get_service)
 ) -> Status:
-    return await service.pagination(rtx_id=token_rtx_id, params=params.model_dump(), _all=True)
+    return await service.pagination(rtx_id=token_rtx_id, params=params, _all=True)
 
 
 @router.get("/log.filter", summary="过滤条件")

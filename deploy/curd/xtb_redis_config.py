@@ -28,7 +28,7 @@ Life is short, I use python.
 ------------------------------------------------
 """
 from typing import Optional, List, Any
-from sqlalchemy import select, update, desc, asc, or_
+from sqlalchemy import select, update, desc, asc, or_, func
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm.attributes import InstrumentedAttribute
 
@@ -108,6 +108,62 @@ class XtbRedisConfigCurd(BaseCurd):
             await db.merge(model)
         except Exception as e:
             raise SQLDBHandleException(f"[{cls.__name__}*更新]{e}")
+
+    @classmethod
+    async def count(cls, db: AsyncSession, content: str = None, *args, **kwargs) -> int:
+        try:
+            stmt = select(func.count(XtbRedisConfigModel.id)).where(cls._not_deleted())
+            if content:
+                keyword = f"%{content}%"
+                stmt = stmt.where(or_(
+                    XtbRedisConfigModel.name.like(keyword),
+                    XtbRedisConfigModel.host.like(keyword),
+                ))
+            result = await db.execute(stmt)
+            return result.scalar()
+        except Exception as e:
+            raise SQLDBHandleException(f"[{cls.__name__}*总数]{e}")
+
+    @classmethod
+    async def pagination(
+            cls, db: AsyncSession, offset: int = 0, limit: int = 15,
+            content: str = None, *args, **kwargs
+    ) -> Optional[List]:
+        try:
+            stmt = select(XtbRedisConfigModel).where(cls._not_deleted())
+            if content:
+                keyword = f"%{content}%"
+                stmt = stmt.where(or_(
+                    XtbRedisConfigModel.name.like(keyword),
+                    XtbRedisConfigModel.host.like(keyword),
+                ))
+            stmt = stmt.order_by(asc(XtbRedisConfigModel.order_id), asc(XtbRedisConfigModel.id)) \
+                .offset(offset).limit(limit)
+            result = await db.execute(stmt)
+            return result.scalars().all()
+        except Exception as e:
+            raise SQLDBHandleException(f"[{cls.__name__}*分页]{e}")
+
+    @classmethod
+    async def download(
+            cls, db: AsyncSession, params: dict, *args, **kwargs
+    ) -> Optional[List]:
+        try:
+            stmt = select(XtbRedisConfigModel).where(cls._not_deleted())
+            if params.get("list"):
+                stmt = stmt.where(XtbRedisConfigModel.md5.in_(params.get("list")))
+            stmt = stmt.order_by(asc(XtbRedisConfigModel.order_id), asc(XtbRedisConfigModel.id))
+            result = await db.execute(stmt)
+            return result.scalars().all()
+        except Exception as e:
+            raise SQLDBHandleException(f"[{cls.__name__}*下载]{e}")
+
+    @classmethod
+    async def delete(cls, db: AsyncSession, model: XtbRedisConfigModel) -> None:
+        try:
+            await db.delete(model)
+        except Exception as e:
+            raise SQLDBHandleException(f"[{cls.__name__}*删除]{e}")
 
     @classmethod
     async def batch_soft_delete_update(cls, db: AsyncSession, md5_list: List[str], rtx_id: str) -> None:

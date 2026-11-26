@@ -47,6 +47,10 @@ class CsbEnumKeyCurd(BaseCurd):
     async def new_model():
         return CsbEnumKeyModel()
 
+    @staticmethod
+    def _not_deleted():
+        return CsbEnumKeyModel.status != True
+
     async def _get_model_by_field(
         self,
         db: AsyncSession,
@@ -64,7 +68,7 @@ class CsbEnumKeyCurd(BaseCurd):
 
             stmt = select(CsbEnumKeyModel).where(
                 _field == value,
-                CsbEnumKeyModel.status != 1)
+                self._not_deleted())
             if filter_lock:
                 stmt = stmt.where(CsbEnumKeyModel.lock != True)
             result = await db.execute(stmt)
@@ -85,7 +89,7 @@ class CsbEnumKeyCurd(BaseCurd):
     async def count(cls, db: AsyncSession) -> int:
         try:
             result = await db.execute(
-                select(func.count(CsbEnumKeyModel.id)).where(CsbEnumKeyModel.status != 1)
+                select(func.count(CsbEnumKeyModel.id)).where(cls._not_deleted())
             )
             return result.scalar()
         except Exception as e:
@@ -100,7 +104,7 @@ class CsbEnumKeyCurd(BaseCurd):
     @classmethod
     async def all_(cls, db: AsyncSession, filter_lock: bool = False) -> Optional[List]:
         try:
-            stmt = select(CsbEnumKeyModel).where(CsbEnumKeyModel.status != 1)
+            stmt = select(CsbEnumKeyModel).where(cls._not_deleted())
             if filter_lock:
                 stmt = stmt.where(CsbEnumKeyModel.lock != True)
             stmt = stmt.order_by(asc(CsbEnumKeyModel.order_id), desc(CsbEnumKeyModel.id))

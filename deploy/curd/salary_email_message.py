@@ -45,6 +45,10 @@ class SalaryEmailMessageCurd(BaseCurd):
     async def new_model() -> SalaryEmailMessageModel:
         return SalaryEmailMessageModel()
 
+    @staticmethod
+    def _not_deleted():
+        return SalaryEmailMessageModel.status != True
+
     @classmethod
     async def get_by_md5(cls, db: AsyncSession, md5: str) -> Optional[SalaryEmailMessageModel]:
         try:
@@ -58,7 +62,7 @@ class SalaryEmailMessageCurd(BaseCurd):
     async def count(cls, db: AsyncSession) -> int:
         try:
             stmt = select(func.count(SalaryEmailMessageModel.id)).where(
-                SalaryEmailMessageModel.status.is_(False)
+                cls._not_deleted()
             )
             result = await db.execute(stmt)
             return result.scalar()
@@ -72,7 +76,7 @@ class SalaryEmailMessageCurd(BaseCurd):
     ) -> Optional[List[SalaryEmailMessageModel]]:
         try:
             stmt = select(SalaryEmailMessageModel).where(
-                SalaryEmailMessageModel.status.is_(False)
+                cls._not_deleted()
             )
             if content:
                 stmt = stmt.where(SalaryEmailMessageModel.file_name.like("%%%s%%" % content))
@@ -92,7 +96,7 @@ class SalaryEmailMessageCurd(BaseCurd):
     ) -> Optional[List[SalaryEmailMessageModel]]:
         try:
             stmt = select(SalaryEmailMessageModel).where(
-                SalaryEmailMessageModel.status.is_(False)
+                cls._not_deleted()
             )
             if md5_list:
                 stmt = stmt.where(SalaryEmailMessageModel.md5.in_(md5_list))
@@ -129,7 +133,7 @@ class SalaryEmailMessageCurd(BaseCurd):
             stmt = update(SalaryEmailMessageModel).where(
                 and_(
                     SalaryEmailMessageModel.md5.in_(md5_list),
-                    SalaryEmailMessageModel.status.is_(False)
+                    cls._not_deleted()
                 )
             ).values(status=True, delete_rtx=rtx_id, delete_time=func.now())
             await db.execute(stmt)

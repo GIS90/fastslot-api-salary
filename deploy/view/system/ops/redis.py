@@ -35,9 +35,9 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from deploy.curd.database import get_session
 from deploy.service.system.ops.redis import SystemOpsRedisService
 from deploy.utils.status import Status
-from deploy.utils.depend import depend_token_rtx
+from deploy.utils.depend import depend_token_rtx, pageable_filter_params
 from deploy.schema.po.x import (
-    PageFilterModel, RequestMd5Model, RequestMd5Models, RequestMd5StatusModel
+    RequestMd5Model, RequestMd5Models, RequestMd5StatusModel
 )
 from deploy.schema.po.system_ops_redis import (
     XtbRedisConfigAddModel, XtbRedisConfigUpdateModel,
@@ -118,6 +118,15 @@ async def config_test(
     return await service.config_test(model=params.model_dump())
 
 
+@router.get("/redis.ping", summary="Redis PING连通性检测")
+async def ping(
+    md5: Optional[str] = Query(default=None, description="指定配置Md5-Id，为空则检测全部启用的配置"),
+    token_rtx_id: str = Depends(depend_token_rtx),
+    service: SystemOpsRedisService = Depends(get_service)
+) -> Status:
+    return await service.ping(md5=md5)
+
+
 # ======================== 清理规则 ========================
 
 @router.get("/redis.rule.filter", summary="规则过滤条件")
@@ -130,11 +139,11 @@ async def filter_(
 
 @router.post("/redis.rule.list", summary="规则数据列表")
 async def pagination(
-    params: Annotated[PageFilterModel, Body()],
+    params: dict = Depends(pageable_filter_params),
     token_rtx_id: str = Depends(depend_token_rtx),
     service: SystemOpsRedisService = Depends(get_service)
 ) -> Status:
-    return await service.pagination(rtx_id=token_rtx_id, params=params.model_dump())
+    return await service.pagination(rtx_id=token_rtx_id, params=params)
 
 
 @router.get("/redis.rule", summary="规则详情")

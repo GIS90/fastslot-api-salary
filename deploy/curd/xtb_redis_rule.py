@@ -27,14 +27,18 @@ Life is short, I use python.
 
 ------------------------------------------------
 """
+from types import SimpleNamespace
 from typing import Optional, List, Any
-from sqlalchemy import select, func, update, desc, asc, or_
+from sqlalchemy import select, func, update, desc, asc, or_, and_
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm.attributes import InstrumentedAttribute
 
 from deploy.curd.base_curd import BaseCurd
 from deploy.schema.dao.xtb_redis_rule import XtbRedisRuleModel
+from deploy.schema.dao.xtb_redis_config import XtbRedisConfigModel
 from deploy.utils.exception import SQLDBHandleException
+from deploy.utils.enumeration import CsbEnumKEY
+from deploy.schema.dao.csb_enum_value import CsbEnumValueModel
 
 
 __all__ = ["XtbRedisRuleCurd"]
@@ -117,16 +121,28 @@ class XtbRedisRuleCurd(BaseCurd):
     ) -> Optional[List]:
         try:
             filter_ = filter_ or {}
-            stmt = select(XtbRedisRuleModel).where(cls._not_deleted())
+            stmt = select(
+                *XtbRedisRuleModel.__table__.columns,
+                XtbRedisConfigModel.name.label("redis"),
+                CsbEnumValueModel.value.label("match__text")
+            ).outerjoin(
+                XtbRedisConfigModel,
+                XtbRedisConfigModel.md5 == XtbRedisRuleModel.redis_md5
+            ).outerjoin(
+                CsbEnumValueModel,
+                and_(
+                    XtbRedisRuleModel.match == CsbEnumValueModel.key,
+                    CsbEnumValueModel.name == CsbEnumKEY.REDIS_MATCH.value
+                )
+            ).where(cls._not_deleted())
             stmt = cls._apply_filter(stmt, filter_)
             stmt = stmt.order_by(
-                asc(XtbRedisRuleModel.lock),
                 asc(XtbRedisRuleModel.order_id),
                 desc(XtbRedisRuleModel.create_time),
                 desc(XtbRedisRuleModel.id),
             ).offset(offset).limit(limit)
             result = await db.execute(stmt)
-            return result.scalars().all()
+            return result.mappings().all()
         except Exception as e:
             raise SQLDBHandleException(f"[{cls.__name__}*分页]{e}")
 
@@ -143,6 +159,42 @@ class XtbRedisRuleCurd(BaseCurd):
             await db.merge(model)
         except Exception as e:
             raise SQLDBHandleException(f"[{cls.__name__}*更新]{e}")
+
+    @classmethod
+    async def download(
+            cls, db: AsyncSession, params: dict, *args, **kwargs
+    ) -> Optional[List]:
+        try:
+            stmt = select(
+                *XtbRedisRuleModel.__table__.columns,
+                XtbRedisConfigModel.name.label("redis"),
+                CsbEnumValueModel.value.label("match__text")
+            ).outerjoin(
+                XtbRedisConfigModel,
+                XtbRedisConfigModel.md5 == XtbRedisRuleModel.redis_md5
+            ).outerjoin(
+                CsbEnumValueModel,
+                and_(
+                    XtbRedisRuleModel.match == CsbEnumValueModel.key,
+                    CsbEnumValueModel.name == CsbEnumKEY.REDIS_MATCH.value
+                )
+            ).where(cls._not_deleted())
+            if params.get("list"):
+                stmt = stmt.where(XtbRedisRuleModel.md5.in_(params.get("list")))
+            stmt = stmt.order_by(
+                asc(XtbRedisRuleModel.order_id), desc(XtbRedisRuleModel.create_time)
+            )
+            result = await db.execute(stmt)
+            return result.mappings().all()
+        except Exception as e:
+            raise SQLDBHandleException(f"[{cls.__name__}*下载]{e}")
+
+    @classmethod
+    async def delete(cls, db: AsyncSession, model: XtbRedisRuleModel) -> None:
+        try:
+            await db.delete(model)
+        except Exception as e:
+            raise SQLDBHandleException(f"[{cls.__name__}*删除]{e}")
 
     @classmethod
     async def get_models_by_md5_list(cls, db: AsyncSession, md5_list: List[str]):

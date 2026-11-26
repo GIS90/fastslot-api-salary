@@ -49,6 +49,10 @@ class CsbEnumValueCurd(BaseCurd):
     async def new_model():
         return CsbEnumValueModel()
 
+    @staticmethod
+    def _not_deleted():
+        return CsbEnumValueModel.status != True
+
     async def _get_model_by_field(
         self,
         db: AsyncSession,
@@ -66,7 +70,7 @@ class CsbEnumValueCurd(BaseCurd):
 
             stmt = select(CsbEnumValueModel).where(
                 _field == value,
-                CsbEnumValueModel.status != 1)
+                self._not_deleted())
             if filter_lock:
                 stmt = stmt.where(CsbEnumValueModel.lock != True)
             result = await db.execute(stmt)
@@ -85,7 +89,7 @@ class CsbEnumValueCurd(BaseCurd):
             stmt = select(CsbEnumValueModel).where(
                 CsbEnumValueModel.name == name,
                 CsbEnumValueModel.key == key,
-                CsbEnumValueModel.status != 1)
+                self._not_deleted())
             result = await db.execute(stmt)
             return result.scalar_one_or_none()
         except Exception as e:
@@ -101,7 +105,7 @@ class CsbEnumValueCurd(BaseCurd):
         try:
             stmt = select(CsbEnumValueModel).where(
                 CsbEnumValueModel.name == name,
-                CsbEnumValueModel.status != 1)
+                cls._not_deleted())
             if filter_lock:
                 stmt = stmt.where(CsbEnumValueModel.lock != True)
             stmt = stmt.order_by(
@@ -123,7 +127,7 @@ class CsbEnumValueCurd(BaseCurd):
         try:
             stmt = select(CsbEnumValueModel).where(
                 CsbEnumValueModel.name.in_(name_list),
-                CsbEnumValueModel.status != 1)
+                cls._not_deleted())
             if filter_lock:
                 stmt = stmt.where(CsbEnumValueModel.lock != True)
             stmt = stmt.order_by(
@@ -138,7 +142,7 @@ class CsbEnumValueCurd(BaseCurd):
     @classmethod
     async def count(cls, db: AsyncSession, name: str = None, filter_lock: bool = False) -> int:
         try:
-            stmt = select(func.count(CsbEnumValueModel.id)).where(CsbEnumValueModel.status != 1)
+            stmt = select(func.count(CsbEnumValueModel.id)).where(cls._not_deleted())
             if name and name != DICT_KEY_ALL.key:
                 stmt = stmt.where(CsbEnumValueModel.name == name)
             if filter_lock:
@@ -161,7 +165,7 @@ class CsbEnumValueCurd(BaseCurd):
             stmt = select(CsbEnumValueModel).join(
                 CsbEnumKeyModel,
                 CsbEnumValueModel.name == CsbEnumKeyModel.key
-            ).where(CsbEnumValueModel.status != 1)
+            ).where(cls._not_deleted())
             if name and name != DICT_KEY_ALL.key:
                 stmt = stmt.where(CsbEnumValueModel.name == name)
             if filter_lock:
@@ -181,7 +185,7 @@ class CsbEnumValueCurd(BaseCurd):
         try:
             result = await db.execute(
                 select(func.count(CsbEnumValueModel.id)).where(
-                    CsbEnumValueModel.status != 1,
+                    cls._not_deleted(),
                     CsbEnumValueModel.md5.in_(md5_list)
                 )
             )
@@ -210,7 +214,7 @@ class CsbEnumValueCurd(BaseCurd):
             ).join(
                 CsbEnumKeyModel,
                 CsbEnumValueModel.name == CsbEnumKeyModel.key
-            ).where(CsbEnumValueModel.status != 1)
+            ).where(cls._not_deleted())
 
             if params.get("list"):
                 stmt = stmt.where(CsbEnumValueModel.md5.in_(params.get("list")))

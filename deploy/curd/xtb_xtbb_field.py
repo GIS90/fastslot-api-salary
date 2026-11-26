@@ -44,8 +44,12 @@ from deploy.utils.exception import SQLDBHandleException
 class XtbXtbbFieldCurd(BaseCurd):
 
     @staticmethod
-    async def new_model():
+    async def new_model() -> XtbXtbbFieldModel:
         return XtbXtbbFieldModel()
+
+    @staticmethod
+    def _not_deleted():
+        return XtbXtbbFieldModel.status != True
 
     async def _get_model_by_field(
         self,
@@ -64,7 +68,7 @@ class XtbXtbbFieldCurd(BaseCurd):
 
             stmt = select(XtbXtbbFieldModel).where(
                 _field == value,
-                XtbXtbbFieldModel.status != 1)
+                self._not_deleted())
             result = await db.execute(stmt)
             return result.scalar_one_or_none()
         except Exception as e:
@@ -90,7 +94,7 @@ class XtbXtbbFieldCurd(BaseCurd):
     async def count(cls, db: AsyncSession) -> int:
         try:
             result = await db.execute(
-                select(func.count(XtbXtbbFieldModel.id)).where(XtbXtbbFieldModel.status != 1)
+                select(func.count(XtbXtbbFieldModel.id)).where(cls._not_deleted())
             )
             return result.scalar()
         except Exception as e:
@@ -101,7 +105,7 @@ class XtbXtbbFieldCurd(BaseCurd):
         try:
             result = await db.execute(
                 select(func.count(XtbXtbbFieldModel.id)).where(
-                    XtbXtbbFieldModel.status != 1,
+                    cls._not_deleted(),
                     XtbXtbbFieldModel.xtbb == xtbb
                 )
             )
@@ -114,7 +118,7 @@ class XtbXtbbFieldCurd(BaseCurd):
         try:
             result = await db.execute(
                 select(func.count(XtbXtbbFieldModel.id)).where(
-                    XtbXtbbFieldModel.status != 1,
+                    cls._not_deleted(),
                     XtbXtbbFieldModel.md5.in_(md5_list)
                 )
             )
@@ -128,7 +132,7 @@ class XtbXtbbFieldCurd(BaseCurd):
     ) -> Optional[List]:
         try:
             stmt = select(XtbXtbbFieldModel).where(
-                XtbXtbbFieldModel.status != 1,
+                cls._not_deleted(),
                 XtbXtbbFieldModel.xtbb == xtbb
             ).order_by(asc(XtbXtbbFieldModel.order_id), asc(XtbXtbbFieldModel.create_time))
             result = await db.execute(stmt)
@@ -144,7 +148,7 @@ class XtbXtbbFieldCurd(BaseCurd):
         if list_ == export_: return None
         try:
             stmt = (select(XtbXtbbFieldModel).where(
-                XtbXtbbFieldModel.status != 1,
+                cls._not_deleted(),
                 XtbXtbbFieldModel.xtbb == xtbb
             ))
             stmt = stmt.where(XtbXtbbFieldModel.list == True) if list_ else stmt.where(XtbXtbbFieldModel.export == True)
@@ -159,7 +163,7 @@ class XtbXtbbFieldCurd(BaseCurd):
         cls, db: AsyncSession, offset: int = 0, limit: int = 15, content: str = None, *args, **kwargs
     ) -> Optional[List]:
         try:
-            stmt = select(XtbXtbbFieldModel).where(XtbXtbbFieldModel.status != 1)
+            stmt = select(XtbXtbbFieldModel).where(cls._not_deleted())
             if kwargs.get("xtbb"):
                 stmt = stmt.where(XtbXtbbFieldModel.xtbb == kwargs.get("xtbb"))
             if content:
@@ -235,7 +239,7 @@ class XtbXtbbFieldCurd(BaseCurd):
     @classmethod
     async def download(cls, db: AsyncSession, params: dict) -> Optional[List]:
         try:
-            stmt = select(XtbXtbbFieldModel).where(XtbXtbbFieldModel.status != 1)
+            stmt = select(XtbXtbbFieldModel).where(cls._not_deleted())
             if params.get("xtbb"):
                 stmt = stmt.where(XtbXtbbFieldModel.xtbb == params.get("xtbb"))
             stmt = stmt.order_by(asc(XtbXtbbFieldModel.order_id), asc(XtbXtbbFieldModel.create_time))

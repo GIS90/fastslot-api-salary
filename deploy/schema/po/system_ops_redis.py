@@ -52,7 +52,7 @@ class __XtbRedisConfigBaseModel(baseModel):
 
 
 class XtbRedisConfigAddModel(__XtbRedisConfigBaseModel):
-    pass
+    ...
 
 
 class XtbRedisConfigUpdateModel(__XtbRedisConfigBaseModel):

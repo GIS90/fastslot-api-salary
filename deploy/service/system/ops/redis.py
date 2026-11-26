@@ -30,6 +30,7 @@ Life is short, I use python.
 ------------------------------------------------
 """
 import re
+from types import SimpleNamespace
 from datetime import datetime
 from typing import Dict, List, Optional, Tuple, Any
 
@@ -48,6 +49,7 @@ from deploy.schema.dto.xtb_redis import (
     xtb_redis_rule_detail_fields,
 )
 from deploy.service.system.config.report import SystemConfigReportService
+from deploy.service.system.config.dict import SystemConfigDictService
 from deploy.utils.status import Status, SuccessStatus, FailureStatus
 from deploy.utils.status_value import StatusCode as status_code
 from deploy.utils.converter import model_converter_dict, many_model_converter_dict
@@ -62,11 +64,6 @@ __all__ = ["SystemOpsRedisService"]
 
 # 匹配方式可选值（枚举 redis-match 的 key）
 MATCH_KEYS: Tuple = ("prefix", "pattern", "regex")
-DEFAULT_MATCH_OPTIONS: List[Dict] = [
-    {"label": "前缀匹配", "value": "prefix"},
-    {"label": "通配符匹配", "value": "pattern"},
-    {"label": "正则匹配", "value": "regex"},
-]
 
 
 class SystemOpsRedisService:
@@ -77,6 +74,7 @@ class SystemOpsRedisService:
         self.rule_curd: XtbRedisRuleCurd = XtbRedisRuleCurd()
         self.enum_curd: CsbEnumValueCurd = CsbEnumValueCurd()
         self.report_service: SystemConfigReportService = SystemConfigReportService(db_connection=db_connection)
+        self.dict_service: SystemConfigDictService = SystemConfigDictService(db_connection=db_connection)
 
     def __str__(self):
         return "SystemOpsRedisService class."
@@ -107,7 +105,7 @@ class SystemOpsRedisService:
         if not model:
             return False, FailureStatus(code=status_code.CODE_501_DATA_NOT_EXIST, message="Redis连接配置不存在")
         if status_check and model.status:
-            return False, FailureStatus(code=status_code.CODE_503_DATA_DELETE_NOT_EDIT)
+            return False, FailureStatus(code=status_code.CODE_503_DATA_DELETE_NOT_EDIT.value)
         return True, model
 
     @staticmethod
@@ -171,6 +169,9 @@ class SystemOpsRedisService:
     # ======================== Redis配置 ========================
 
     async def config_list(self, content: str = None) -> Status:
+        """
+        不分页，直接获取全部数据
+        """
         models = await self.config_curd.list_all(db=self.db, content=content) or []
         data = await many_model_converter_dict(
             models=models, fields=xtb_redis_config_list_fields,
@@ -179,12 +180,7 @@ class SystemOpsRedisService:
         return SuccessStatus(data={"list": data or [], "total": len(models)})
 
     async def config_options(self) -> Status:
-        models = await self.config_curd.list_all(db=self.db) or []
-        data = [
-            {"label": m.name, "value": m.md5, "disabled": bool(m.lock)}
-            for m in models if not m.lock
-        ]
-        return SuccessStatus(data=data)
+        return SuccessStatus(data=await self.__redis_config_options())
 
     async def config_one(self, md5: str) -> Status:
         flag, data = await self.__valid_config(md5=md5, status_check=False)
@@ -233,7 +229,7 @@ class SystemOpsRedisService:
 
     async def config_test(self, model: Dict) -> Status:
         """测试连接：使用前端提交的连接参数（不落库）"""
-        config = XtbRedisConfigModel()
+        config: XtbRedisConfigModel = XtbRedisConfigModel()
         for key in ("host", "port", "db", "password"):
             setattr(config, key, model.get(key))
         try:
@@ -247,26 +243,60 @@ class SystemOpsRedisService:
             LOG.error(f"[SystemOpsRedisService*测试连接]{e}")
             return FailureStatus(code=status_code.CODE_902_OTHER_THREE_API_EXCEPTION, message=f"Redis连接失败：{e}")
 
+    async def ping(self, md5: str = None) -> Status:
+        """PING检测：指定配置或全部启用配置，逐项返回连通结果"""
+        if md5:
+            flag, data = await self.__valid_config(md5=md5, status_check=False)
+            if not flag: return data
+            configs: list[Any] = [data]
+        else:
+            configs: list[Any] = [
+                m for m in (await self.config_curd.list_all(db=self.db) or [])
+                if not m.lock
+            ]
+
+        results: List[Dict] = []
+        for config in configs:
+            item: Dict = {
+                "md5": config.md5, "name": config.name, "host": config.host,
+                "port": config.port, "db": config.db, "ok": False,
+                "dbsize": 0, "message": ""
+            }
+            try:
+                client: RedisClientLib = self.__client(config)
+                ok: bool = bool(client.ping())
+                with client.get_connection() as conn:
+                    dbsize = conn.dbsize()
+                item.update(ok=ok, dbsize=dbsize, message="PONG" if ok else "PING无响应")
+            except Exception as e:
+                item["message"] = str(e)
+            results.append(item)
+
+        success = sum(1 for item in results if item["ok"])
+        return SuccessStatus(data={
+            "list": results, "total": len(results), "success": success,
+            "failed": len(results) - success,
+        })
+
     # ======================== 清理规则 ========================
 
-    async def __match_options(self) -> List[Dict]:
-        models = await self.enum_curd.get_list_by_name(
-            db=self.db, name=CsbEnumKEY.REDIS_MATCH.value, filter_lock=True
-        )
-        options = [
-            {"label": m.value, "value": m.key, "disabled": bool(m.lock)}
-            for m in (models or []) if m and m.key
-        ]
-        return options or DEFAULT_MATCH_OPTIONS
+    async def __redis_config_options(self) -> List:
+        models: List[XtbRedisConfigModel] = await self.config_curd.list_all(db=self.db) or []
+        __res: list[Dict] = []
+        for m in models:
+            if not m or getattr(m, "lock", False): continue
+            __res.append({"label": m.name, "value": m.md5, "disabled": bool(m.lock)})
+        else:
+            return __res
 
     async def filter_(self) -> Status:
-        models = await self.config_curd.list_all(db=self.db) or []
         return SuccessStatus(data={
-            "config": [
-                {"label": m.name, "value": m.md5, "disabled": bool(m.lock)}
-                for m in models if not m.lock
-            ],
-            "match": await self.__match_options(),
+            "config": await self.__redis_config_options(),
+            "match": await self.dict_service.dict_value_by_name_money(
+                name=CsbEnumKEY.REDIS_MATCH.value,
+                response_="option",
+                filter_lock=True
+            ) or [],
         })
 
     async def pagination(self, rtx_id: str, params: Dict) -> Status:
@@ -289,6 +319,8 @@ class SystemOpsRedisService:
             columns = xtb_redis_rule_list_fields
             auto_id = False
 
+        # 联表查询返回 RowMapping，转换为支持属性访问的对象供转换器使用
+        models = [SimpleNamespace(**dict(row)) for row in models]
         config_map = await self.__config_map()
         for model in models:
             config = config_map.get(model.redis_md5)

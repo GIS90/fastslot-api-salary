@@ -48,6 +48,10 @@ class XtbMenuCurd(BaseCurd):
     async def new_model() -> XtbMenuModel:
         return XtbMenuModel()
 
+    @staticmethod
+    def _not_deleted() -> Any:
+        return XtbMenuModel.status != True
+
     async def _get_model_by_field(
         self,
         db: AsyncSession,
@@ -80,7 +84,7 @@ class XtbMenuCurd(BaseCurd):
     async def count(cls, db: AsyncSession) -> int:
         try:
             result = await db.execute(
-                select(func.count(XtbMenuModel.id)).where(XtbMenuModel.status != 1)
+                select(func.count(XtbMenuModel.id)).where(cls._not_deleted())
             )
             return result.scalar()
         except Exception as e:
@@ -95,7 +99,7 @@ class XtbMenuCurd(BaseCurd):
     @classmethod
     async def get_all(cls, db: AsyncSession, root: bool = True) -> Optional[List]:
         try:
-            stmt = select(XtbMenuModel).where(XtbMenuModel.status != 1)
+            stmt = select(XtbMenuModel).where(cls._not_deleted())
             if not root:
                 stmt = stmt.where(XtbMenuModel.id != MENU_ROOT_ID)
             stmt = stmt.order_by(asc(XtbMenuModel.order_id), asc(XtbMenuModel.id))

@@ -45,6 +45,10 @@ class SalaryDtalkMessageCurd(BaseCurd):
     async def new_model() -> SalaryDtalkMessageModel:
         return SalaryDtalkMessageModel()
 
+    @staticmethod
+    def _not_deleted():
+        return SalaryDtalkMessageModel.status != True
+
     @classmethod
     async def get_by_md5(cls, db: AsyncSession, md5: str) -> Optional[SalaryDtalkMessageModel]:
         try:
@@ -57,9 +61,7 @@ class SalaryDtalkMessageCurd(BaseCurd):
     @classmethod
     async def count(cls, db: AsyncSession) -> int:
         try:
-            stmt = select(func.count(SalaryDtalkMessageModel.id)).where(
-                SalaryDtalkMessageModel.status.is_(False)
-            )
+            stmt = select(func.count(SalaryDtalkMessageModel.id)).where(cls._not_deleted())
             result = await db.execute(stmt)
             return result.scalar()
         except Exception as e:
@@ -72,7 +74,7 @@ class SalaryDtalkMessageCurd(BaseCurd):
     ) -> Optional[List[SalaryDtalkMessageModel]]:
         try:
             stmt = select(SalaryDtalkMessageModel).where(
-                SalaryDtalkMessageModel.status.is_(False)
+                cls._not_deleted()
             )
             if content:
                 stmt = stmt.where(SalaryDtalkMessageModel.file_name.like("%%%s%%" % content))
@@ -92,7 +94,7 @@ class SalaryDtalkMessageCurd(BaseCurd):
     ) -> Optional[List[SalaryDtalkMessageModel]]:
         try:
             stmt = select(SalaryDtalkMessageModel).where(
-                SalaryDtalkMessageModel.status.is_(False)
+                cls._not_deleted()
             )
             if md5_list:
                 stmt = stmt.where(SalaryDtalkMessageModel.md5.in_(md5_list))
@@ -129,7 +131,7 @@ class SalaryDtalkMessageCurd(BaseCurd):
             stmt = update(SalaryDtalkMessageModel).where(
                 and_(
                     SalaryDtalkMessageModel.md5.in_(md5_list),
-                    SalaryDtalkMessageModel.status.is_(False)
+                    cls._not_deleted()
                 )
             ).values(status=True, delete_rtx=rtx_id, delete_time=func.now())
             await db.execute(stmt)

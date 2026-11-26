@@ -33,6 +33,10 @@ class SalaryQywxMessageCurd(BaseCurd):
     async def new_model() -> SalaryQywxMessageModel:
         return SalaryQywxMessageModel()
 
+    @staticmethod
+    def _not_deleted():
+        return SalaryQywxMessageModel.status != True
+
     @classmethod
     async def get_by_md5(cls, db: AsyncSession, md5: str) -> Optional[SalaryQywxMessageModel]:
         try:
@@ -46,7 +50,7 @@ class SalaryQywxMessageCurd(BaseCurd):
     async def count(cls, db: AsyncSession) -> int:
         try:
             stmt = select(func.count(SalaryQywxMessageModel.id)).where(
-                SalaryQywxMessageModel.status.is_(False)
+                cls._not_deleted()
             )
             result = await db.execute(stmt)
             return result.scalar()
@@ -60,7 +64,7 @@ class SalaryQywxMessageCurd(BaseCurd):
     ) -> Optional[List[SalaryQywxMessageModel]]:
         try:
             stmt = select(SalaryQywxMessageModel).where(
-                SalaryQywxMessageModel.status.is_(False)
+                cls._not_deleted()
             )
             if content:
                 stmt = stmt.where(SalaryQywxMessageModel.file_name.like("%%%s%%" % content))
@@ -80,7 +84,7 @@ class SalaryQywxMessageCurd(BaseCurd):
     ) -> Optional[List[SalaryQywxMessageModel]]:
         try:
             stmt = select(SalaryQywxMessageModel).where(
-                SalaryQywxMessageModel.status.is_(False)
+                cls._not_deleted()
             )
             if md5_list:
                 stmt = stmt.where(SalaryQywxMessageModel.md5.in_(md5_list))
@@ -117,7 +121,7 @@ class SalaryQywxMessageCurd(BaseCurd):
             stmt = update(SalaryQywxMessageModel).where(
                 and_(
                     SalaryQywxMessageModel.md5.in_(md5_list),
-                    SalaryQywxMessageModel.status.is_(False)
+                    cls._not_deleted()
                 )
             ).values(status=True, delete_rtx=rtx_id, delete_time=func.now())
             await db.execute(stmt)

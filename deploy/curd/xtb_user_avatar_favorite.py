@@ -19,6 +19,14 @@ class XtbUserAvatarFavoriteCurd:
     async def new_model() -> XtbUserAvatarFavoriteModel:
         return XtbUserAvatarFavoriteModel()
 
+    @staticmethod
+    def _avatar_not_deleted():
+        return XtbUserAvatarModel.status != True
+        
+    @staticmethod
+    def _avatar_favorite_not_deleted():
+        return XtbUserAvatarFavoriteModel.status != True
+
     async def get_by_user_avatar(
         self, db: AsyncSession, rtx_id: str, avatar_md5: str
     ) -> Optional[XtbUserAvatarFavoriteModel]:
@@ -48,7 +56,7 @@ class XtbUserAvatarFavoriteCurd:
             join_condition = and_(
                 XtbUserAvatarFavoriteModel.avatar_md5 == XtbUserAvatarModel.md5,
                 XtbUserAvatarFavoriteModel.rtx_id == rtx_id,
-                XtbUserAvatarFavoriteModel.status != True,
+                cls._avatar_favorite_not_deleted(),
             )
             stmt = select(
                 XtbUserAvatarModel.md5,
@@ -63,7 +71,7 @@ class XtbUserAvatarFavoriteCurd:
             ).outerjoin(
                 XtbUserAvatarFavoriteModel, join_condition
             ).where(
-                XtbUserAvatarModel.status != True,
+                cls._avatar_not_deleted(),
                 XtbUserAvatarModel.lock != True,
             )
             if type_:
@@ -104,12 +112,12 @@ class XtbUserAvatarFavoriteCurd:
             join_condition = and_(
                 XtbUserAvatarFavoriteModel.avatar_md5 == XtbUserAvatarModel.md5,
                 XtbUserAvatarFavoriteModel.rtx_id == rtx_id,
-                XtbUserAvatarFavoriteModel.status != True,
+                cls._avatar_favorite_not_deleted()
             )
             stmt = select(func.count(XtbUserAvatarModel.id)).outerjoin(
                 XtbUserAvatarFavoriteModel, join_condition
             ).where(
-                XtbUserAvatarModel.status != True,
+                cls._avatar_not_deleted(),
                 XtbUserAvatarModel.lock != True,
             )
             if type_:

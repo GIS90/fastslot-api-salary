@@ -47,6 +47,10 @@ class XtbXtbbCurd(BaseCurd):
     async def new_model():
         return XtbXtbbModel()
 
+    @staticmethod
+    def _not_deleted():
+        return XtbXtbbModel.status != True
+
     async def _get_model_by_field(
         self,
         db: AsyncSession,
@@ -64,7 +68,7 @@ class XtbXtbbCurd(BaseCurd):
 
             stmt = select(XtbXtbbModel).where(
                 _field == value,
-                XtbXtbbModel.status != 1)
+                self._not_deleted())
             result = await db.execute(stmt)
             return result.scalar_one_or_none()
         except Exception as e:
@@ -104,7 +108,7 @@ class XtbXtbbCurd(BaseCurd):
             stmt = select(XtbXtbbModel).where(
                 XtbXtbbModel.name == key,
                 XtbXtbbModel.md5 != md5,
-                XtbXtbbModel.status != 1)
+                self._not_deleted())
             result = await db.execute(stmt)
             return result.scalar_one_or_none()
         except Exception as e:
@@ -114,7 +118,7 @@ class XtbXtbbCurd(BaseCurd):
     async def count(cls, db: AsyncSession) -> int:
         try:
             result = await db.execute(
-                select(func.count(XtbXtbbModel.id)).where(XtbXtbbModel.status != 1)
+                select(func.count(XtbXtbbModel.id)).where(cls._not_deleted())
             )
             return result.scalar()
         except Exception as e:
@@ -125,7 +129,7 @@ class XtbXtbbCurd(BaseCurd):
         try:
             result = await db.execute(
                 select(func.count(XtbXtbbModel.id)).where(
-                    XtbXtbbModel.status != 1,
+                    cls._not_deleted(),
                     XtbXtbbModel.md5.in_(md5_list)
                 )
             )
@@ -138,7 +142,7 @@ class XtbXtbbCurd(BaseCurd):
         cls, db: AsyncSession, offset: int = 0, limit: int = 15, content: str = None, *args, **kwargs
     ) -> Optional[List]:
         try:
-            stmt = select(XtbXtbbModel).where(XtbXtbbModel.status != 1)
+            stmt = select(XtbXtbbModel).where(cls._not_deleted())
             if content:
                 stmt = stmt.where(
                     or_(
@@ -158,7 +162,7 @@ class XtbXtbbCurd(BaseCurd):
             cls, db: AsyncSession, params: Dict, *args, **kwargs
     ) -> Optional[List]:
         try:
-            stmt = select(XtbXtbbModel).where(XtbXtbbModel.status != 1)
+            stmt = select(XtbXtbbModel).where(cls._not_deleted())
             if params.get("list"):
                 stmt = stmt.where(XtbXtbbModel.md5.in_(params.get("list")))
             stmt = stmt.order_by(asc(XtbXtbbModel.order_id), asc(XtbXtbbModel.create_time))

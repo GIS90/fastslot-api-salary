@@ -46,8 +46,12 @@ from deploy.schema.dao.csb_enum_value import CsbEnumValueModel
 class XtbXtcsCurd(BaseCurd):
 
     @staticmethod
-    async def new_model():
+    async def new_model() -> XtbXtcsModel:
         return XtbXtcsModel()
+
+    @staticmethod
+    def _not_deleted():
+        return XtbXtcsModel.status != True
 
     async def _get_model_by_field(
         self,
@@ -66,7 +70,7 @@ class XtbXtcsCurd(BaseCurd):
 
             stmt = select(XtbXtcsModel).where(
                 _field == value,
-                XtbXtcsModel.status != 1)
+                self._not_deleted())
             if filter_lock:
                 stmt = stmt.where(XtbXtcsModel.lock != True)
             result = await db.execute(stmt)
@@ -109,7 +113,7 @@ class XtbXtcsCurd(BaseCurd):
             stmt = select(XtbXtcsModel).where(
                 XtbXtcsModel.key == key,
                 XtbXtcsModel.md5 != md5,
-                XtbXtcsModel.status != 1)
+                self._not_deleted())
             if filter_lock:
                 stmt = stmt.where(XtbXtcsModel.lock != True)
             result = await db.execute(stmt)
@@ -121,7 +125,7 @@ class XtbXtcsCurd(BaseCurd):
     async def count(cls, db: AsyncSession) -> int:
         try:
             result = await db.execute(
-                select(func.count(XtbXtcsModel.id)).where(XtbXtcsModel.status != 1)
+                select(func.count(XtbXtcsModel.id)).where(cls._not_deleted())
             )
             return result.scalar()
         except Exception as e:
@@ -132,7 +136,7 @@ class XtbXtcsCurd(BaseCurd):
         try:
             result = await db.execute(
                 select(func.count(XtbXtcsModel.id)).where(
-                    XtbXtcsModel.status != 1,
+                    cls._not_deleted(),
                     XtbXtcsModel.md5.in_(md5_list)
                 )
             )
@@ -154,7 +158,7 @@ class XtbXtcsCurd(BaseCurd):
                     XtbXtcsModel.type == CsbEnumValueModel.key,
                     CsbEnumValueModel.name == CsbEnumKEY.XTCS_TYPE.value
                 )
-            ).where(XtbXtcsModel.status != 1)
+            ).where(cls._not_deleted())
 
             if content:
                 stmt = stmt.where(
@@ -176,7 +180,7 @@ class XtbXtcsCurd(BaseCurd):
     ) -> Optional[List]:
         try:
             stmt = select(XtbXtcsModel).where(
-                XtbXtcsModel.status != 1,
+                cls._not_deleted(),
                 XtbXtcsModel.key.in_(key_list)
             )
             if filter_lock:
@@ -200,7 +204,7 @@ class XtbXtcsCurd(BaseCurd):
                     XtbXtcsModel.type == CsbEnumValueModel.key,
                     CsbEnumValueModel.name == CsbEnumKEY.XTCS_TYPE.value
                 )
-            ).where(XtbXtcsModel.status != 1)
+            ).where(cls._not_deleted())
             if params.get("list"):
                 stmt = stmt.where(XtbXtcsModel.md5.in_(params.get("list")))
             stmt = stmt.order_by(asc(XtbXtcsModel.create_time))

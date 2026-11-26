@@ -336,6 +336,7 @@ insert into csb_enum_key(`key`, `md5`, `value`, `lock`, `status`, `create_rtx`, 
 ('xtcs-type', '8621ffdbc5698829397d97767ac13db3', '系统参数类型', False, False, 'admin', 13),
 ('redis-match', 'f4722fc556c2837ca6afc1f5aeb380a7', 'Redis缓存匹配方式', False, False, 'admin', 14);
 
+
 -- CSB_ENUM_VALUE枚举 Value表
 -- create table && index
 DROP TABLES IF EXISTS `csb_enum_value`;
@@ -434,6 +435,29 @@ insert into csb_enum_value(`name`, `md5`, `key`, `value`, `remark`, `lock`, `sta
 ('redis-match', '65ced1c77e36284d24f838579921a53c', 'prefix', '前缀匹配', '按key前缀匹配', FALSE, FALSE, 'admin', 1),
 ('redis-match', '1ceea6140924d190ba58018a092ec59f', 'pattern', '通配符匹配', '支持*和?通配符', FALSE, FALSE, 'admin', 2),
 ('redis-match', 'cfe5cfd0fd98921cbef328468d9bb35c', 'regex', '正则匹配', '按正则表达式匹配', FALSE, FALSE, 'admin', 3);
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

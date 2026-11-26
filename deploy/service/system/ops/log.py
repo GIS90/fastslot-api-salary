@@ -122,16 +122,11 @@ class SystemOpsLogService:
                 return __tag
 
     async def pagination(self, rtx_id: str, params: Dict, _all: bool = False) -> Status:
-        if _all:
-            __rtx_id = None
-            pagination_offset = (params.get("page") - 1) * params.get("pageSize")
-        else:
-            __rtx_id = rtx_id
-            pagination_offset = params.get("offset")
-            params["filter"]: Dict = {}
+        __rtx_id: str | None = rtx_id if not _all else None
+
         models: List[XtbRequestModel] = await self.xtb_request_curd.pagination(
             db=self.db,
-            offset=pagination_offset,
+            offset=params.get("offset"),
             limit=params.get("pageSize"),
             rtx_id=__rtx_id,
             filter_=params.get("filter")
@@ -162,7 +157,7 @@ class SystemOpsLogService:
             fields=fields.get("column"),
             default_value=TABLE_DEFAULT_NULL,
             auto_id=fields.get("id_auto"),
-            auto_id_value=pagination_offset + 1
+            auto_id_value=params.get("offset") + 1
         )
         result: Dict = {
             "list": data,

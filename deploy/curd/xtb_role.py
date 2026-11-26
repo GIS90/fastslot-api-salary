@@ -47,6 +47,10 @@ class XtbRoleCurd(BaseCurd):
     async def new_model() -> XtbRoleModel:
         return XtbRoleModel()
 
+    @staticmethod
+    def _not_deleted():
+        return XtbRoleModel.status != True
+
     async def _get_model_by_field(
         self,
         db: AsyncSession,
@@ -62,8 +66,8 @@ class XtbRoleCurd(BaseCurd):
                 _field = field
 
             result = await db.execute(select(XtbRoleModel).where(
-                _field == value,
-                XtbRoleModel.status != 1
+                    _field == value,
+                   self._not_deleted()
                 )
             )
             return result.scalar_one_or_none()
@@ -89,7 +93,7 @@ class XtbRoleCurd(BaseCurd):
             stmt = select(XtbRoleModel).where(
                 XtbRoleModel.engname == key,
                 XtbRoleModel.md5 != md5,
-                XtbRoleModel.status != 1)
+                self._not_deleted())
             result = await db.execute(stmt)
             return result.scalar_one_or_none()
         except Exception as e:
@@ -99,7 +103,7 @@ class XtbRoleCurd(BaseCurd):
     async def count(cls, db: AsyncSession) -> int:
         try:
             result = await db.execute(
-                select(func.count(XtbRoleModel.id)).where(XtbRoleModel.status != 1)
+                select(func.count(XtbRoleModel.id)).where(cls._not_deleted())
             )
             return result.scalar()
         except Exception as e:
@@ -110,7 +114,7 @@ class XtbRoleCurd(BaseCurd):
         cls, db: AsyncSession, offset: int = 0, limit: int = 15, content: str = None, *args, **kwargs
     ) -> Optional[List]:
         try:
-            stmt = select(XtbRoleModel).where(XtbRoleModel.status != 1)
+            stmt = select(XtbRoleModel).where(cls._not_deleted())
             if content:
                 stmt = stmt.where(
                     or_(
@@ -130,7 +134,7 @@ class XtbRoleCurd(BaseCurd):
             cls, db: AsyncSession, params: Dict, *args, **kwargs
     ) -> Optional[List]:
         try:
-            stmt = select(XtbRoleModel).where(XtbRoleModel.status != 1)
+            stmt = select(XtbRoleModel).where(cls._not_deleted())
             if params.get("list"):
                 stmt = stmt.where(XtbRoleModel.md5.in_(params.get("list")))
             stmt = stmt.order_by(asc(XtbRoleModel.order_id), asc(XtbRoleModel.id))
@@ -148,7 +152,7 @@ class XtbRoleCurd(BaseCurd):
         try:
             stmt = select(XtbRoleModel)
             if filter_status:
-                stmt = stmt.where(XtbRoleModel.status != 1)
+                stmt = stmt.where(cls._not_deleted())
             stmt = stmt.order_by(asc(XtbRoleModel.order_id), asc(XtbRoleModel.id))
             result = await db.execute(stmt)
             return result.scalars().all()
@@ -162,7 +166,7 @@ class XtbRoleCurd(BaseCurd):
         try:
             stmt = select(XtbRoleModel.engname).where(
                 XtbRoleModel.md5.in_(md5_list),
-                XtbRoleModel.status != 1
+                cls._not_deleted()
             )
             result = await db.execute(stmt)
             return result.scalars().all()
@@ -176,7 +180,7 @@ class XtbRoleCurd(BaseCurd):
         try:
             stmt = select(XtbRoleModel).where(
                 XtbRoleModel.engname.in_(engname_list),
-                XtbRoleModel.status != 1
+                cls._not_deleted()
             )
             result = await db.execute(stmt)
             return result.scalars().all()

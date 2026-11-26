@@ -55,6 +55,10 @@ class XtbUserTaskCurd(BaseCurd):
     async def new_model():
         return XtbUserTaskModel()
 
+    @staticmethod
+    def _not_deleted():
+        return XtbUserTaskModel.status != True
+
     async def _get_model_by_field(
         self,
         db: AsyncSession,
@@ -71,7 +75,7 @@ class XtbUserTaskCurd(BaseCurd):
 
             stmt = select(XtbUserTaskModel).where(
                 _field == value,
-                XtbUserTaskModel.status != 1)
+                self._not_deleted())
             result = await db.execute(stmt)
             return result.scalar_one_or_none()
         except Exception as e:
@@ -87,20 +91,19 @@ class XtbUserTaskCurd(BaseCurd):
     async def count(cls, db: AsyncSession, rtx_id: str = None, filter_: Dict | None = None) -> int:
         if filter_ is None: filter_ = {}
         try:
-            stmt = select(func.count(XtbUserTaskModel.id)).where(XtbUserTaskModel.status != 1)
+            stmt = select(func.count(XtbUserTaskModel.id)).where(cls._not_deleted())
             if rtx_id:
                 stmt = stmt.where(XtbUserTaskModel.create_rtx == rtx_id)
-            if filter_.get("ds"):
-                stmt = stmt.where(XtbUserTaskModel.data.in_(filter_.get("ds")))
-            if filter_.get("status"):
-                stmt = stmt.where(XtbUserTaskModel.task.in_(filter_.get("status")))
+            if filter_.get("data"):
+                stmt = stmt.where(XtbUserTaskModel.data.in_(filter_.get("data")))
+            if filter_.get("task"):
+                stmt = stmt.where(XtbUserTaskModel.task.in_(filter_.get("task")))
             if filter_.get("user"):
                 stmt = stmt.where(XtbUserTaskModel.create_rtx.in_(filter_.get("user")))
             if filter_.get("content"):
-                stmt = stmt.where(XtbUserTaskModel.name.like(f"%{filter_.get('content')}%"))
-            if filter_.get("dateRange"):
-                __start, __end = automatic_time(dateRange=filter_.get("dateRange"))
-                stmt = stmt.where(XtbUserTaskModel.create_time.between(__start, __end))
+                stmt = stmt.where(XtbUserTaskModel.name.like(filter_.get('content')))
+            if filter_.get("createTime"):
+                stmt = stmt.where(XtbUserTaskModel.create_time.between(filter_.get("createTime")[0], filter_.get("createTime")[1]))
             result = await db.execute(stmt)
             return result.scalar()
         except Exception as e:
@@ -111,7 +114,7 @@ class XtbUserTaskCurd(BaseCurd):
         try:
             result = await db.execute(
                 select(func.count(XtbUserTaskModel.id)).where(
-                    XtbUserTaskModel.status != 1,
+                    cls._not_deleted(),
                     XtbUserTaskModel.md5.in_(md5_list)
                 )
             )
@@ -136,23 +139,22 @@ class XtbUserTaskCurd(BaseCurd):
                 EV2,
                 XtbUserTaskModel.task == EV2.key
             ).where(
-                XtbUserTaskModel.status != 1,
+                cls._not_deleted(),
                 EV1.name == CsbEnumKEY.DOWNLOAD_SELECT.value,
                 EV2.name == CsbEnumKEY.TASK_STATUS.value
             ))
             if rtx_id:
                 stmt = stmt.where(XtbUserTaskModel.create_rtx == rtx_id)
-            if filter_.get("ds"):
-                stmt = stmt.where(XtbUserTaskModel.data.in_(filter_.get("ds")))
-            if filter_.get("status"):
-                stmt = stmt.where(XtbUserTaskModel.task.in_(filter_.get("status")))
+            if filter_.get("data"):
+                stmt = stmt.where(XtbUserTaskModel.data.in_(filter_.get("data")))
+            if filter_.get("task"):
+                stmt = stmt.where(XtbUserTaskModel.task.in_(filter_.get("task")))
             if filter_.get("user"):
                 stmt = stmt.where(XtbUserTaskModel.create_rtx.in_(filter_.get("user")))
             if filter_.get("content"):
-                stmt = stmt.where(XtbUserTaskModel.name.like(f"%{filter_.get('content')}%"))
-            if filter_.get("dateRange"):
-                __start, __end = automatic_time(dateRange=filter_.get("dateRange"))
-                stmt = stmt.where(XtbUserTaskModel.create_time.between(__start, __end))
+                stmt = stmt.where(XtbUserTaskModel.name.like(filter_.get('content')))
+            if filter_.get("createTime"):
+                stmt = stmt.where(XtbUserTaskModel.create_time.between(filter_.get("createTime")[0], filter_.get("createTime")[1]))
             stmt = stmt.order_by(desc(XtbUserTaskModel.create_time)).offset(offset).limit(limit)
             result = await db.execute(stmt)
             return result.mappings().all()
@@ -175,7 +177,7 @@ class XtbUserTaskCurd(BaseCurd):
                 EV2,
                 XtbUserTaskModel.task == EV2.key
             ).where(
-                XtbUserTaskModel.status != 1,
+                cls._not_deleted(),
                 EV1.name == CsbEnumKEY.DOWNLOAD_SELECT.value,
                 EV2.name == CsbEnumKEY.TASK_STATUS.value
             ))
