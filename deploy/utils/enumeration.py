@@ -33,6 +33,7 @@ Life is short, I use python.
 from typing import Dict
 from enum import Enum, unique, IntEnum, StrEnum
 from colorama import Fore, Back, Style
+from dataclasses import dataclass
 
 
 __all__ = [
@@ -46,7 +47,6 @@ __all__ = [
     'XtbXtcsKEY',
     'CsbEnumKEY',
     'DownloadExcelFormat',
-    'API_TYPE_DICT',
     'DICT_KEY_ALL',
 ]
 
@@ -249,16 +249,8 @@ class DownloadExcelFormat(StrEnum):
     XLSX = ".xlsx"
 
 
-# API类型字典
-API_TYPE_DICT: Dict[str, str] =  {
-    "GET": "primary",
-    "POST": "success",
-    "PUT": "warning",
-    "DELETE": "danger",
-}
-
-
 # 数据字典全部常量
+@dataclass(frozen=True)
 class DICT_KEY_ALL:
     id = 0
     md5 = "ALL"

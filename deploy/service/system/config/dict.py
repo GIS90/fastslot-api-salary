@@ -44,7 +44,7 @@ from deploy.utils.status_value import (StatusCode as status_code,
                                        StatusMsg as status_msg)
 from deploy.utils.converter import model_converter_dict, option_converter_dict, many_model_converter_dict
 from deploy.schema.dto.csb_enum_key import csb_ek_list_fields, csb_ek_detail_fields
-from deploy.schema.dto.csb_enum_value import csb_ev_list_fields, csb_ev_detail_fields, xtb_ev_download_fields
+from deploy.schema.dto.csb_enum_value import csb_ev_detail_fields
 from deploy.config import (
     redis_host, redis_port, redis_password, redis_db, redis_expire, 
     table_default_null as TABLE_DEFAULT_NULL,

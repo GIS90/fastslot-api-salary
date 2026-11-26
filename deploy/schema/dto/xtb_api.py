@@ -34,21 +34,6 @@ from typing import List
 from deploy.utils.enumeration import FieldTypeEnum as ft
 
 
-xtb_api_list_fields: List = [
-    {"key": "md5", "type": ft.STR, "name": "md5", "null": False},
-    {"key": "blueprint", "type": ft.STR, "name": "blueprint", "null": False},
-    {"key": "apiname", "type": ft.STR, "name": "apiname", "null": False},
-    {"key": "endpoint", "type": ft.STR, "name": "endpoint", "null": False},
-    {"key": "path", "type": ft.STR, "name": "path", "null": False},
-    {"key": "method", "type": ft.STR, "name": "method", "null": False},
-    {"key": "short", "type": ft.STR, "name": "short", "null": True},
-    {"key": "long", "type": ft.STR, "name": "long", "null": True},
-    {"key": "order_id", "type": ft.INT, "name": "orderId", "null": True},
-    {"key": "create_rtx", "type": ft.STR, "name": "createRtx", "null": True},
-    {"key": "create_time", "type": ft.DATETIME, "name": "createTime", "null": True},
-]
-
-
 xtb_api_detail_fields: List = [
     {"key": "md5", "type": ft.STR, "name": "md5", "null": False},
     {"key": "blueprint", "type": ft.STR, "name": "blueprint", "null": False},
@@ -61,16 +46,3 @@ xtb_api_detail_fields: List = [
     {"key": "order_id", "type": ft.INT, "name": "orderId", "null": True},
 ]
 
-
-xtb_api_download_fields: List = [
-    {"key": "blueprint", "type": ft.STR, "name": "blueprint", "null": False},
-    {"key": "apiname", "type": ft.STR, "name": "apiname", "null": False},
-    {"key": "endpoint", "type": ft.STR, "name": "endpoint", "null": False},
-    {"key": "path", "type": ft.STR, "name": "path", "null": False},
-    {"key": "method", "type": ft.STR, "name": "method", "null": False},
-    {"key": "short", "type": ft.STR, "name": "short", "null": True},
-    {"key": "long", "type": ft.STR, "name": "long", "null": True},
-    {"key": "order_id", "type": ft.INT, "name": "orderId", "null": True},
-    {"key": "create_rtx", "type": ft.STR, "name": "createRtx", "null": True},
-    {"key": "create_time", "type": ft.DATETIME, "name": "createTime", "null": True},
-]

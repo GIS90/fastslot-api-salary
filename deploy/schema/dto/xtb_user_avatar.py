@@ -54,6 +54,3 @@ xtb_user_avatar_detail_fields: List = [
     {"key": "create_time", "type": ft.DATETIME, "name": "createTime", "null": True},
 ]
 
-xtb_user_avatar_list_fields: List = xtb_user_avatar_detail_fields + [
-    {"key": "id", "type": ft.INT, "name": "id", "null": False},
-]

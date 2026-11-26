@@ -42,13 +42,13 @@ from deploy.utils.status import Status, SuccessStatus, FailureStatus
 from deploy.utils.status_value import (StatusCode as status_code,
                                        StatusMsg as status_msg)
 from deploy.utils.converter import model_converter_dict, many_model_converter_dict
-from deploy.schema.dto.xtb_request import xtb_request_detail_fields, xtb_request_download_fields
+from deploy.schema.dto.xtb_request import xtb_request_detail_fields
 from deploy.config import (
     table_default_null as TABLE_DEFAULT_NULL,
     table_default_db_id as TABLE_DEFAULT_DB_ID
 )
 from deploy.utils.utils import get_now, xtbb_field_id_value
-from deploy.utils.enumeration import CsbEnumKEY, API_TYPE_DICT, XtbReportKey
+from deploy.utils.enumeration import CsbEnumKEY, XtbReportKey
 from deploy.utils.exception import ReportNotColumnException
 
 
@@ -91,35 +91,6 @@ class SystemOpsLogService:
 
         return (True, model if response_type == "model"
                         else await model_converter_dict(model=model, fields=fields, default_value="****"))
-
-    async def __get_tag(self, type_: Literal["option", "dict"] = "dict") -> Union[List, Dict]:
-        """
-        因为枚举值的tag在数据库中存储key-value反的，所以需要反转
-        """
-        enum_v_model = await self.csb_ev_curd.get_list_by_name(
-            db=self.db,
-            name=CsbEnumKEY.API_TYPE,
-            filter_lock=False)
-        __default: Dict = API_TYPE_DICT
-        if type_ == "dict":
-            __tag: Dict = {}
-            if not enum_v_model: return __default
-            for model in enum_v_model:
-                if not model or not getattr(model, "key") or not getattr(model, "value"): continue
-                __tag[str(model.value).upper()] = str(model.key).lower() if getattr(model, "value") else "info"
-            else:
-                return __tag
-        else:
-            __tag: List = []
-            if not enum_v_model:
-                for k in __default.keys():
-                    if not k: continue
-                    __tag.append({"label": k, "value": k})
-            for model in enum_v_model:
-                if not model or not getattr(model, "value"): continue
-                __tag.append({"label": str(model.value).upper(), "value": str(model.value).upper()})
-            else:
-                return __tag
 
     async def pagination(self, rtx_id: str, params: Dict, _all: bool = False) -> Status:
         __rtx_id: str | None = rtx_id if not _all else None
@@ -169,7 +140,11 @@ class SystemOpsLogService:
 
     async def filter_(self, rtx_id: str) -> Status:
         data = {
-            "api": await self.__get_tag(type_="option"),
+            "api": await self.system_config_dict_service.dict_value_by_name_money(
+                name=CsbEnumKEY.API_TYPE.value,
+                response_="option",
+                filter_lock=True
+            ),
             "user": await self.system_main_user_service.option(status_view=True)
         }
         return SuccessStatus(data=data)
