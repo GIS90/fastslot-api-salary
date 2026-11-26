@@ -46,6 +46,7 @@ from deploy.service.system.config.dict import SystemConfigDictService
 from deploy.service.system.config.report import SystemConfigReportService
 from deploy.service.system.ops.task import SystemOpsTaskService
 from deploy.service.system.ops.log import SystemOpsLogService
+from deploy.service.system.ops.redis import SystemOpsRedisService
 from deploy.service.system.ops.depart import SystemOpsDepartService
 from deploy.service.system.ops.avatar import SystemOpsAvatarService
 from deploy.service.system.config.api import SystemConfigApiService
@@ -93,6 +94,7 @@ class ApiDownloadService(object):
         self.system_config_report_service: SystemConfigReportService = SystemConfigReportService(db_connection=db_connection)
         self.system_ops_task_service: SystemOpsTaskService = SystemOpsTaskService(db_connection=db_connection)
         self.system_ops_log_service: SystemOpsLogService = SystemOpsLogService(db_connection=db_connection)
+        self.system_ops_redis_service: SystemOpsRedisService = SystemOpsRedisService(db_connection=db_connection)
         self.system_ops_depart_service: SystemOpsDepartService = SystemOpsDepartService(db_connection=db_connection)
         self.system_ops_avatar_service: SystemOpsAvatarService = SystemOpsAvatarService(db_connection=db_connection)
         self.system_config_api_service: SystemConfigApiService = SystemConfigApiService(db_connection=db_connection)
@@ -148,43 +150,46 @@ class ApiDownloadService(object):
             match api:
                 case "SystemMainUser":
                     # 系统>权限>用户管理
-                    __res = await self.system_main_user_service.download(rtx_id=rtx_id, params=new_params)
+                    __res: List = await self.system_main_user_service.download(rtx_id=rtx_id, params=new_params)
                 case "SystemMainRole":
                     # 系统>权限>角色管理
-                    __res = await self.system_main_role_service.download(rtx_id=rtx_id, params=new_params)
+                    __res: List = await self.system_main_role_service.download(rtx_id=rtx_id, params=new_params)
                 case "SystemConfigXtcs":
                     # 系统>配置>系统参数
-                    __res = await self.system_config_xtcs_service.download(rtx_id=rtx_id, params=new_params)
+                    __res: List = await self.system_config_xtcs_service.download(rtx_id=rtx_id, params=new_params)
                 case "SystemConfigReport":
                     # 系统>配置>系统参数
-                    __res = await self.system_config_report_service.download(rtx_id=rtx_id, params=new_params)
+                    __res: List = await self.system_config_report_service.download(rtx_id=rtx_id, params=new_params)
                 case "SystemConfigDict":
                     # 系统>配置>数据字典
-                    __res = await self.system_config_csb_enum_v_service.download(rtx_id=rtx_id, params=new_params)
+                    __res: List = await self.system_config_csb_enum_v_service.download(rtx_id=rtx_id, params=new_params)
                 case "SystemOpsLog":
                     # 系统>维护>系统日志
-                    __res = await self.system_ops_log_service.download(rtx_id=rtx_id, params=new_params)
+                    __res: List = await self.system_ops_log_service.download(rtx_id=rtx_id, params=new_params)
                 case "SystemOpsTask":
                     # 系统>维护>任务中心
-                    __res = await self.system_ops_task_service.download(rtx_id=rtx_id, params=new_params)
+                    __res: List = await self.system_ops_task_service.download(rtx_id=rtx_id, params=new_params)
+                case "SystemOpsRedis":
+                    # 系统>维护>Redis缓存管理
+                    __res: List = await self.system_ops_redis_service.download(rtx_id=rtx_id, params=new_params)
                 case "SystemOpsDepart":
                     # 系统>维护>部门管理
-                    __res = await self.system_ops_depart_service.download(params=new_params)
+                    __res: List = await self.system_ops_depart_service.download(params=new_params)
                 case "SystemOpsAvatar":
                     # 系统>维护>头像管理
-                    __res = await self.system_ops_avatar_service.download(rtx_id=rtx_id, params=new_params)
+                    __res: List = await self.system_ops_avatar_service.download(rtx_id=rtx_id, params=new_params)
                 case "SystemConfigApi":
                     # 系统>配置>API管理
-                    __res = await self.system_config_api_service.download(rtx_id=rtx_id, params=new_params)
+                    __res: List = await self.system_config_api_service.download(rtx_id=rtx_id, params=new_params)
                 case "SalaryNotifyDtalk":
                     # 工资>消息通知>钉钉通知
-                    __res = await self.salary_notify_dtalk_service.download(rtx_id=rtx_id, params=new_params)
+                    __res: List = await self.salary_notify_dtalk_service.download(rtx_id=rtx_id, params=new_params)
                 case "SalaryNotifyQywx":
                     # 工资>消息通知>企业微信通知
-                    __res = await self.salary_notify_qywx_service.download(rtx_id=rtx_id, params=new_params)
+                    __res: List = await self.salary_notify_qywx_service.download(rtx_id=rtx_id, params=new_params)
                 case "SalaryNotifyEmail":
                     # 工资>消息通知>邮件通知
-                    __res = await self.salary_notify_email_service.download(rtx_id=rtx_id, params=new_params)
+                    __res: List = await self.salary_notify_email_service.download(rtx_id=rtx_id, params=new_params)
                 case _:
                     return FailureStatus(
                         code=status_code.CODE_404_REQUEST_PARAMETER_VALUE_ERROR.value,

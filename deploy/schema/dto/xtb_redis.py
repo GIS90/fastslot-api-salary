@@ -32,7 +32,7 @@ from typing import List
 from deploy.utils.enumeration import FieldTypeEnum as ft
 
 
-xtb_redis_config_list_fields: List = [
+xtb_redis_config_detail_fields: List = [
     {"key": "id", "type": ft.INT, "name": "id", "null": False},
     {"key": "md5", "type": ft.STR, "null": False},
     {"key": "name", "type": ft.STR, "null": False},
@@ -49,10 +49,8 @@ xtb_redis_config_list_fields: List = [
 ]
 
 
-xtb_redis_config_detail_fields: List = xtb_redis_config_list_fields
 
-
-xtb_redis_rule_list_fields: List = [
+xtb_redis_rule_detail_fields: List = [
     {"key": "id", "type": ft.INT, "name": "id", "null": False},
     {"key": "md5", "type": ft.STR, "null": False},
     {"key": "name", "type": ft.STR, "null": False},
@@ -72,4 +70,3 @@ xtb_redis_rule_list_fields: List = [
 ]
 
 
-xtb_redis_rule_detail_fields: List = xtb_redis_rule_list_fields

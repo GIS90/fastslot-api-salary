@@ -31,7 +31,6 @@ Life is short, I use python.
 """
 import json
 import re
-from types import SimpleNamespace
 from datetime import datetime
 from typing import Dict, List, Optional, Tuple, Any
 
@@ -44,9 +43,7 @@ from deploy.delib.redis_lib import RedisClientLib
 from deploy.schema.dao.xtb_redis_config import XtbRedisConfigModel
 from deploy.schema.dao.xtb_redis_rule import XtbRedisRuleModel
 from deploy.schema.dto.xtb_redis import (
-    xtb_redis_config_list_fields,
     xtb_redis_config_detail_fields,
-    xtb_redis_rule_list_fields,
     xtb_redis_rule_detail_fields,
 )
 from deploy.service.system.config.report import SystemConfigReportService
@@ -56,8 +53,12 @@ from deploy.utils.status_value import StatusCode as status_code
 from deploy.utils.converter import model_converter_dict, many_model_converter_dict
 from deploy.utils.enumeration import XtbReportKey, CsbEnumKEY
 from deploy.utils.logger import logger as LOG
-from deploy.utils.utils import get_now, d2s, md5 as generator_md5
-from deploy.config import table_default_null as TABLE_DEFAULT_NULL
+from deploy.utils.utils import get_now, d2s, md5 as generator_md5, xtbb_field_id_value
+from deploy.config import (
+    table_default_null as TABLE_DEFAULT_NULL,
+    table_default_db_id as TABLE_DEFAULT_DB_ID
+)
+from deploy.utils.exception import ReportNotColumnException
 
 
 __all__ = ["SystemOpsRedisService"]
@@ -74,7 +75,7 @@ class SystemOpsRedisService:
         self.config_curd: XtbRedisConfigCurd = XtbRedisConfigCurd()
         self.rule_curd: XtbRedisRuleCurd = XtbRedisRuleCurd()
         self.enum_curd: CsbEnumValueCurd = CsbEnumValueCurd()
-        self.report_service: SystemConfigReportService = SystemConfigReportService(db_connection=db_connection)
+        self.system_config_report_service: SystemConfigReportService = SystemConfigReportService(db_connection=db_connection)
         self.dict_service: SystemConfigDictService = SystemConfigDictService(db_connection=db_connection)
 
     def __str__(self):
@@ -175,7 +176,7 @@ class SystemOpsRedisService:
         """
         models = await self.config_curd.list_all(db=self.db, content=content) or []
         data = await many_model_converter_dict(
-            models=models, fields=xtb_redis_config_list_fields,
+            models=models, fields=xtb_redis_config_detail_fields,
             default_value=TABLE_DEFAULT_NULL, auto_id=False,
         )
         return SuccessStatus(data={"list": data or [], "total": len(models)})
@@ -365,43 +366,66 @@ class SystemOpsRedisService:
         })
 
     async def pagination(self, rtx_id: str, params: Dict) -> Status:
-        offset = (int(params.get("page", 1)) - 1) * int(params.get("pageSize", 15))
-        limit = int(params.get("pageSize", 15))
-        filter_ = params.get("filter") or {}
-        models = await self.rule_curd.pagination(db=self.db, offset=offset, limit=limit, filter_=filter_) or []
-        default_data = {"list": [], "page": params.get("page"), "pageSize": params.get("pageSize"), "total": 0}
-        if not models:
-            return FailureStatus(code=status_code.CODE_101_SUCCESS_NO_DATA.value, data=default_data)
-
-        fields = await self.report_service.report_column_by_xtbb(
-            rtx_id=rtx_id, xtbb=XtbReportKey.SystemOpsRedis.value, type_="list", is_md5=True
+        models = await self.rule_curd.pagination(
+            db=self.db, 
+            offset=params.get("offset"), 
+            limit=params.get("limit"), 
+            filter_=params.get("filter"), 
         )
-        if fields:
-            columns = fields.get("column")
-            auto_id = fields.get("id_auto")
-        else:
-            # 未配置报表时仍可正常使用（与后台报表配置解耦）
-            columns = xtb_redis_rule_list_fields
-            auto_id = False
-
-        # 联表查询返回 RowMapping，转换为支持属性访问的对象供转换器使用
-        models = [SimpleNamespace(**dict(row)) for row in models]
-        config_map = await self.__config_map()
-        for model in models:
-            config = config_map.get(model.redis_md5)
-            setattr(model, "config_name", config.name if config else "配置已删除")
-
-        data = await many_model_converter_dict(
-            models=models, fields=columns, default_value=TABLE_DEFAULT_NULL,
-            auto_id=auto_id, auto_id_value=offset + 1,
-        )
-        result = {
-            "list": data or [],
+        _default_data = {
+            "list": [],
             "page": params.get("page"),
-            "pageSize": params.get("pageSize"),
-            "total": await self.rule_curd.count(db=self.db, filter_=filter_),
+            "pageSize": params.get("limit"),
+            "total": 0
+        }
+        if not models:
+            return FailureStatus(code=status_code.CODE_101_SUCCESS_NO_DATA.value, data=_default_data)
+        fields: Dict = await self.system_config_report_service.report_column_by_xtbb(
+            rtx_id=rtx_id,
+            xtbb=XtbReportKey.SystemOpsRedis.value,
+            type_="list",
+            is_md5=True
+        )
+        if not fields:
+            return FailureStatus(code=status_code.CODE_102_SUCCESS_NO_COLUMN.value, data=_default_data)
+
+        data: List = await many_model_converter_dict(
+            models=models,
+            fields=fields.get("column"),
+            default_value=TABLE_DEFAULT_NULL,
+            auto_id=fields.get("id_auto"),
+            auto_id_value=params.get("offset") + 1
+        )
+        result: Dict = {
+            "list": data,
+            "page": params.get("page"),
+            "pageSize": params.get("limit"),
+            "total": await self.rule_curd.count(db=self.db, filter_=params.get("filter")),
         }
         return SuccessStatus(data=result)
+
+    async def download(self, rtx_id: str, params: dict) -> List:
+        """参照角色管理下载：按报表导出列转换 Redis 清理规则数据"""
+        models = await self.rule_curd.download(db=self.db, params=params) or []
+        fields: Dict = await self.system_config_report_service.report_column_by_xtbb(
+            rtx_id=rtx_id,
+            xtbb=XtbReportKey.SystemOpsRedis.value,
+            type_="export",
+            is_md5=False
+        )
+        if not fields:
+            raise ReportNotColumnException(detail="[系统表-用户表]未配置导出表头")
+
+        __auto_id_name: Any = xtbb_field_id_value(options=fields.get("column"))
+        data: List = await many_model_converter_dict(
+            models=models,
+            fields=fields.get("column"),
+            default_value=TABLE_DEFAULT_NULL,
+            auto_id=fields.get("id_auto"),
+            auto_id_name=__auto_id_name if __auto_id_name else TABLE_DEFAULT_DB_ID,
+            auto_id_value=1,
+        )
+        return data or []
 
     async def rule_one(self, md5: str) -> Status:
         flag, data = await self.__valid_rule(md5=md5, status_check=False)
