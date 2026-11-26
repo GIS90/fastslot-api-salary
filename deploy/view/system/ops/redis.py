@@ -127,6 +127,17 @@ async def ping(
     return await service.ping(md5=md5)
 
 
+@router.get("/redis.keys", summary="浏览Redis键和值（只读）")
+async def keys_browser(
+    md5: str = Query(..., description="Redis配置Md5-Id"),
+    pattern: Optional[str] = Query(default="*", description="key筛选，支持*和?通配符"),
+    limit: int = Query(default=200, ge=1, le=10000, description="最多返回key数量"),
+    token_rtx_id: str = Depends(depend_token_rtx),
+    service: SystemOpsRedisService = Depends(get_service)
+) -> Status:
+    return await service.keys_browser(md5=md5, pattern=pattern, limit=limit)
+
+
 # ======================== 清理规则 ========================
 
 @router.get("/redis.rule.filter", summary="规则过滤条件")

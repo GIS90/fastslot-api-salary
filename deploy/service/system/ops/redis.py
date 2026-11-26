@@ -29,6 +29,7 @@ Life is short, I use python.
 
 ------------------------------------------------
 """
+import json
 import re
 from types import SimpleNamespace
 from datetime import datetime
@@ -277,6 +278,69 @@ class SystemOpsRedisService:
             "list": results, "total": len(results), "success": success,
             "failed": len(results) - success,
         })
+
+    @staticmethod
+    def __format_value(conn, key: str, type_: str) -> str:
+        """按数据类型读取键值，并限制展示长度"""
+        try:
+            if type_ == "string":
+                value = conn.get(key)
+            elif type_ == "hash":
+                value = json.dumps(conn.hgetall(key), ensure_ascii=False)
+            elif type_ == "list":
+                value = json.dumps(conn.lrange(key, 0, 99), ensure_ascii=False)
+            elif type_ == "set":
+                value = json.dumps(sorted(conn.smembers(key)), ensure_ascii=False)
+            elif type_ == "zset":
+                value = json.dumps(conn.zrange(key, 0, 99, withscores=True), ensure_ascii=False)
+            elif type_ == "stream":
+                value = f"stream length: {conn.xlen(key)}"
+            else:
+                value = f"unsupported type: {type_}"
+        except Exception as e:
+            value = f"读取失败：{e}"
+        value = "" if value is None else str(value)
+        return value if len(value) <= 1000 else f"{value[:1000]}...（已截断）"
+
+    async def keys_browser(self, md5: str, pattern: str = None, limit: int = 200) -> Status:
+        """只读浏览：按配置扫描 key 并读取对应 value"""
+        flag, config = await self.__valid_config(md5=md5, status_check=False)
+        if not flag: return config
+        if config.lock:
+            return FailureStatus(code=status_code.CODE_511_DATA_LOCKED_NOT_EDIT, message="Redis连接配置已停用")
+
+        scan_pattern = (pattern or "*").strip() or "*"
+        max_keys = max(1, min(int(limit or 200), 1000))
+        try:
+            client = self.__client(config)
+            items: List[Dict] = []
+            with client.get_connection() as conn:
+                keys: List[str] = []
+                for key in conn.scan_iter(match=scan_pattern, count=500):
+                    keys.append(key)
+                    if len(keys) >= max_keys:
+                        break
+                for key in keys:
+                    type_ = conn.type(key)
+                    ttl = conn.ttl(key)
+                    items.append({
+                        "key": key,
+                        "type": type_,
+                        "ttl": ttl,
+                        "ttlText": "永不过期" if ttl == -1 else (f"{ttl}秒" if ttl > 0 else "已过期"),
+                        "value": self.__format_value(conn, key, type_),
+                    })
+            return SuccessStatus(data={
+                "list": items,
+                "total": len(items),
+                "pattern": scan_pattern,
+                "limit": max_keys,
+                "truncated": len(keys) >= max_keys,
+                "config": config.name,
+            })
+        except Exception as e:
+            LOG.error(f"[SystemOpsRedisService*键浏览]{e}")
+            return FailureStatus(code=status_code.CODE_902_OTHER_THREE_API_EXCEPTION, message=f"读取Redis键失败：{e}")
 
     # ======================== 清理规则 ========================
 
